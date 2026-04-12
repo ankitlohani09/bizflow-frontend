@@ -12,6 +12,8 @@ import {
     Settings,
     LogOut,
     Store,
+    X,
+    RotateCcw,
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import authService from '../services/authService';
@@ -28,6 +30,7 @@ const menuItems = [
     { label: 'Suppliers',  icon: Users,            path: '/suppliers' }, // Borrowing icon or use Warehouse
     { label: 'Inventory',  icon: Package,          path: '/inventory' },
     { label: 'Invoices',   icon: FileText,         path: '/invoices' },
+    { label: 'Returns',    icon: RotateCcw,        path: '/returns' },
     { label: 'Purchases',  icon: ShoppingCart,     path: '/purchases' },
     { label: 'Expenses',   icon: Wallet,           path: '/expenses' },
     { label: 'Staff',      icon: UserCog,          path: '/staff' },
@@ -74,7 +77,7 @@ function SidebarItem({ item }) {
 }
 
 // ── Sidebar root ───────────────────────────────────────────────────────────────
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
     const navigate = useNavigate();
 
     function handleLogout() {
@@ -83,17 +86,28 @@ export default function Sidebar() {
     }
 
     return (
-        <aside className="flex h-screen w-64 shrink-0 flex-col bg-slate-900 text-slate-100">
+        <aside className={cn(
+            "fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-slate-900 border-r border-white/5 transition-transform duration-300 lg:relative lg:translate-x-0",
+            isOpen ? "translate-x-0" : "-translate-x-full"
+        )}>
+            {/* ── Mobile/Tablet Close Button (Hidden on Desktop) ─────────── */}
+            <button 
+                onClick={onClose}
+                className="absolute right-[-40px] top-4 flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white lg:hidden"
+            >
+                <X className="h-4 w-4" />
+            </button>
+
             {/* ── Brand ──────────────────────────────────────────────────────── */}
-            <div className="flex h-16 items-center gap-3 border-b border-white/10 px-5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 text-white shadow-md">
+            <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-5 bg-slate-900">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 text-white shadow-md shadow-blue-500/20">
                     <Store className="h-4 w-4" />
                 </div>
                 <div>
-                    <p className="text-sm font-bold leading-none tracking-tight text-white">
+                    <p className="text-sm font-black leading-none tracking-tight text-white uppercase">
                         BizFlow
                     </p>
-                    <p className="mt-0.5 text-[10px] font-medium uppercase tracking-widest text-slate-400">
+                    <p className="mt-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
                         Enterprise
                     </p>
                 </div>

@@ -14,6 +14,9 @@ import {
     TrendingUp,
     Shield,
     DollarSign,
+    FileDown,
+    Pencil,
+    Trash2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import staffService from '../services/staffService';
@@ -30,6 +33,7 @@ import {
     TableCell,
 } from '../components/ui/Table';
 import StaffModal from '../components/StaffModal';
+import { exportToCSV, flattenData } from '../utils/exportUtils';
 import { cn } from '../utils/cn';
 
 const fmt = (val) =>
@@ -87,6 +91,7 @@ export default function Staff() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [search, setSearch] = useState('');
+    const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
 
     // Modal state
     const [modal, setModal] = useState({ isOpen: false, data: null });
@@ -106,7 +111,27 @@ export default function Staff() {
 
     useEffect(() => { fetchStaff(); }, [fetchStaff]);
 
-    const filteredStaff = staff.filter(s =>
+    const handleSort = (key) => {
+        setSortConfig(prev => ({
+            key,
+            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+        }));
+    };
+
+    const handleExportCSV = () => {
+        const data = flattenData(filteredStaff);
+        exportToCSV(data, 'staff-roster');
+    };
+
+    const sortedStaff = [...staff].sort((a, b) => {
+        const aVal = a[sortConfig.key] ?? '';
+        const bVal = b[sortConfig.key] ?? '';
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    const filteredStaff = sortedStaff.filter(s =>
         (s.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
         (s.role ?? '').toLowerCase().includes(search.toLowerCase()) ||
         (s.email ?? '').toLowerCase().includes(search.toLowerCase())
@@ -119,54 +144,57 @@ export default function Staff() {
     };
 
     return (
-        <MainLayout title="Staff Directory">
+        <MainLayout title="Human Resources">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Staff Management</h1>
-                    <p className="text-sm text-slate-500">Manage your workforce, roles, and compensation.</p>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Force Roster</h1>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Manage permissions, compensation, and active personnel.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="ghost" onClick={fetchStaff} disabled={loading}>
+                    <Button variant="ghost" onClick={fetchStaff} disabled={loading} className="dark:text-slate-400">
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
-                    <Button className="gap-2 bg-blue-600 hover:bg-blue-700" onClick={() => setModal({ isOpen: true, data: null })}>
-                        <Plus className="h-4 w-4" /> Add Staff Member
+                    <Button variant="outline" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={handleExportCSV}>
+                        <FileDown className="h-4 w-4" /> Export Roster
+                    </Button>
+                    <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20" onClick={() => setModal({ isOpen: true, data: null })}>
+                        <Plus className="h-4 w-4" /> Add Personnel
                     </Button>
                 </div>
             </div>
 
             {/* ── Status Metrics ────────────────────────────────────────────────── */}
-            <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <Card className="shadow-sm">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
-                            <Users size={24} />
+            <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+                <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl">
+                    <CardContent className="p-6 flex items-center gap-6">
+                        <div className="rounded-2xl bg-blue-50 dark:bg-blue-500/10 p-4 text-blue-600">
+                            <Users size={28} />
                         </div>
                         <div>
-                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Force Total</p>
-                            <p className="text-2xl font-black text-slate-900">{stats.total}</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Count</p>
+                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.total}</p>
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="shadow-sm">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="rounded-xl bg-emerald-50 p-3 text-emerald-600">
-                            <UserCheck size={24} />
+                <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl">
+                    <CardContent className="p-6 flex items-center gap-6">
+                        <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 p-4 text-emerald-600">
+                            <UserCheck size={28} />
                         </div>
                         <div>
-                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Currently Active</p>
-                            <p className="text-2xl font-black text-slate-900">{stats.active}</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Active Duty</p>
+                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.active}</p>
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="shadow-sm">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600">
-                            <Shield size={24} />
+                <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl">
+                    <CardContent className="p-6 flex items-center gap-6">
+                        <div className="rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 p-4 text-indigo-600">
+                            <Shield size={28} />
                         </div>
                         <div>
-                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Unique Roles</p>
-                            <p className="text-2xl font-black text-slate-900">{stats.roles}</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Unique Roles</p>
+                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.roles}</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -175,96 +203,98 @@ export default function Staff() {
             {error && <Alert variant="error" message={error} className="mb-6" onClose={() => setError(null)} />}
 
             {/* ── Directory Table ─────────────────────────────────────────────── */}
-            <Card className="shadow-xl shadow-slate-200/50 overflow-hidden border-none">
-                <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+            <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden">
+                <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 p-8">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <CardTitle>Directory</CardTitle>
-                            <CardDescription>
-                                {filteredStaff.length} employee record{filteredStaff.length !== 1 ? 's' : ''} shown.
+                            <CardTitle className="dark:text-white tracking-tighter">Personnel Directory</CardTitle>
+                            <CardDescription className="dark:text-slate-400">
+                                {filteredStaff.length} active records identified in the network.
                             </CardDescription>
                         </div>
 
-                        <div className="relative w-full lg:w-72">
+                        <div className="relative w-full lg:w-80">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                             <input
                                 type="text"
-                                placeholder="Search by name, role or email..."
-                                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
+                                placeholder="Search Name, Role or CID..."
+                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent className="p-0">
+                <CardContent className="p-0 overflow-x-auto">
                     {loading ? (
-                        <div className="p-6"><TableSkeleton /></div>
+                        <div className="p-8"><TableSkeleton rows={6} /></div>
                     ) : filteredStaff.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 text-center opacity-30">
-                            <Users size={48} className="mb-4" />
-                            <p className="font-semibold text-lg">No staff members found</p>
+                            <Users size={64} className="mb-4" />
+                            <p className="font-black text-xl uppercase tracking-widest">No Matches</p>
                         </div>
                     ) : (
-                        <Table>
+                        <div className="min-w-[800px]">
+                            <Table>
                             <TableHeader>
-                                <TableRow className="bg-transparent hover:bg-transparent">
-                                    <TableHead>Employee</TableHead>
-                                    <TableHead>Role</TableHead>
-                                    <TableHead>Contact Info</TableHead>
-                                    <TableHead>Join Date</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
+                                <TableRow className="bg-transparent hover:bg-transparent border-none">
+                                    <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 dark:hover:text-white" onClick={() => handleSort('name')}>Identity</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white" onClick={() => handleSort('role')}>Classification</TableHead>
+                                    <TableHead>Contact Link</TableHead>
+                                    <TableHead className="text-right pr-8">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredStaff.map((s) => (
-                                    <TableRow key={s.id} className={cn(!s.isActive && 'opacity-60 bg-slate-50/50')}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center font-black text-slate-400">
-                                                    {s.name?.charAt(0)}
+                                {filteredStaff.map((staffMember) => (
+                                    <TableRow key={staffMember.id} className={cn(!staffMember.isActive && 'opacity-60 bg-slate-50/50 dark:bg-slate-800/20', 'group dark:border-slate-800 dark:hover:bg-slate-800/40')}>
+                                        <TableCell className="pl-8 py-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center font-black text-slate-400 dark:text-slate-500 text-lg shadow-sm">
+                                                    {staffMember.name?.charAt(0)}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="font-bold text-slate-900">{s.name}</span>
-                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.employeeId || `#EMP-${s.id}`}</span>
+                                                    <span className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tighter leading-none">{staffMember.name}</span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1.5">{staffMember.employeeId || `ID_${staffMember.id.toString().padStart(4, '0')}`}</span>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <RoleBadge role={s.role} />
+                                            <RoleBadge role={staffMember.role} />
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex flex-col gap-1 text-xs text-slate-500 font-medium">
-                                                <div className="flex items-center gap-2"><Mail size={12} className="text-slate-300" /> {s.email || '—'}</div>
-                                                <div className="flex items-center gap-2"><Phone size={12} className="text-slate-300" /> {s.phone || '—'}</div>
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 tracking-tight">
+                                                    <Mail size={12} className="text-blue-500" /> {staffMember.email || '—'}
+                                                </div>
+                                                <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 tracking-tight">
+                                                    <Phone size={12} className="text-emerald-500" /> {staffMember.phone || '—'}
+                                                </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-slate-500">
-                                            <div className="flex items-center gap-2 font-medium text-sm">
-                                                <Calendar size={14} className="text-slate-300" />
-                                                {s.joinDate ? new Date(s.joinDate).toLocaleDateString() : '—'}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <StatusBadge active={s.isActive !== false} />
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex justify-end gap-1">
+                                        <TableCell className="text-right pr-8">
+                                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="h-8 w-8 p-0"
-                                                    onClick={() => setModal({ isOpen: true, data: s })}
+                                                    className="h-9 w-9 p-0 rounded-full hover:bg-blue-50 dark:hover:bg-blue-500/10"
+                                                    onClick={() => setModal({ isOpen: true, data: staffMember })}
                                                 >
-                                                    <MoreVertical size={16} className="text-slate-400" />
+                                                    <Pencil size={14} className="text-slate-400 hover:text-blue-500" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-9 w-9 p-0 rounded-full hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                                                >
+                                                    <MoreVertical size={14} className="text-slate-400" />
                                                 </Button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
-                        </Table>
+                            </Table>
+                        </div>
                     )}
                 </CardContent>
             </Card>
