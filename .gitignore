@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Research / Temporary
+src/assets/docs.zip
+src/assets/docs_extracted/
