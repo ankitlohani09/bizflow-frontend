@@ -12,7 +12,8 @@ import {
     History,
     FileDown,
     Layers,
-    Warehouse
+    Warehouse,
+    Upload
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import inventoryService from '../services/inventoryService';
@@ -29,23 +30,24 @@ import {
     TableCell,
 } from '../components/ui/Table';
 import StockMovementModal from '../components/StockMovementModal';
+import ImportModal from '../components/ImportModal';
 import { cn } from '../utils/cn';
 import { exportToCSV, flattenData } from '../utils/exportUtils';
 import { TableSkeleton } from '../components/ui/Skeleton';
 
 function StockBadge({ qty, threshold = 5 }) {
     if (qty <= 0) return (
-        <span className="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-rose-700 ring-1 ring-inset ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/20">
+        <span className="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-rose-700 border border-rose-100">
             Out of Stock
         </span>
     );
     if (qty <= threshold) return (
-        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20">
+        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-700 border border-amber-100">
             Low Stock
         </span>
     );
     return (
-        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20">
+        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100">
             In Stock
         </span>
     );
@@ -61,6 +63,7 @@ export default function Inventory() {
 
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
 
     const fetchData = useCallback(async () => {
@@ -115,23 +118,25 @@ export default function Inventory() {
 
     return (
         <MainLayout title="Logistics Center">
-            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between no-print">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Stock Control</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Inventory</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Monitor real-time availability and warehouse movements.</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="ghost" onClick={fetchData} disabled={loading} className="dark:text-slate-400">
-                        <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-                    </Button>
-                    <Button variant="outline" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={handleExport}>
+                <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" size="sm" className="gap-2 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" onClick={handleExport}>
                         <FileDown className="h-4 w-4" /> Export Ledger
                     </Button>
-                    <Button variant="outline" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={() => navigate('/inventory/history')}>
-                        <History className="h-4 w-4" /> Log
+                    <Button variant="outline" size="sm" className="gap-2 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" onClick={() => setIsImportModalOpen(true)}>
+                        <Upload className="h-4 w-4" /> Bulk Import
                     </Button>
-                    <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20" onClick={() => { setSelectedItem(null); setIsModalOpen(true); }}>
-                        <Plus className="h-4 w-4" /> Stock Adjustment
+                    <Button variant="outline" size="sm" className="gap-2 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" onClick={() => navigate('/stock-movements')}>
+                        <History className="h-4 w-4" /> Audit Logs
+                    </Button>
+                </div>
+                <div className="flex gap-2">
+                    <Button onClick={() => setIsModalOpen(true)} className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
+                        <Plus size={16} /> Adjustment
                     </Button>
                 </div>
             </div>
@@ -142,28 +147,28 @@ export default function Inventory() {
                     title="Available Pool"
                     value={metrics.available}
                     icon={Warehouse}
-                    color="blue"
+                    colorClass="icon-box-blue"
                     subtitle="Sellable assets"
                 />
                 <StatusCard
                     title="Reserved"
                     value={metrics.reserved}
                     icon={Layers}
-                    color="indigo"
+                    colorClass="icon-box-indigo"
                     subtitle="Pending fulfillment"
                 />
                 <StatusCard
                     title="Damaged"
                     value={metrics.damaged}
                     icon={ShieldAlert}
-                    color="amber"
+                    colorClass="icon-box-amber"
                     subtitle="Loss/Damage log"
                 />
                 <StatusCard
                     title="Expired"
                     value={metrics.expired}
                     icon={AlertTriangle}
-                    color="rose"
+                    colorClass="icon-box-rose"
                     subtitle="Critical depletion"
                 />
             </div>
@@ -171,12 +176,12 @@ export default function Inventory() {
             {error && <Alert variant="error" message={error} className="mb-6" onClose={() => setError(null)} />}
 
             {/* ── Main List ───────────────────────────────────────────────────── */}
-            <Card className="glass-card premium-shadow rounded-3xl overflow-hidden border-none mb-12">
-                <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 p-8">
+            <Card className="enterprise-card overflow-hidden mb-12">
+                <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <CardTitle className="dark:text-white tracking-tighter">Availability Matrix</CardTitle>
-                            <CardDescription className="dark:text-slate-400">
+                            <CardTitle className="tracking-tighter font-bold text-slate-900 border-none">Availability Matrix</CardTitle>
+                            <CardDescription>
                                 Real-time stock levels across all categories.
                             </CardDescription>
                         </div>
@@ -186,7 +191,7 @@ export default function Inventory() {
                             <input
                                 type="text"
                                 placeholder="Search by SKU or Item Name..."
-                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -272,45 +277,33 @@ export default function Inventory() {
 
             <StockMovementModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => { setIsModalOpen(false); setSelectedItem(null); }}
                 onSuccess={fetchData}
                 initialItem={selectedItem}
+            />
+
+            <ImportModal
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
+                onSuccess={fetchData}
             />
         </MainLayout>
     );
 }
 
-function StatusCard({ title, value, icon: Icon, color, subtitle }) {
-    const iconBg = {
-        blue: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10',
-        indigo: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10',
-        amber: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10',
-        rose: 'bg-rose-50 text-rose-600 dark:bg-rose-500/10',
-    }[color];
-
+function StatusCard({ title, value, icon: Icon, colorClass, subtitle }) {
     return (
-        <Card className={cn("glass-card group overflow-hidden relative transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl rounded-3xl", {
-            'shadow-blue-500/10': color === 'blue',
-            'shadow-indigo-500/10': color === 'indigo',
-            'shadow-amber-500/10': color === 'amber',
-            'shadow-rose-500/10': color === 'rose',
-        })}>
-            <div className={cn("absolute top-0 left-0 w-1.5 h-full", {
-                'bg-blue-500': color === 'blue',
-                'bg-indigo-500': color === 'indigo',
-                'bg-amber-500': color === 'amber',
-                'bg-rose-500': color === 'rose',
-            })} />
-            <CardContent className="p-8 flex items-center gap-6">
-                <div className={cn("glow-icon rounded-2xl p-4 transition-all duration-500 group-hover:rotate-6", iconBg)}>
-                    <Icon size={32} />
+        <Card className="enterprise-card h-full p-8 transition-all hover:shadow-md">
+            <div className="flex items-center gap-6">
+                <div className={cn("p-4 rounded-2xl shrink-0 transition-transform", colorClass)}>
+                    <Icon size={28} />
                 </div>
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">{title}</p>
-                    <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mb-1">{value}</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{title}</p>
+                    <p className="text-3xl font-black text-slate-900 leading-none mb-1">{value}</p>
                     <p className="text-[10px] font-bold text-slate-400 tracking-tight">{subtitle}</p>
                 </div>
-            </CardContent>
+            </div>
         </Card>
     );
 }

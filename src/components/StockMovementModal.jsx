@@ -36,10 +36,12 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
             async function loadItems() {
                 setLoading(true);
                 try {
-                    const data = await itemService.getAll();
+                    // Fetch existing inventory records instead of the entire catalog
+                    // This ensures consistency with the items seen in the background table
+                    const data = await inventoryService.getAll();
                     setItems(Array.isArray(data) ? data : []);
                 } catch (err) {
-                    setError('Failed to load items catalog.');
+                    setError('Failed to load items from inventory.');
                 } finally {
                     setLoading(false);
                 }
@@ -101,8 +103,8 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
                             >
                                 <option value="">Select product...</option>
                                 {items.map((item) => (
-                                    <option key={item.id} value={item.id}>
-                                        {item.name}
+                                    <option key={item.id} value={item.itemId}>
+                                        {item.itemName}
                                     </option>
                                 ))}
                             </select>

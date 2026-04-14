@@ -10,7 +10,8 @@ import {
     Phone, 
     MapPin,
     AlertCircle,
-    User
+    User,
+    Star
 } from 'lucide-react';
 import customerService from '../services/customerService';
 import MainLayout from '../layouts/MainLayout';
@@ -153,7 +154,7 @@ export default function Customers() {
         <MainLayout title="Customer Relations">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Client Directory</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Customers</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Manage your relationships and acquisition history.</p>
                 </div>
                 <div className="flex gap-2">
@@ -211,6 +212,7 @@ export default function Customers() {
                                 <TableRow className="bg-transparent hover:bg-transparent border-none">
                                     <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white pl-8 py-4 text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('name')}>Identification</TableHead>
                                     <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('phone')}>Contact Info</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest text-center" onClick={() => handleSort('loyaltyPoints')}>Reward Points</TableHead>
                                     <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('city')}>Region</TableHead>
                                     <TableHead className="text-right pr-8 text-[9px] font-black uppercase tracking-widest">Actions</TableHead>
                                 </TableRow>
@@ -222,7 +224,12 @@ export default function Customers() {
                                             <div className="flex items-center gap-4">
                                                 <Avatar name={customer.name} />
                                                 <div className="flex flex-col">
-                                                    <span className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tighter text-sm leading-none">{customer.name}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tighter text-sm leading-none">{customer.name}</span>
+                                                        {customer.loyaltyPoints > 500 && (
+                                                            <span className="bg-amber-100 text-amber-700 text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase ring-1 ring-amber-200 shadow-sm">VIP</span>
+                                                        )}
+                                                    </div>
                                                     <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1.5">
                                                         <Mail size={10} className="text-blue-500" /> {customer.email || 'NO_INTERNAL_MAIL'}
                                                     </div>
@@ -234,6 +241,12 @@ export default function Customers() {
                                                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400">
                                                     <Phone size={12} className="text-emerald-500" /> {customer.phone || 'N/A'}
                                                 </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800">
+                                                <Star size={12} className="text-amber-500 fill-amber-500" />
+                                                <span className="text-xs font-black text-slate-900 dark:text-white">{customer.loyaltyPoints || 0}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>

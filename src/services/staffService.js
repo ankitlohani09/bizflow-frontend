@@ -34,6 +34,28 @@ const staffService = {
     /** Toggle active status (assuming partial update) */
     toggleStatus(id, isActive) {
         return api.put(`/staff/${id}`, { isActive });
+    },
+
+    // ── Attendance ──────────────────────────────────────────────────────────
+    getAttendanceByStaff(staffId) {
+        return api.get(`/attendance/staff/${staffId}`);
+    },
+
+    markAttendance(attendanceData) {
+        return api.post('/attendance', attendanceData);
+    },
+
+    // ── Advances ────────────────────────────────────────────────────────────
+    getAdvancesByStaff(staffId) {
+        return api.get(`/staff-advances/staff/${staffId}`);
+    },
+
+    createAdvance(advanceData) {
+        return api.post('/staff-advances', advanceData);
+    },
+
+    deleteAdvance(id) {
+        return api.delete(`/staff-advances/${id}`);
     }
 };
 

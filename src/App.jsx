@@ -12,9 +12,11 @@ const Invoices = lazy(() => import('./pages/Invoices'));
 const InvoiceDetails = lazy(() => import('./pages/InvoiceDetails'));
 const InvoiceForm = lazy(() => import('./pages/InvoiceForm'));
 const Inventory = lazy(() => import('./pages/Inventory'));
+const StockMovements = lazy(() => import('./pages/StockMovements'));
 const StockHistory = lazy(() => import('./pages/StockHistory'));
 const Expenses = lazy(() => import('./pages/Expenses'));
 const Staff = lazy(() => import('./pages/Staff'));
+const StaffDetails = lazy(() => import('./pages/StaffDetails'));
 const Suppliers = lazy(() => import('./pages/Suppliers'));
 const Purchases = lazy(() => import('./pages/Purchases'));
 const PurchaseForm = lazy(() => import('./pages/PurchaseForm'));
@@ -50,6 +52,7 @@ export default function App() {
               <Route path="/invoices/new" element={<InvoiceForm />} />
               <Route path="/invoices/:id" element={<InvoiceDetails />} />
               <Route path="/inventory" element={<Inventory />} />
+              <Route path="/stock-movements" element={<StockMovements />} />
               <Route path="/inventory/history" element={<StockHistory />} />
               <Route path="/expenses" element={<Expenses />} />
               <Route path="/suppliers" element={<Suppliers />} />
@@ -62,6 +65,7 @@ export default function App() {
             {/* Admin and Owner Only */}
             <Route element={<ProtectedRoute allowedRoles={['OWNER', 'ADMIN']} />}>
               <Route path="/staff" element={<Staff />} />
+              <Route path="/staff/:id" element={<StaffDetails />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
 

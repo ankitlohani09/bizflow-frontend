@@ -109,18 +109,18 @@ export default function Invoices() {
         <MainLayout title="Invoices">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Sales Ledger</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Manage your billing, dynamic invoicing, and cash flow.</p>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Invoices</h1>
+                    <p className="text-sm text-slate-500 font-medium">Manage your billing, dynamic invoicing, and cash flow.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="ghost" onClick={fetchInvoices} disabled={loading} className="dark:text-slate-400">
+                    <Button variant="ghost" onClick={fetchInvoices} disabled={loading}>
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
-                    <Button variant="outline" className="gap-2 dark:border-slate-800 dark:text-slate-300 font-bold" onClick={handleExportCSV}>
+                    <Button variant="outline" className="gap-2 border-slate-200 font-bold" onClick={handleExportCSV}>
                         <FileDown className="h-4 w-4" /> CSV Export
                     </Button>
                     <Button
-                        className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-black uppercase tracking-widest px-6 rounded-xl"
+                        className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-6 rounded-xl"
                         onClick={() => navigate('/invoices/new')}
                     >
                         <Plus className="h-4 w-4" />
@@ -131,13 +131,13 @@ export default function Invoices() {
 
             {error && <Alert variant="error" message={error} className="mb-6 shadow-lg" onClose={() => setError(null)} />}
 
-            <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden">
-                <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-8">
+            <Card className="enterprise-card overflow-hidden">
+                <CardHeader className="border-b border-slate-100 bg-slate-50/50 p-8">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <CardTitle className="dark:text-white text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Invoice Records</CardTitle>
-                            <CardDescription className="dark:text-slate-400 font-medium text-lg tracking-tighter text-slate-900 capitalize leading-none">
-                                Showing {filteredInvoices.length} transactions across your filters.
+                            <CardTitle className="text-slate-900 border-none font-bold">Invoices & Records</CardTitle>
+                            <CardDescription className="text-slate-500 font-medium">
+                                Showing {filteredInvoices.length} transactions in your ledger.
                             </CardDescription>
                         </div>
 
@@ -147,13 +147,13 @@ export default function Invoices() {
                                 <input
                                     type="text"
                                     placeholder="Order #, Customer..."
-                                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white font-medium"
+                                    className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-shadow"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </div>
 
-                            <div className="flex items-center gap-1.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 p-1">
+                             <div className="flex items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50 p-1">
                                 {['ALL', 'PAID', 'PENDING'].map((status) => (
                                     <button
                                         key={status}
@@ -161,8 +161,8 @@ export default function Invoices() {
                                         className={cn(
                                             'px-3 py-1 text-[10px] font-black uppercase tracking-widest transition-all rounded-lg',
                                             statusFilter === status
-                                                ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                                                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
+                                                ? 'bg-white text-blue-600 shadow-sm'
+                                                : 'text-slate-500 hover:text-slate-700'
                                         )}
                                     >
                                         {status}
@@ -175,28 +175,28 @@ export default function Invoices() {
 
                 <CardContent className="p-0 overflow-x-auto">
                     <div className="min-w-[800px]">
-                        <Table>
+                         <Table>
                             <TableHeader>
-                                <TableRow className="bg-transparent hover:bg-transparent border-none">
-                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest pl-8 py-4" onClick={() => handleSort('id')}>Invoice #</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('customerName')}>Customer</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('invoiceDate')}>Timeline</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('totalAmount')}>Amount</TableHead>
-                                    <TableHead className="text-[9px] font-black uppercase tracking-widest">Status</TableHead>
-                                    <TableHead className="text-right pr-8 text-[9px] font-black uppercase tracking-widest">Actions</TableHead>
+                                <TableRow className="bg-slate-50 border-b border-slate-100">
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500 pl-8 py-4" onClick={() => handleSort('id')}>Invoice info</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('customerName')}>Customer</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('invoiceDate')}>Timeline</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('totalAmount')}>Amount</TableHead>
+                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
+                                    <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredInvoices.map((invoice) => (
-                                    <TableRow key={invoice.id} className="dark:border-slate-800 dark:hover:bg-slate-800/40 group">
-                                        <TableCell className="font-black text-slate-900 dark:text-slate-200 pl-8 py-6 leading-none">
-                                            {invoice.invoiceNumber || `#INV-${invoice.id}`}
+                                 {filteredInvoices.map((invoice) => (
+                                    <TableRow key={invoice.id} className="group border-slate-50">
+                                        <TableCell className="font-bold text-slate-900 pl-8 py-6 leading-none">
+                                            {invoice.invoiceNumber || `#INV-${invoice.formattedId || invoice.id || 'N/A'}`}
                                         </TableCell>
-                                        <TableCell className="text-slate-600 dark:text-slate-400 font-bold uppercase tracking-tighter text-xs">{invoice.customerName || invoice.customer?.name || 'Walk-in'}</TableCell>
+                                        <TableCell className="text-slate-600 font-bold uppercase tracking-tighter text-xs">{invoice.customerName || invoice.customer?.name || 'Walk-in'}</TableCell>
                                         <TableCell className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">
                                             {new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
                                         </TableCell>
-                                        <TableCell className="font-black text-blue-600 dark:text-blue-400 text-lg tabular-nums">{fmt(invoice.totalAmount || invoice.grandTotal || 0)}</TableCell>
+                                        <TableCell className="font-black text-slate-900 text-lg tabular-nums">{fmt(invoice.totalAmount || invoice.grandTotal || 0)}</TableCell>
                                         <TableCell>
                                             <StatusBadge status={invoice.paymentStatus ?? invoice.status} />
                                         </TableCell>

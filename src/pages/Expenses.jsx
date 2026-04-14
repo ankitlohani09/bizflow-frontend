@@ -93,10 +93,10 @@ export default function Expenses() {
     const totalSpending = filteredExpenses.reduce((acc, ex) => acc + (ex.amount || 0), 0);
 
     return (
-        <MainLayout title="Financial Audit">
+        <MainLayout title="Expenses">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Expense Ledger</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Expenses</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Track operational costs and categorize business outflows.</p>
                 </div>
                 <div className="flex gap-2">

@@ -57,10 +57,10 @@ export default function Returns() {
     }
 
     return (
-        <MainLayout title="Returns Log">
+        <MainLayout title="Returns">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Returns Audit</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Returns</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">Track every refund and inventory restoration in real-time.</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -68,7 +68,7 @@ export default function Returns() {
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <Input 
                             placeholder="Search by Invoice or Client..." 
-                            className="pl-9 w-64 h-11 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-none ring-1 ring-slate-200 dark:ring-slate-800"
+                            className="pl-9 w-72 h-11 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition-all font-medium"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -83,16 +83,16 @@ export default function Returns() {
                 </Card>
             )}
 
-            <Card className="glass-card premium-shadow rounded-3xl overflow-hidden border-none">
+            <Card className="enterprise-card overflow-hidden">
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 border-none">
-                                <TableHead className="pl-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Transaction Info</TableHead>
-                                <TableHead className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Item Detail</TableHead>
-                                <TableHead className="text-center text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Condition</TableHead>
-                                <TableHead className="text-right text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Qty</TableHead>
-                                <TableHead className="text-right pr-8 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Timestamp</TableHead>
+                            <TableRow className="bg-slate-50 border-b border-slate-100">
+                                <TableHead className="pl-8 py-5 text-[10px] font-black uppercase tracking-wider text-slate-500">Transaction Info</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Item Detail</TableHead>
+                                <TableHead className="text-center text-[10px] font-black uppercase tracking-wider text-slate-500">Condition</TableHead>
+                                <TableHead className="text-right text-[10px] font-black uppercase tracking-wider text-slate-500">Qty</TableHead>
+                                <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Timestamp</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -143,10 +143,10 @@ export default function Returns() {
                                         </TableCell>
                                         <TableCell className="text-right pr-8">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tabular-nums">
+                                                <span className="text-[11px] font-bold text-slate-900 uppercase tabular-nums">
                                                     {new Date(r.createdAt).toLocaleDateString()}
                                                 </span>
-                                                <span className="text-[9px] font-bold text-slate-400 uppercase leading-none mt-1">
+                                                <span className="text-[10px] font-medium text-slate-400 uppercase leading-none mt-1">
                                                     {new Date(r.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </span>
                                             </div>

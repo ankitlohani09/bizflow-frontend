@@ -147,17 +147,17 @@ export default function Staff() {
         <MainLayout title="Human Resources">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Force Roster</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Staff</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Manage permissions, compensation, and active personnel.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="ghost" onClick={fetchStaff} disabled={loading} className="dark:text-slate-400">
+                    <Button variant="ghost" onClick={fetchStaff} disabled={loading}>
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
-                    <Button variant="outline" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={handleExportCSV}>
+                    <Button variant="outline" className="gap-2 border-slate-200" onClick={handleExportCSV}>
                         <FileDown className="h-4 w-4" /> Export Roster
                     </Button>
-                    <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20" onClick={() => setModal({ isOpen: true, data: null })}>
+                    <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-6 rounded-xl" onClick={() => setModal({ isOpen: true, data: null })}>
                         <Plus className="h-4 w-4" /> Add Personnel
                     </Button>
                 </div>
@@ -165,50 +165,50 @@ export default function Staff() {
 
             {/* ── Status Metrics ────────────────────────────────────────────────── */}
             <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
-                <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl">
-                    <CardContent className="p-6 flex items-center gap-6">
-                        <div className="rounded-2xl bg-blue-50 dark:bg-blue-500/10 p-4 text-blue-600">
+                <Card className="enterprise-card h-full p-6 transition-all hover:shadow-md">
+                    <div className="flex items-center gap-6">
+                        <div className="p-4 rounded-2xl bg-blue-50 text-blue-600">
                             <Users size={28} />
                         </div>
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Count</p>
-                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.total}</p>
+                            <p className="text-3xl font-black text-slate-900 leading-none mt-1">{stats.total}</p>
                         </div>
-                    </CardContent>
+                    </div>
                 </Card>
-                <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl">
-                    <CardContent className="p-6 flex items-center gap-6">
-                        <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 p-4 text-emerald-600">
+                <Card className="enterprise-card h-full p-6 transition-all hover:shadow-md">
+                    <div className="flex items-center gap-6">
+                        <div className="p-4 rounded-2xl bg-emerald-50 text-emerald-600">
                             <UserCheck size={28} />
                         </div>
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Active Duty</p>
-                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.active}</p>
+                            <p className="text-3xl font-black text-slate-900 leading-none mt-1">{stats.active}</p>
                         </div>
-                    </CardContent>
+                    </div>
                 </Card>
-                <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl">
-                    <CardContent className="p-6 flex items-center gap-6">
-                        <div className="rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 p-4 text-indigo-600">
+                <Card className="enterprise-card h-full p-6 transition-all hover:shadow-md">
+                    <div className="flex items-center gap-6">
+                        <div className="p-4 rounded-2xl bg-indigo-50 text-indigo-600">
                             <Shield size={28} />
                         </div>
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Unique Roles</p>
-                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.roles}</p>
+                            <p className="text-3xl font-black text-slate-900 leading-none mt-1">{stats.roles}</p>
                         </div>
-                    </CardContent>
+                    </div>
                 </Card>
             </div>
 
             {error && <Alert variant="error" message={error} className="mb-6" onClose={() => setError(null)} />}
 
             {/* ── Directory Table ─────────────────────────────────────────────── */}
-            <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden">
-                <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 p-8">
+            <Card className="enterprise-card overflow-hidden">
+                <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <CardTitle className="dark:text-white tracking-tighter">Personnel Directory</CardTitle>
-                            <CardDescription className="dark:text-slate-400">
+                            <CardTitle className="text-slate-900 border-none font-bold">Personnel Directory</CardTitle>
+                            <CardDescription className="text-slate-500 font-medium capitalize">
                                 {filteredStaff.length} active records identified in the network.
                             </CardDescription>
                         </div>
@@ -218,7 +218,7 @@ export default function Staff() {
                             <input
                                 type="text"
                                 placeholder="Search Name, Role or CID..."
-                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow font-medium"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -236,63 +236,66 @@ export default function Staff() {
                     ) : (
                         <div className="min-w-[800px]">
                             <Table>
-                            <TableHeader>
-                                <TableRow className="bg-transparent hover:bg-transparent border-none">
-                                    <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 dark:hover:text-white" onClick={() => handleSort('name')}>Identity</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white" onClick={() => handleSort('role')}>Classification</TableHead>
-                                    <TableHead>Contact Link</TableHead>
-                                    <TableHead className="text-right pr-8">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredStaff.map((staffMember) => (
-                                    <TableRow key={staffMember.id} className={cn(!staffMember.isActive && 'opacity-60 bg-slate-50/50 dark:bg-slate-800/20', 'group dark:border-slate-800 dark:hover:bg-slate-800/40')}>
-                                        <TableCell className="pl-8 py-6">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center font-black text-slate-400 dark:text-slate-500 text-lg shadow-sm">
-                                                    {staffMember.name?.charAt(0)}
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tighter leading-none">{staffMember.name}</span>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1.5">{staffMember.employeeId || `ID_${staffMember.id.toString().padStart(4, '0')}`}</span>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <RoleBadge role={staffMember.role} />
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-col gap-1">
-                                                <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 tracking-tight">
-                                                    <Mail size={12} className="text-blue-500" /> {staffMember.email || '—'}
-                                                </div>
-                                                <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 tracking-tight">
-                                                    <Phone size={12} className="text-emerald-500" /> {staffMember.phone || '—'}
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right pr-8">
-                                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-9 w-9 p-0 rounded-full hover:bg-blue-50 dark:hover:bg-blue-500/10"
-                                                    onClick={() => setModal({ isOpen: true, data: staffMember })}
-                                                >
-                                                    <Pencil size={14} className="text-slate-400 hover:text-blue-500" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-9 w-9 p-0 rounded-full hover:bg-rose-50 dark:hover:bg-rose-500/10"
-                                                >
-                                                    <MoreVertical size={14} className="text-slate-400" />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
+                                <TableHeader>
+                                    <TableRow className="bg-slate-50 border-b border-slate-100">
+                                        <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('name')}>Identity</TableHead>
+                                        <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('role')}>Classification</TableHead>
+                                        <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Contact Link</TableHead>
+                                        <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
+                                </TableHeader>
+                                <TableBody>
+                                    {filteredStaff.map((staffMember) => (
+                                        <TableRow 
+                                            key={staffMember.id} 
+                                            className={cn(
+                                                !staffMember.isActive && 'opacity-60 bg-slate-50/50', 
+                                                'group border-slate-50 cursor-pointer hover:bg-slate-50/50'
+                                            )}
+                                            onClick={() => navigate(`/staff/${staffMember.id}`)}
+                                        >
+                                            <TableCell className="pl-8 py-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-400 text-lg shadow-sm">
+                                                        {staffMember.name?.charAt(0)}
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="font-bold text-slate-900 uppercase tracking-tighter leading-none">{staffMember.name}</span>
+                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1.5 font-mono">{staffMember.employeeId || `ID_${staffMember.id.toString().padStart(4, '0')}`}</span>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <RoleBadge role={staffMember.role} />
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-600 tracking-tight">
+                                                        <Mail size={12} className="text-blue-500" /> {staffMember.email || '—'}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-600 tracking-tight">
+                                                        <Phone size={12} className="text-emerald-500" /> {staffMember.phone || '—'}
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right pr-8">
+                                                <div className="flex justify-end gap-1 opacity-10 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-9 w-9 p-0 rounded-full hover:bg-blue-50"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setModal({ isOpen: true, data: staffMember });
+                                                        }}
+                                                    >
+                                                        <Pencil size={14} className="text-slate-400 hover:text-blue-500" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
                             </Table>
                         </div>
                     )}

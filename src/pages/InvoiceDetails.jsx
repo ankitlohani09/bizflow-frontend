@@ -7,7 +7,8 @@ import {
     Printer, 
     CreditCard, 
     Loader2, 
-    RotateCcw
+    RotateCcw,
+    MessageCircle
 } from 'lucide-react';
 import invoiceService from '../services/invoiceService';
 import pdfExportService from '../services/pdfExportService';
@@ -28,6 +29,7 @@ export default function InvoiceDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+    const [isThermal, setIsThermal] = useState(false);
 
     const fetchInvoice = useCallback(async () => {
         setLoading(true);
@@ -46,6 +48,19 @@ export default function InvoiceDetails() {
 
     const handleDownload = () => {
         if (invoice) pdfExportService.generateInvoicePDF(invoice);
+    };
+
+    const handleWhatsAppShare = () => {
+        if (!invoice) return;
+        const tenantName = localStorage.getItem('tenantName') || 'BizFlow';
+        const customerName = invoice.customerName || invoice.customer?.name || 'Customer';
+        const amount = fmt(invoice.grandTotal || invoice.totalAmount || 0);
+        const text = `Hello ${customerName}, here is your Invoice ${invoice.invoiceNumber || ('#INV-' + (invoice.id || 'N/A'))} for ${amount} from ${tenantName}. Thank you!`;
+        const phone = invoice.customerPhone || invoice.customer?.phone || '';
+        const cleanPhone = phone.replace(/\D/g, ''); // Remove non-numeric
+        
+        const url = `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
     };
 
     if (loading) {
@@ -79,15 +94,21 @@ export default function InvoiceDetails() {
                 <Button variant="ghost" size="sm" onClick={() => navigate('/invoices')} className="gap-2 dark:text-slate-400">
                     <ArrowLeft className="h-4 w-4" /> Back to List
                 </Button>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={() => window.print()}>
-                        <Printer className="h-4 w-4" /> Print
+                <div className="flex gap-2 no-print">
+                    <Button variant="outline" size="sm" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={() => { setIsThermal(false); setTimeout(() => window.print(), 100); }}>
+                        <Printer className="h-4 w-4" /> Full Page
+                    </Button>
+                    <Button variant="outline" size="sm" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={() => { setIsThermal(true); setTimeout(() => window.print(), 100); }}>
+                        <Printer size={16} /> 80mm Receipt
                     </Button>
                     <Button variant="outline" size="sm" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={handleDownload}>
                         <Download className="h-4 w-4" /> PDF Report
                     </Button>
                     <Button variant="outline" size="sm" className="gap-2 text-rose-500 hover:bg-rose-50 border-rose-100" onClick={() => setIsReturnModalOpen(true)}>
                         <RotateCcw className="h-4 w-4" /> Process Return
+                    </Button>
+                    <Button variant="outline" size="sm" className="gap-2 text-emerald-600 border-emerald-100 hover:bg-emerald-50 dark:hover:bg-emerald-500/10" onClick={handleWhatsAppShare}>
+                        <MessageCircle className="h-4 w-4" /> WhatsApp
                     </Button>
                     <Button size="sm" className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
                         <CreditCard className="h-4 w-4" /> Add Payment
@@ -97,7 +118,10 @@ export default function InvoiceDetails() {
 
             <div className="mx-auto max-w-4xl space-y-8 print:max-w-none print:p-0">
                 {/* Main Invoice Card */}
-                <Card className="overflow-hidden shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl">
+                <Card className={cn(
+                    "overflow-hidden shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl",
+                    isThermal && "thermal-receipt"
+                )}>
                     <CardContent className="p-0">
                         {/* Branded Header */}
                         <div className="bg-slate-900 dark:bg-black p-12 text-white flex flex-col sm:flex-row justify-between items-start gap-8">
@@ -118,7 +142,7 @@ export default function InvoiceDetails() {
                                 <h2 className="text-2xl font-black uppercase tracking-tighter text-blue-500">Business Invoice</h2>
                                 <div className="space-y-1">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Document No.</p>
-                                    <p className="font-mono text-xl font-bold tracking-tight">#INV-{invoice.id || 'N/A'}</p>
+                                    <p className="font-mono text-xl font-bold tracking-tight">#{invoice.invoiceNumber || ('INV-' + (invoice.id || 'N/A'))}</p>
                                 </div>
                             </div>
                         </div>
@@ -151,11 +175,11 @@ export default function InvoiceDetails() {
                                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Status</p>
                                         <span className={cn(
                                             "inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border",
-                                            invoice.status === 'PAID' 
+                                            (invoice.paymentStatus || invoice.status) === 'PAID' 
                                                 ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" 
                                                 : "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20"
                                         )}>
-                                            {invoice.status || 'PENDING'}
+                                            {invoice.paymentStatus || invoice.status || 'PENDING'}
                                         </span>
                                     </div>
                                 </div>
@@ -188,17 +212,17 @@ export default function InvoiceDetails() {
                                 </Table>
                             </div>
 
-                            {/* Totals */}
+                             {/* Totals */}
                             <div className="flex justify-end pt-12 border-t border-slate-100 dark:border-slate-800">
                                 <div className="w-full sm:w-80 space-y-4">
                                     <div className="flex justify-between text-sm">
                                         <span className="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Grand Total</span>
-                                        <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{fmt(invoice.totalAmount)}</span>
+                                        <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{fmt(invoice.grandTotal || invoice.totalAmount || 0)}</span>
                                     </div>
                                     <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10">
                                         <div className="flex justify-between items-center">
                                             <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">Balance Due</span>
-                                            <span className="font-black text-blue-900 dark:text-blue-200">{invoice.status === 'PAID' ? fmt(0) : fmt(invoice.totalAmount)}</span>
+                                            <span className="font-black text-blue-900 dark:text-blue-200">{(invoice.paymentStatus || invoice.status) === 'PAID' ? fmt(0) : fmt(invoice.grandTotal || invoice.totalAmount || 0)}</span>
                                         </div>
                                     </div>
                                 </div>

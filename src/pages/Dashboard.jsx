@@ -10,7 +10,12 @@ import {
     TrendingUp,
     TrendingDown,
     ArrowUpRight,
-    AlertCircle
+    AlertCircle,
+    Sparkles,
+    Lightbulb,
+    ShieldAlert,
+    Hourglass,
+    Package
 } from 'lucide-react';
 import { CardSkeleton } from '../components/ui/Skeleton';
 import reportService from '../services/reportService';
@@ -62,19 +67,25 @@ export default function Dashboard() {
     const [summary, setSummary] = useState(null);
     const [analytics, setAnalytics] = useState(null);
     const [recentInvoices, setRecentInvoices] = useState([]);
+    const [insights, setInsights] = useState([]);
+    const [predictions, setPredictions] = useState([]);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const [sum, enh, invs] = await Promise.all([
+            const [sum, enh, invs, ai, pred] = await Promise.all([
                 reportService.getFinancialSummary(),
                 reportService.getEnhancedAnalytics(),
-                invoiceService.getAll()
+                invoiceService.getAll(),
+                reportService.getSmartInsights(),
+                reportService.getPredictiveInventory()
             ]);
             setSummary(sum);
             setAnalytics(enh);
             setRecentInvoices(invs.slice(0, 5));
+            setInsights(ai);
+            setPredictions(pred.slice(0, 4));
         } catch (err) {
             setError(err.message ?? 'Failed to load executive summary.');
         } finally {
@@ -88,7 +99,7 @@ export default function Dashboard() {
         <MainLayout title="Executive Overview">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Executive Pulse</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Dashboard</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Real-time financial and operational health metrics.</p>
                 </div>
                 <div className="flex gap-2">
@@ -114,33 +125,33 @@ export default function Dashboard() {
                 <div className="space-y-8">
                     {/* Metrics Grid */}
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                        <DashboardStat
-                            title="Revenue"
+                        <MetricCard
+                            title="Total Sales"
                             value={fmt(summary?.revenue)}
                             icon={TrendingUp}
-                            color="blue"
-                            trend="+12.5%"
+                            colorClass="icon-box-blue"
+                            subtitle={`${recentInvoices.length} invoices registered`}
                         />
-                        <DashboardStat
-                            title="Operational Cost"
-                            value={fmt(summary?.costs)}
+                        <MetricCard
+                            title="Total Expenses"
+                            value={fmt(summary?.expenses)}
                             icon={TrendingDown}
-                            color="rose"
-                            trend="-4.2%"
+                            colorClass="icon-box-rose"
+                            subtitle={`${summary?.expenseCount || 0} expense records`}
                         />
-                        <DashboardStat
+                        <MetricCard
                             title="Net Profit"
                             value={fmt(summary?.netProfit)}
                             icon={ArrowUpRight}
-                            color="emerald"
-                            trend="+18.3%"
+                            colorClass="icon-box-emerald"
+                            subtitle="On track"
                         />
-                        <DashboardStat
-                            title="Low Stock"
-                            value={analytics?.topItems.filter(i => i.quantity < 10).length || 0}
+                        <MetricCard
+                            title="Low Stock Items"
+                            value={analytics?.topItems?.filter(i => i.quantity < 10).length || 0}
                             icon={AlertCircle}
-                            color="amber"
-                            isWarning={true}
+                            colorClass="icon-box-amber"
+                            subtitle={`of ${analytics?.topItems?.length || 0} total items`}
                         />
                     </div>
 
@@ -161,36 +172,36 @@ export default function Dashboard() {
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.5} />
-                                        <XAxis 
-                                            dataKey="name" 
-                                            axisLine={false} 
-                                            tickLine={false} 
-                                            tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }} 
+                                        <XAxis
+                                            dataKey="name"
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }}
                                             dy={10}
                                         />
-                                        <YAxis 
-                                            axisLine={false} 
-                                            tickLine={false} 
-                                            tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }} 
-                                            tickFormatter={(val) => `₹${val / 1000}k`} 
+                                        <YAxis
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }}
+                                            tickFormatter={(val) => `₹${val / 1000}k`}
                                         />
                                         <Tooltip
-                                            contentStyle={{ 
-                                                borderRadius: '16px', 
-                                                border: 'none', 
+                                            contentStyle={{
+                                                borderRadius: '16px',
+                                                border: 'none',
                                                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
                                                 backdropFilter: 'blur(12px)',
-                                                boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' 
+                                                boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)'
                                             }}
                                             labelStyle={{ fontWeight: 900, color: '#1e293b', marginBottom: '4px' }}
                                         />
-                                        <Area 
-                                            type="monotone" 
-                                            dataKey="sales" 
-                                            stroke="#3b82f6" 
-                                            strokeWidth={4} 
-                                            fillOpacity={1} 
-                                            fill="url(#colorRev)" 
+                                        <Area
+                                            type="monotone"
+                                            dataKey="sales"
+                                            stroke="#3b82f6"
+                                            strokeWidth={4}
+                                            fillOpacity={1}
+                                            fill="url(#colorRev)"
                                             animationDuration={2000}
                                         />
                                     </AreaChart>
@@ -204,13 +215,13 @@ export default function Dashboard() {
                                 <CardDescription className="dark:text-slate-400 font-medium">Inventory performance</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6 p-6">
-                                {analytics?.topItems.slice(0, 4).map((item, idx) => (
+                                {(analytics?.topItems || []).slice(0, 4).map((item, idx) => (
                                     <div key={idx} className="group">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate w-32">{item.name}</span>
+                                            <span className="text-xs font-bold text-slate-700 truncate w-32">{item.name}</span>
                                             <span className="text-[10px] font-black text-blue-500">{item.quantity} units</span>
                                         </div>
-                                        <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                                             <div
                                                 className="h-full bg-blue-500 rounded-full transition-all duration-1000"
                                                 style={{ width: `${(item.quantity / (analytics?.topItems[0]?.quantity || 1)) * 100}%` }}
@@ -222,39 +233,147 @@ export default function Dashboard() {
                         </Card>
                     </div>
 
+                    {/* AI Advisor Section */}
+                    {insights.length > 0 && (
+                        <div className="grid gap-6 lg:grid-cols-2">
+                            <div className="lg:col-span-2">
+                                <Card className="border-none bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-[2.5rem] p-1 shadow-2xl overflow-hidden relative group">
+                                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                                        <Sparkles size={120} className="text-blue-400" />
+                                    </div>
+                                    <div className="relative bg-slate-900/50 backdrop-blur-3xl rounded-[2.4rem] p-8">
+                                        <div className="flex items-center justify-between mb-8">
+                                            <div className="flex items-center gap-4">
+                                                <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
+                                                    <Lightbulb className="text-blue-400" size={24} />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-white font-black uppercase tracking-widest text-sm">BizFlow AI Advisor</h3>
+                                                    <p className="text-slate-400 text-xs font-bold uppercase tracking-tight">Phase 1: Smart Insights Engine</p>
+                                                </div>
+                                            </div>
+                                            <div className="px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                                                <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest animate-pulse">Live Analysis</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            {insights.map((insight, idx) => (
+                                                <div key={idx} className="bg-slate-800/40 border border-slate-700/50 p-6 rounded-3xl group hover:border-blue-500/30 transition-all">
+                                                    <div className="flex items-start gap-4">
+                                                        <div className={cn(
+                                                            "p-2 rounded-xl shrink-0 mt-1",
+                                                            insight.type === 'POSITIVE' ? "bg-emerald-500/10 text-emerald-400" :
+                                                            insight.type === 'WARNING' ? "bg-amber-500/10 text-amber-400" :
+                                                            "bg-rose-500/10 text-rose-400"
+                                                        )}>
+                                                            {insight.type === 'POSITIVE' ? <TrendingUp size={16} /> :
+                                                             insight.type === 'WARNING' ? <ShieldAlert size={16} /> :
+                                                             <AlertCircle size={16} />}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-slate-200 text-sm font-bold leading-relaxed">{insight.text}</p>
+                                                            <div className="mt-3 flex items-center gap-2">
+                                                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{insight.category}</span>
+                                                                <div className="h-1 w-1 rounded-full bg-slate-700" />
+                                                                <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Confidence: {(insight.relevance * 100).toFixed(0)}%</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </Card>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Recent Invoices */}
-                    <Card className="border-none shadow-xl shadow-slate-200/50 dark:shadow-none bg-white dark:bg-slate-900 dark:ring-1 dark:ring-slate-800 rounded-3xl overflow-hidden">
-                        <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 dark:border-slate-800 p-6">
+                    <Card className="enterprise-card overflow-hidden">
+                        <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 p-6">
                             <div>
-                                <CardTitle className="dark:text-white uppercase tracking-tighter text-sm font-black text-slate-400">Recent Ledger</CardTitle>
-                                <CardDescription className="dark:text-slate-400 font-medium">Latest billing transactions</CardDescription>
+                                <CardTitle className="text-slate-900 border-none font-bold">Recent Invoices</CardTitle>
+                                <CardDescription>Latest {recentInvoices.length} records from your backend</CardDescription>
                             </div>
                             <Button variant="ghost" size="sm" onClick={() => navigate('/invoices')} className="text-blue-500 font-bold hover:bg-blue-50">View All</Button>
                         </CardHeader>
                         <CardContent className="p-0 overflow-x-auto">
                             <div className="min-w-[600px]">
                                 <Table>
-                                <TableHeader>
-                                    <TableRow className="bg-transparent hover:bg-transparent border-none">
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-6">Invoice</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Customer</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 pr-6">Status</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {recentInvoices.map((invoice) => (
-                                        <TableRow key={invoice.id} className="dark:hover:bg-slate-800/50 dark:border-slate-800/50 border-slate-50">
-                                            <TableCell className="font-bold text-slate-900 dark:text-slate-200 pl-6">#INV-{invoice.id}</TableCell>
-                                            <TableCell className="text-slate-500 dark:text-slate-400 font-medium">{invoice.customerName || 'Walk-in'}</TableCell>
-                                            <TableCell className="font-black text-slate-900 dark:text-white">{fmt(invoice.totalAmount)}</TableCell>
-                                            <TableCell className="pr-6"><StatusBadge status={invoice.status} /></TableCell>
+                                    <TableHeader>
+                                        <TableRow className="bg-transparent hover:bg-transparent border-none">
+                                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-6">Invoice</TableHead>
+                                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Customer</TableHead>
+                                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</TableHead>
+                                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 pr-6">Status</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </CardContent>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {recentInvoices.map((invoice) => (
+                                            <TableRow key={invoice.id} className="dark:hover:bg-slate-800/50 dark:border-slate-800/50 border-slate-50">
+                                                <TableCell className="font-bold text-slate-900 dark:text-slate-200 pl-6">
+                                                    {invoice.invoiceNumber || (`#INV-${invoice.id}`)}
+                                                </TableCell>
+                                                <TableCell className="text-slate-500 dark:text-slate-400 font-medium">{invoice.customerName || 'Walk-in'}</TableCell>
+                                                <TableCell className="font-black text-slate-900 dark:text-white">{fmt(invoice.grandTotal || invoice.totalAmount || 0)}</TableCell>
+                                                <TableCell className="pr-6"><StatusBadge status={invoice.paymentStatus || invoice.status} /></TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Smart Inventory Reorders (AI Phase 2) */}
+                    <Card className="glass-card premium-shadow rounded-3xl overflow-hidden border-none transition-all duration-300">
+                        <CardHeader className="border-b border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-blue-500/10 rounded-xl">
+                                    <Hourglass className="h-4 w-4 text-blue-500" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-[10px] font-black uppercase tracking-widest text-slate-400">Smart Reorder Alerts</CardTitle>
+                                    <CardDescription className="text-xs font-bold text-slate-900 dark:text-white">Predictive Stock Management</CardDescription>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="divide-y divide-slate-50 dark:divide-slate-800">
+                                {predictions.length === 0 ? (
+                                    <div className="p-12 text-center opacity-30 italic text-sm">No predictive data available.</div>
+                                ) : (
+                                    predictions.map((p, i) => (
+                                        <div key={i} className="p-6 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                                    <Package size={18} />
+                                                </div>
+                                                <div>
+                                                    <p className="font-black text-slate-900 dark:text-white uppercase tracking-tighter text-sm leading-none">{p.itemName}</p>
+                                                    <p className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Velocity: {p.dailyVelocity} units / day</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className={cn(
+                                                    "inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest",
+                                                    p.status === 'CRITICAL' ? "bg-rose-50 text-rose-600 border border-rose-100" :
+                                                    p.status === 'WARNING' ? "bg-amber-50 text-amber-600 border border-amber-100" :
+                                                    "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                                                )}>
+                                                    Stockout in {p.daysRemaining} days
+                                                </div>
+                                                <p className="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-widest">Available: {p.availableQty}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className="p-4 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-50 dark:border-slate-800 text-center">
+                                <Button variant="ghost" size="sm" onClick={() => navigate('/inventory')} className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 w-full">Update Logistics Plan</Button>
+                            </div>
+                        </CardContent>
                     </Card>
                 </div>
             )}
@@ -262,41 +381,19 @@ export default function Dashboard() {
     );
 }
 
-function DashboardStat({ title, value, icon: Icon, color, trend, isWarning }) {
-    const colors = {
-        blue: 'bg-blue-50/50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 border-blue-100/50 dark:border-blue-500/20',
-        rose: 'bg-rose-50/50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border-rose-100/50 dark:border-rose-500/20',
-        emerald: 'bg-emerald-50/50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-500/20',
-        amber: 'bg-amber-50/50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 border-amber-100/50 dark:border-amber-500/20',
-    };
-
+function MetricCard({ title, value, subtitle, icon: Icon, colorClass }) {
     return (
-        <Card className={cn(
-            "glass-card group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/10 rounded-3xl",
-            isWarning && "ring-2 ring-amber-500/30 shadow-lg shadow-amber-500/5"
-        )}>
-            <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                    <div className={cn("glow-icon flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 group-hover:rotate-6", colors[color])}>
-                        <Icon size={26} />
-                    </div>
-                    {trend && (
-                        <span className={cn(
-                            "text-[10px] font-black px-3 py-1.5 rounded-full border tracking-wider",
-                            trend.startsWith('+') ? "bg-emerald-50/50 text-emerald-600 border-emerald-100/50" : "bg-rose-50/50 text-rose-600 border-rose-100/50"
-                        )}>
-                            {trend}
-                        </span>
-                    )}
+        <Card className="enterprise-card h-full p-8 transition-all hover:shadow-md">
+            <div className="flex items-center gap-6">
+                <div className={cn("p-4 rounded-2xl shrink-0", colorClass)}>
+                    <Icon size={28} />
                 </div>
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-1.5">{title}</p>
-                    <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">{value}</h3>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{title}</p>
+                    <h3 className="text-3xl font-black text-slate-900 tracking-tighter tabular-nums">{value}</h3>
+                    <p className="text-xs font-bold text-slate-400 mt-1">{subtitle}</p>
                 </div>
-                
-                {/* Decorative background glow */}
-                <div className="absolute -right-4 -bottom-4 h-24 w-24 rounded-full bg-blue-500/5 blur-3xl group-hover:bg-blue-500/10 transition-colors" />
-            </CardContent>
+            </div>
         </Card>
     );
 }

@@ -58,17 +58,17 @@ export default function Suppliers() {
     );
 
     return (
-        <MainLayout title="Vendors & Suppliers">
+        <MainLayout title="Suppliers">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Suppliers</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Suppliers</h1>
                     <p className="text-sm text-slate-500">Manage your business vendor relationships and tax information.</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="ghost" onClick={fetchSuppliers} disabled={loading}>
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
-                    <Button className="gap-2 bg-slate-900 hover:bg-black text-white" onClick={() => setModal({ isOpen: true, data: null })}>
+                    <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-6 rounded-xl" onClick={() => setModal({ isOpen: true, data: null })}>
                         <Plus className="h-4 w-4" /> Add Vendor
                     </Button>
                 </div>
@@ -76,13 +76,13 @@ export default function Suppliers() {
 
             {error && <Alert variant="error" message={error} className="mb-6" onClose={() => setError(null)} />}
 
-            <Card className="shadow-xl shadow-slate-200/50 border-none overflow-hidden">
-                <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+            <Card className="enterprise-card overflow-hidden">
+                <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <CardTitle>Vendor Directory</CardTitle>
-                            <CardDescription>
-                                {filteredSuppliers.length} suppliers currently active.
+                            <CardTitle className="text-slate-900 border-none font-bold">Vendor Directory</CardTitle>
+                            <CardDescription className="text-slate-500 font-medium capitalize">
+                                {filteredSuppliers.length} active suppliers identified in network.
                             </CardDescription>
                         </div>
 
@@ -91,7 +91,7 @@ export default function Suppliers() {
                             <input
                                 type="text"
                                 placeholder="Search by name, contact..."
-                                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 transition-all"
+                                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-shadow"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -113,24 +113,24 @@ export default function Suppliers() {
                     ) : (
                         <Table>
                             <TableHeader>
-                                <TableRow>
-                                    <TableHead>Company</TableHead>
-                                    <TableHead>Contact Person</TableHead>
-                                    <TableHead>Email / Phone</TableHead>
-                                    <TableHead>Location</TableHead>
-                                    <TableHead>Tax ID</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
+                                <TableRow className="bg-slate-50 border-b border-slate-100">
+                                    <TableHead className="pl-8 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500">Company</TableHead>
+                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Contact Person</TableHead>
+                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Email / Phone</TableHead>
+                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Location</TableHead>
+                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Tax ID</TableHead>
+                                    <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {filteredSuppliers.map((s) => (
-                                    <TableRow key={s.id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400">
+                                    <TableRow key={s.id} className="group border-slate-50">
+                                        <TableCell className="pl-8 py-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
                                                     <Building2 size={20} />
                                                 </div>
-                                                <span className="font-bold text-slate-900">{s.name}</span>
+                                                <span className="font-bold text-slate-900 uppercase tracking-tighter leading-none">{s.name || 'Unknown Vendor'}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="font-medium text-slate-600">
@@ -138,24 +138,24 @@ export default function Suppliers() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col text-xs text-slate-500 gap-1">
-                                                <div className="flex items-center gap-1.5"><Mail size={12} /> {s.email || '—'}</div>
-                                                <div className="flex items-center gap-1.5"><Phone size={12} /> {s.phone || '—'}</div>
+                                                <div className="flex items-center gap-1.5 font-bold tracking-tight"><Mail size={12} className="text-blue-500" /> {s.email || '—'}</div>
+                                                <div className="flex items-center gap-1.5 font-bold tracking-tight"><Phone size={12} className="text-emerald-500" /> {s.phone || '—'}</div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                                                <MapPin size={12} /> {s.city || '—'}
+                                            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold tracking-tight">
+                                                <MapPin size={12} className="text-rose-500/70" /> {s.city || '—'}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                        <TableCell className="font-mono text-[11px] font-black text-slate-400 uppercase tracking-widest">
                                             {s.taxId || 'UNREGISTERED'}
                                         </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex justify-end gap-1">
+                                        <TableCell className="text-right pr-8">
+                                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="h-8 w-8 p-0"
+                                                    className="h-8 w-8 p-0 rounded-full hover:bg-slate-100"
                                                     onClick={() => setModal({ isOpen: true, data: s })}
                                                 >
                                                     <MoreVertical size={16} className="text-slate-400" />

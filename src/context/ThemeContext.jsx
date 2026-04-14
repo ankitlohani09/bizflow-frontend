@@ -8,20 +8,36 @@ export function ThemeProvider({ children }) {
         return saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
     });
 
+    const [branding, setBranding] = useState(() => {
+        const saved = localStorage.getItem('branding');
+        return saved ? JSON.parse(saved) : {
+            primaryColor: '#3b82f6',
+            companyName: 'BizFlow',
+            logoUrl: null
+        };
+    });
+
     useEffect(() => {
+        const root = window.document.documentElement;
         if (isDarkMode) {
-            document.documentElement.classList.add('dark');
+            root.classList.add('dark');
             localStorage.setItem('theme', 'dark');
         } else {
-            document.documentElement.classList.remove('dark');
+            root.classList.remove('dark');
             localStorage.setItem('theme', 'light');
         }
     }, [isDarkMode]);
 
+    useEffect(() => {
+        document.documentElement.style.setProperty('--color-brand-primary', branding.primaryColor);
+        localStorage.setItem('branding', JSON.stringify(branding));
+    }, [branding]);
+
     const toggleTheme = () => setIsDarkMode(prev => !prev);
+    const updateBranding = (newBranding) => setBranding(prev => ({ ...prev, ...newBranding }));
 
     return (
-        <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+        <ThemeContext.Provider value={{ isDarkMode, toggleTheme, branding, updateBranding }}>
             {children}
         </ThemeContext.Provider>
     );

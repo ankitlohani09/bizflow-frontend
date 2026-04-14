@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, AlertTriangle, Clock, ChevronRight, Check } from 'lucide-react';
 import inventoryService from '../services/inventoryService';
 import invoiceService from '../services/invoiceService';
@@ -11,6 +12,7 @@ export default function NotificationCenter() {
     const [notifications, setNotifications] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const navigate = useNavigate();
 
     const fetchAlerts = async () => {
         try {
@@ -20,22 +22,22 @@ export default function NotificationCenter() {
             ]);
 
             const alerts = [
-                ...items.filter(it => (it.quantity || 0) <= (it.threshold || 5))
+                ...items.filter(it => (it.availableQty || 0) <= (it.lowStockThreshold || 5))
                     .map(it => ({
                         id: `stock-${it.id}`,
                         type: 'LOW_STOCK',
                         title: 'Low Stock Alert',
-                        message: `${it.name} is down to ${it.quantity} units.`,
+                        message: `${it.itemName || 'Product'} is down to ${it.availableQty} units.`,
                         icon: AlertTriangle,
                         color: 'text-amber-500',
                         bgColor: 'bg-amber-50'
                     })),
-                ...invoices.filter(inv => inv.status === 'PENDING')
+                ...invoices.filter(inv => (inv.paymentStatus || inv.status) === 'PENDING')
                     .map(inv => ({
                         id: `pay-${inv.id}`,
                         type: 'PENDING_PAYMENT',
                         title: 'Pending Payment',
-                        message: `Invoice #INV-${inv.id} for ${inv.customerName} is unpaid.`,
+                        message: `Invoice ${inv.invoiceNumber || ('#INV-' + inv.id)} for ${inv.customerName || 'Walk-in'} is unpaid.`,
                         icon: Clock,
                         color: 'text-blue-500',
                         bgColor: 'bg-blue-50'
@@ -68,7 +70,7 @@ export default function NotificationCenter() {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <button 
+            <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
                     "relative flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 transition-all hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800",
@@ -109,7 +111,7 @@ export default function NotificationCenter() {
                                         <p className="text-xs font-bold text-slate-900 dark:text-white">{n.title}</p>
                                         <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">{n.message}</p>
                                     </div>
-                                    <button 
+                                    <button
                                         onClick={() => markAsRead(n.id)}
                                         className="absolute top-4 right-4 text-slate-300 hover:text-slate-900 dark:hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
@@ -121,7 +123,13 @@ export default function NotificationCenter() {
                     </div>
 
                     {notifications.length > 0 && (
-                        <button className="flex w-full items-center justify-center gap-2 border-t border-slate-100 p-3 text-xs font-bold text-blue-600 hover:bg-blue-50 transition-colors dark:border-slate-800 dark:hover:bg-blue-500/5">
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                navigate('/stock-movements');
+                            }}
+                            className="flex w-full items-center justify-center gap-2 border-t border-slate-100 p-3 text-xs font-bold text-blue-600 hover:bg-blue-50 transition-colors dark:border-slate-800 dark:hover:bg-blue-500/5"
+                        >
                             VIEW ALL ACTIVITY <ChevronRight size={14} />
                         </button>
                     )}

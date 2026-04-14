@@ -1,15 +1,37 @@
 import React from 'react';
-import { Sun, Moon, User, Menu } from 'lucide-react';
+import { Sun, Moon, User, Menu, Maximize, Minimize } from 'lucide-react';
 import GlobalSearch from '../components/GlobalSearch';
 import NotificationCenter from '../components/NotificationCenter';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 /**
  * Topbar – Global search, notifications, and theme controls
  */
 export default function Topbar({ onToggleSidebar }) {
     const { isDarkMode, toggleTheme } = useTheme();
+    const [isFullscreen, setIsFullscreen] = React.useState(false);
+    const { t } = useTranslation();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+    };
+
+    const toggleFullScreen = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+            });
+            setIsFullscreen(true);
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+                setIsFullscreen(false);
+            }
+        }
+    };
 
     return (
         <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 md:px-8 dark:border-slate-800 dark:bg-slate-900 transition-colors">
@@ -37,6 +59,26 @@ export default function Topbar({ onToggleSidebar }) {
                 >
                     {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
                 </button>
+
+                {/* Full Screen Toggle */}
+                <button
+                    onClick={toggleFullScreen}
+                    className="hidden md:flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 transition-all hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
+                    title={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+                >
+                    {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+                </button>
+
+                {/* Language Switcher */}
+                <select 
+                    onChange={(e) => changeLanguage(e.target.value)}
+                    value={i18n.language}
+                    className="h-10 rounded-xl bg-slate-50 px-2 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:bg-slate-100 dark:bg-slate-900/50 dark:border-slate-800 dark:hover:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                    <option value="en">EN</option>
+                    <option value="hi">HI</option>
+                    <option value="hg">HG</option>
+                </select>
 
                 {/* Notifications */}
                 <NotificationCenter />
