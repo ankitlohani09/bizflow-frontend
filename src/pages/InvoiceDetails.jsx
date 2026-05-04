@@ -1,39 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-    ArrowLeft,
-    Download,
-    Printer,
-    CreditCard,
-    Calendar,
-    User,
-    Hash,
-    Receipt,
-    Loader2,
+import { 
+    Receipt, 
+    ArrowLeft, 
+    Download, 
+    Printer, 
+    CreditCard, 
+    Loader2, 
+    RotateCcw,
+    MessageCircle
 } from 'lucide-react';
 import invoiceService from '../services/invoiceService';
+import pdfExportService from '../services/pdfExportService';
 import MainLayout from '../layouts/MainLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardContent } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Alert from '../components/ui/Alert';
-import {
-    Table,
-    TableHeader,
-    TableBody,
-    TableRow,
-    TableHead,
-    TableCell,
-} from '../components/ui/Table';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
+import { cn } from '../utils/cn';
+import { formatCurrency as fmt } from '../utils/formatCurrency';
+import ReturnModal from '../components/ReturnModal';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-const fmt = (val) =>
-    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
-
-/**
- * InvoiceDetails – View and manage a single invoice
- *
- * GET /invoices/{id}
- */
 export default function InvoiceDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -41,6 +28,8 @@ export default function InvoiceDetails() {
     const [invoice, setInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+    const [isThermal, setIsThermal] = useState(false);
 
     const fetchInvoice = useCallback(async () => {
         setLoading(true);
@@ -57,11 +46,29 @@ export default function InvoiceDetails() {
 
     useEffect(() => { fetchInvoice(); }, [fetchInvoice]);
 
+    const handleDownload = () => {
+        if (invoice) pdfExportService.generateInvoicePDF(invoice);
+    };
+
+    const handleWhatsAppShare = () => {
+        if (!invoice) return;
+        const tenantName = localStorage.getItem('tenantName') || 'BizFlow';
+        const customerName = invoice.customerName || invoice.customer?.name || 'Customer';
+        const amount = fmt(invoice.grandTotal || invoice.totalAmount || 0);
+        const text = `Hello ${customerName}, here is your Invoice ${invoice.invoiceNumber || ('#INV-' + (invoice.id || 'N/A'))} for ${amount} from ${tenantName}. Thank you!`;
+        const phone = invoice.customerPhone || invoice.customer?.phone || '';
+        const cleanPhone = phone.replace(/\D/g, ''); // Remove non-numeric
+        
+        const url = `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+    };
+
     if (loading) {
         return (
             <MainLayout title="Loading Invoice...">
-                <div className="flex h-96 items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                <div className="flex h-96 flex-col items-center justify-center gap-4">
+                    <Loader2 className="h-12 w-12 animate-spin text-blue-500 opacity-20" />
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Retrieving Ledger...</p>
                 </div>
             </MainLayout>
         );
@@ -83,167 +90,162 @@ export default function InvoiceDetails() {
     return (
         <MainLayout title={`Invoice ${invoice.invoiceNumber || id}`}>
             {/* Header Actions */}
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <Button variant="ghost" size="sm" onClick={() => navigate('/invoices')} className="gap-2">
-                    <ArrowLeft className="h-4 w-4" /> Back
+            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <Button variant="ghost" size="sm" onClick={() => navigate('/invoices')} className="gap-2 dark:text-slate-400">
+                    <ArrowLeft className="h-4 w-4" /> Back to List
                 </Button>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="gap-2" onClick={() => window.print()}>
-                        <Printer className="h-4 w-4" /> Print
+                <div className="flex gap-2 no-print">
+                    <Button variant="outline" size="sm" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={() => { setIsThermal(false); setTimeout(() => window.print(), 100); }}>
+                        <Printer className="h-4 w-4" /> Full Page
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-2">
-                        <Download className="h-4 w-4" /> Download
+                    <Button variant="outline" size="sm" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={() => { setIsThermal(true); setTimeout(() => window.print(), 100); }}>
+                        <Printer size={16} /> 80mm Receipt
                     </Button>
-                    <Button size="sm" className="gap-2 bg-emerald-600 hover:bg-emerald-700">
+                    <Button variant="outline" size="sm" className="gap-2 dark:border-slate-800 dark:text-slate-300" onClick={handleDownload}>
+                        <Download className="h-4 w-4" /> PDF Report
+                    </Button>
+                    <Button variant="outline" size="sm" className="gap-2 text-rose-500 hover:bg-rose-50 border-rose-100" onClick={() => setIsReturnModalOpen(true)}>
+                        <RotateCcw className="h-4 w-4" /> Process Return
+                    </Button>
+                    <Button variant="outline" size="sm" className="gap-2 text-emerald-600 border-emerald-100 hover:bg-emerald-50 dark:hover:bg-emerald-500/10" onClick={handleWhatsAppShare}>
+                        <MessageCircle className="h-4 w-4" /> WhatsApp
+                    </Button>
+                    <Button size="sm" className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
                         <CreditCard className="h-4 w-4" /> Add Payment
                     </Button>
                 </div>
             </div>
 
-            <div className="mx-auto max-w-4xl space-y-6">
+            <div className="mx-auto max-w-4xl space-y-8 print:max-w-none print:p-0">
                 {/* Main Invoice Card */}
-                <Card className="overflow-hidden shadow-xl sm:rounded-2xl">
-                    {/* Visual separation bar at top */}
-                    <div className="h-2 bg-blue-600" />
-
-                    <CardContent className="p-8 sm:p-12">
-                        {/* Summary Header */}
-                        <div className="mb-12 flex flex-col justify-between gap-8 border-b border-slate-100 pb-12 sm:flex-row sm:items-start">
+                <Card className={cn(
+                    "overflow-hidden shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl",
+                    isThermal && "thermal-receipt"
+                )}>
+                    <CardContent className="p-0">
+                        {/* Branded Header */}
+                        <div className="bg-slate-900 dark:bg-black p-12 text-white flex flex-col sm:flex-row justify-between items-start gap-8">
                             <div className="space-y-4">
-                                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                                    <Receipt className="h-6 w-6" />
+                                <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500 text-white shadow-xl shadow-blue-500/30">
+                                    <Receipt className="h-8 w-8" />
                                 </div>
-                                <div>
-                                    <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">
-                                        Invoice
+                                <div className="space-y-1">
+                                    <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">
+                                        {localStorage.getItem('tenantName') || 'BIZFLOW'}
                                     </h1>
-                                    <p className="mt-1 flex items-center gap-2 font-mono text-sm text-slate-500">
-                                        <Hash className="h-3.5 w-3.5" />
-                                        {invoice.invoiceNumber || id}
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500/80 font-mono">
+                                        Verified Business Operator
                                     </p>
                                 </div>
                             </div>
-
-                            <div className="grid grid-cols-1 gap-x-12 gap-y-6 sm:grid-cols-2">
+                            <div className="text-right sm:text-right space-y-2">
+                                <h2 className="text-2xl font-black uppercase tracking-tighter text-blue-500">Business Invoice</h2>
                                 <div className="space-y-1">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Date Issued</p>
-                                    <p className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                                        <Calendar className="h-4 w-4 text-slate-400" />
-                                        {new Date(invoice.invoiceDate ?? invoice.createdAt).toLocaleDateString(undefined, {
-                                            year: 'numeric', month: 'long', day: 'numeric'
-                                        })}
-                                    </p>
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Status</p>
-                                    <span className={cn(
-                                        'inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border',
-                                        invoice.paymentStatus === 'PAID' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-amber-50 text-amber-700 border-amber-100'
-                                    )}>
-                                        {invoice.paymentStatus || 'Pending'}
-                                    </span>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Document No.</p>
+                                    <p className="font-mono text-xl font-bold tracking-tight">#{invoice.invoiceNumber || ('INV-' + (invoice.id || 'N/A'))}</p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Bill To Section */}
-                        <div className="mb-12">
-                            <h3 className="mb-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Bill To</h3>
-                            <div className="flex items-start gap-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-                                    <User className="h-5 w-5" />
+                        <div className="p-12">
+                            {/* Info Grid */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 mb-16 border-b border-slate-100 dark:border-slate-800 pb-12">
+                                <div className="space-y-6">
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Bill To</p>
+                                        <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase leading-tight mb-2">
+                                            {invoice.customerName || invoice.customer?.name || 'Walk-in Customer'}
+                                        </h3>
+                                        <div className="space-y-0.5 text-sm font-medium text-slate-500">
+                                            {invoice.customerEmail && <p>{invoice.customerEmail}</p>}
+                                            {invoice.customerPhone && <p>{invoice.customerPhone}</p>}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="space-y-1">
-                                    <p className="text-lg font-bold text-slate-900">{invoice.customerName || invoice.customer?.name || 'Walk-in Customer'}</p>
-                                    {invoice.customer?.email && <p className="text-sm text-slate-500">{invoice.customer.email}</p>}
-                                    {invoice.customer?.phone && <p className="text-sm text-slate-500">{invoice.customer.phone}</p>}
-                                    {invoice.customer?.address && <p className="text-sm text-slate-500 whitespace-pre-line">{invoice.customer.address}</p>}
+                                <div className="grid grid-cols-2 gap-8">
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Issue Date</p>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-slate-200">
+                                            {new Date(invoice.issueDate || invoice.createdAt).toLocaleDateString(undefined, { 
+                                                day: '2-digit', month: 'short', year: 'numeric' 
+                                            })}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Status</p>
+                                        <span className={cn(
+                                            "inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border",
+                                            (invoice.paymentStatus || invoice.status) === 'PAID' 
+                                                ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" 
+                                                : "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20"
+                                        )}>
+                                            {invoice.paymentStatus || invoice.status || 'PENDING'}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Items Table */}
-                        <div className="mb-12">
-                            <Table className="border-t border-slate-100">
-                                <TableHeader>
-                                    <TableRow className="bg-slate-50/50">
-                                        <TableHead className="w-2/5">Item Description</TableHead>
-                                        <TableHead className="text-right">Qty</TableHead>
-                                        <TableHead className="text-right">Price</TableHead>
-                                        <TableHead className="text-right">Total</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {(invoice.items || []).map((item, idx) => (
-                                        <TableRow key={item.id || idx}>
-                                            <TableCell className="font-medium text-slate-900">
-                                                {item.itemName || item.productName || 'Line Item'}
-                                                {item.description && <p className="mt-0.5 text-xs font-normal text-slate-400">{item.description}</p>}
-                                            </TableCell>
-                                            <TableCell className="text-right">{item.quantity}</TableCell>
-                                            <TableCell className="text-right">{fmt(item.unitPrice)}</TableCell>
-                                            <TableCell className="text-right font-semibold">{fmt(item.subtotal || (item.quantity * item.unitPrice))}</TableCell>
+                            {/* Table */}
+                            <div className="mb-16">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="bg-transparent hover:bg-transparent border-b-2 border-slate-900 dark:border-slate-700">
+                                            <TableHead className="text-slate-900 dark:text-slate-400 font-black uppercase tracking-widest text-[10px]">Description</TableHead>
+                                            <TableHead className="text-center text-slate-900 dark:text-slate-400 font-black uppercase tracking-widest text-[10px]">Qty</TableHead>
+                                            <TableHead className="text-right text-slate-900 dark:text-slate-400 font-black uppercase tracking-widest text-[10px]">Unit Price</TableHead>
+                                            <TableHead className="text-right text-slate-900 dark:text-slate-400 font-black uppercase tracking-widest text-[10px]">Total</TableHead>
                                         </TableRow>
-                                    ))}
-                                    {(!invoice.items || invoice.items.length === 0) && (
-                                        <TableRow>
-                                            <TableCell colSpan={4} className="h-24 text-center text-slate-400">
-                                                No items listed on this invoice
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {invoice.items?.map((item, i) => (
+                                            <TableRow key={i} className="border-b border-slate-50 dark:border-slate-800/50">
+                                                <TableCell className="py-6">
+                                                    <p className="font-bold text-slate-900 dark:text-slate-200">{item.itemName || 'Product'}</p>
+                                                    {item.sku && <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">SKU: {item.sku}</p>}
+                                                </TableCell>
+                                                <TableCell className="text-center font-bold text-slate-600 dark:text-slate-400">{item.quantity}</TableCell>
+                                                <TableCell className="text-right font-medium text-slate-600 dark:text-slate-400">{fmt(item.unitPrice)}</TableCell>
+                                                <TableCell className="text-right font-black text-slate-900 dark:text-white">{fmt(item.quantity * item.unitPrice)}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
 
-                        {/* Totals Summary */}
-                        <div className="flex flex-col items-end gap-3 border-t border-slate-100 pt-8">
-                            <div className="flex w-full max-w-xs justify-between text-sm text-slate-500">
-                                <span>Subtotal</span>
-                                <span className="font-medium text-slate-900">{fmt(invoice.subtotal || (invoice.grandTotal - (invoice.taxAmount ?? 0)))}</span>
+                             {/* Totals */}
+                            <div className="flex justify-end pt-12 border-t border-slate-100 dark:border-slate-800">
+                                <div className="w-full sm:w-80 space-y-4">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Grand Total</span>
+                                        <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{fmt(invoice.grandTotal || invoice.totalAmount || 0)}</span>
+                                    </div>
+                                    <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">Balance Due</span>
+                                            <span className="font-black text-blue-900 dark:text-blue-200">{(invoice.paymentStatus || invoice.status) === 'PAID' ? fmt(0) : fmt(invoice.grandTotal || invoice.totalAmount || 0)}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            {invoice.taxAmount > 0 && (
-                                <div className="flex w-full max-w-xs justify-between text-sm text-slate-500">
-                                    <span>Tax (GST)</span>
-                                    <span className="font-medium text-slate-900">{fmt(invoice.taxAmount)}</span>
-                                </div>
-                            )}
-                            <div className="mt-2 flex w-full max-w-xs justify-between border-t border-blue-100 bg-blue-50/50 px-4 py-3 rounded-xl">
-                                <span className="text-base font-bold text-blue-900">Total Amount</span>
-                                <span className="text-lg font-black text-blue-600">
-                                    {fmt(invoice.grandTotal ?? invoice.totalAmount)}
-                                </span>
-                            </div>
-                            {invoice.paidAmount > 0 && (
-                                <div className="flex w-full max-w-xs justify-between text-xs font-medium text-emerald-600 px-4">
-                                    <span>Amount Paid</span>
-                                    <span>- {fmt(invoice.paidAmount)}</span>
-                                </div>
-                            )}
-                            {invoice.dueAmount > 0 && (
-                                <div className="flex w-full max-w-xs justify-between text-xs font-bold text-amber-600 px-4">
-                                    <span>Balance Due</span>
-                                    <span>{fmt(invoice.dueAmount)}</span>
-                                </div>
-                            )}
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Internal Notes Card */}
-                {invoice.notes && (
-                    <Card className="bg-amber-50/30 border-amber-100">
-                        <CardContent className="p-6">
-                            <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber-700">
-                                <AlertCircle size={14} /> Notes
-                            </h4>
-                            <p className="mt-2 text-sm text-amber-900/70 italic">
-                                "{invoice.notes}"
-                            </p>
-                        </CardContent>
-                    </Card>
-                )}
+                {/* Footer */}
+                <div className="text-center py-12 px-8 space-y-4 opacity-30 group hover:opacity-100 transition-opacity">
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 dark:text-white">Authorized Digital Document</p>
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+                        This document is electronically generated by BizFlow SaaS. No signature is required. For verification, please scan the system logs.
+                    </p>
+                </div>
             </div>
+
+            <ReturnModal 
+                isOpen={isReturnModalOpen} 
+                onClose={() => setIsReturnModalOpen(false)} 
+                onSuccess={fetchInvoice} 
+                invoice={invoice} 
+            />
         </MainLayout>
     );
 }

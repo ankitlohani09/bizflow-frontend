@@ -7,6 +7,13 @@ import Alert from './ui/Alert';
 import inventoryService from '../services/inventoryService';
 import itemService from '../services/itemService';
 
+const DIRECTION_MAP = {
+    'PURCHASE': 'IN',
+    'SALE': 'OUT',
+    'ADJUSTMENT': 'IN', // Default for adjustment
+    'TRANSFER': 'OUT'  // Default for transfer source
+};
+
 /**
  * StockMovementModal – record a manual stock adjustment (IN/OUT/ADJUST)
  */
@@ -18,7 +25,7 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
 
     const [form, setForm] = useState({
         itemId: '',
-        movementType: 'IN', // IN, OUT, ADJUST
+        movementType: 'PURCHASE',
         quantity: 1,
         reason: '',
     });
@@ -36,10 +43,12 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
             async function loadItems() {
                 setLoading(true);
                 try {
+                    // Fetch all items from the catalog instead of just inventory records
+                    // This allows initializing stock for newly created items
                     const data = await itemService.getAll();
                     setItems(Array.isArray(data) ? data : []);
-                } catch (err) {
-                    setError('Failed to load items catalog.');
+                } catch {
+                    setError('Failed to load items from inventory.');
                 } finally {
                     setLoading(false);
                 }
@@ -47,7 +56,7 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
             loadItems();
         } else {
             // Reset on close
-            setForm({ itemId: '', movementType: 'IN', quantity: 1, reason: '' });
+            setForm({ itemId: '', movementType: 'PURCHASE', quantity: 1, reason: '' });
             setError(null);
         }
     }, [isOpen]);
@@ -65,8 +74,9 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
             await inventoryService.createStockMovement({
                 itemId: Number(form.itemId),
                 movementType: form.movementType,
+                direction: DIRECTION_MAP[form.movementType],
                 quantity: Number(form.quantity),
-                reason: form.reason,
+                notes: form.reason,
             });
             onSuccess();
             onClose();
@@ -102,7 +112,7 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
                                 <option value="">Select product...</option>
                                 {items.map((item) => (
                                     <option key={item.id} value={item.id}>
-                                        {item.name}
+                                        {item.name || item.itemName} {item.barcode ? `(${item.barcode})` : ''}
                                     </option>
                                 ))}
                             </select>
@@ -116,11 +126,12 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
                                 <select
                                     value={form.movementType}
                                     onChange={(e) => setForm({ ...form, movementType: e.target.value })}
-                                    className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full rounded-lg border border-slate-200 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                                 >
-                                    <option value="IN">Stock In (Addition)</option>
-                                    <option value="OUT">Stock Out (Removal)</option>
-                                    <option value="ADJUST">Correction/Adjustment</option>
+                                    <option value="PURCHASE">Stock In (Purchase/Return)</option>
+                                    <option value="SALE">Stock Out (Sale/Loss)</option>
+                                    <option value="TRANSFER">Internal Transfer (E.g. Move to Damaged)</option>
+                                    <option value="ADJUSTMENT">Correction/Audit</option>
                                 </select>
                             </div>
 
@@ -133,6 +144,27 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
                                 required
                             />
                         </div>
+
+                        {form.movementType === 'TRANSFER' && (
+                            <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">From Category</label>
+                                    <select className="w-full rounded-lg border border-slate-200 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold dark:text-white">
+                                        <option value="AVAILABLE">Available</option>
+                                        <option value="RESERVED">Reserved</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">To Category</label>
+                                    <select className="w-full rounded-lg border border-slate-200 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold dark:text-white">
+                                        <option value="DAMAGED">Damaged</option>
+                                        <option value="EXPIRED">Expired</option>
+                                        <option value="RESERVED">Reserved</option>
+                                        <option value="AVAILABLE">Available</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">

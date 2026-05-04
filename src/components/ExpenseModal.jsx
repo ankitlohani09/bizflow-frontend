@@ -53,7 +53,7 @@ export default function ExpenseModal({ isOpen, onClose, onSuccess, expense = nul
                 try {
                     const data = await expenseService.getCategories();
                     setCategories(Array.isArray(data) ? data : []);
-                } catch (err) {
+                } catch {
                     setError('Failed to load expense categories.');
                 } finally {
                     setLoading(false);

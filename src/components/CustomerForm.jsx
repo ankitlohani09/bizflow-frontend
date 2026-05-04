@@ -17,6 +17,7 @@ const EMPTY_FORM = {
     city: '',
     state: '',
     openingBalance: '',
+    loyaltyPoints: 0,
 };
 
 /**
@@ -49,6 +50,7 @@ export default function CustomerForm({ customer, onSuccess, onCancel }) {
                 city: customer.city ?? '',
                 state: customer.state ?? '',
                 openingBalance: customer.openingBalance ?? '',
+                loyaltyPoints: customer.loyaltyPoints ?? 0,
             });
         } else {
             setForm(EMPTY_FORM);
@@ -95,6 +97,7 @@ export default function CustomerForm({ customer, onSuccess, onCancel }) {
             ...(form.city && { city: form.city }),
             ...(form.state && { state: form.state }),
             ...(form.openingBalance && { openingBalance: Number(form.openingBalance) }),
+            loyaltyPoints: Number(form.loyaltyPoints),
         };
 
         setSubmitting(true);

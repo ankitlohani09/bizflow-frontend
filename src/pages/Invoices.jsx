@@ -1,71 +1,59 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    FileText,
-    Plus,
-    RefreshCw,
-    Search,
-    Eye,
-    Receipt,
-    Filter,
+import { 
+    FileText, 
+    Plus, 
+    RefreshCw, 
+    Search, 
+    Eye, 
+    Download, 
+    MoreVertical, 
+    FileDown,
+    AlertCircle 
 } from 'lucide-react';
+import { exportToCSV, flattenData } from '../utils/exportUtils';
+import pdfExportService from '../services/pdfExportService';
 import invoiceService from '../services/invoiceService';
 import MainLayout from '../layouts/MainLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Alert from '../components/ui/Alert';
-import {
-    Table,
-    TableHeader,
-    TableBody,
-    TableRow,
-    TableHead,
-    TableCell,
-} from '../components/ui/Table';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
+import { TableSkeleton } from '../components/ui/Skeleton';
+import Pagination from '../components/ui/Pagination';
 import { cn } from '../utils/cn';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
 function StatusBadge({ status }) {
-    const s = (status ?? '').toUpperCase();
+    const s = (status || '').toUpperCase();
     const styles = {
-        PAID:    'bg-emerald-50 text-emerald-700 border-emerald-100',
+        PAID: 'bg-emerald-50 text-emerald-700 border-emerald-100',
         PENDING: 'bg-amber-50 text-amber-700 border-amber-100',
+        VOID: 'bg-rose-50 text-rose-700 border-rose-100',
         PARTIAL: 'bg-blue-50 text-blue-700 border-blue-100',
-        OVERDUE: 'bg-rose-50 text-rose-700 border-rose-100',
-        DRAFT:   'bg-slate-100 text-slate-600 border-slate-200',
     };
     return (
         <span className={cn(
-            'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium',
+            'inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider',
             styles[s] ?? 'bg-slate-50 text-slate-500 border-slate-100'
         )}>
-            {status || '—'}
+            {status || 'Unknown'}
         </span>
     );
 }
-
-function TableSkeleton() {
-    return (
-        <div className="animate-pulse space-y-3">
-            {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-14 rounded-lg bg-slate-100" />
-            ))}
-        </div>
-    );
-}
-
-// ─── Invoices Page ────────────────────────────────────────────────────────────
 
 export default function Invoices() {
     const navigate = useNavigate();
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [sortConfig, setSortConfig] = useState({ key: 'id', direction: 'desc' });
+
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     // Filters
     const [search, setSearch] = useState('');
@@ -86,8 +74,32 @@ export default function Invoices() {
 
     useEffect(() => { fetchInvoices(); }, [fetchInvoices]);
 
-    // ── Client-side filter ────────────────────────────────────────────────────
-    const filteredInvoices = invoices.filter((inv) => {
+    const handleSort = (key) => {
+        setSortConfig(prev => ({
+            key,
+            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+        }));
+        setCurrentPage(1);
+    };
+
+    const handleExportCSV = () => {
+        const data = flattenData(filteredInvoices);
+        exportToCSV(data, 'invoices-report');
+    };
+
+    const handleDownloadPDF = (inv) => {
+        pdfExportService.generateInvoicePDF(inv);
+    };
+
+    const sortedInvoices = [...invoices].sort((a, b) => {
+        const aVal = a[sortConfig.key] ?? '';
+        const bVal = b[sortConfig.key] ?? '';
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    const filteredInvoices = sortedInvoices.filter((inv) => {
         const matchesSearch =
             (inv.invoiceNumber ?? '').toLowerCase().includes(search.toLowerCase()) ||
             (inv.customerName ?? inv.customer?.name ?? '').toLowerCase().includes(search.toLowerCase());
@@ -99,19 +111,28 @@ export default function Invoices() {
         return matchesSearch && matchesStatus;
     });
 
+    // Paginated results
+    const paginatedInvoices = filteredInvoices.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
     return (
         <MainLayout title="Invoices">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Invoices</h1>
-                    <p className="text-sm text-slate-500">Manage all your sales billing and payments.</p>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Invoices</h1>
+                    <p className="text-sm text-slate-500 font-medium">Manage your billing, dynamic invoicing, and cash flow.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="ghost" size="sm" onClick={fetchInvoices} disabled={loading}>
+                    <Button variant="ghost" onClick={fetchInvoices} disabled={loading}>
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
+                    <Button variant="outline" className="gap-2 border-slate-200 font-bold" onClick={handleExportCSV}>
+                        <FileDown className="h-4 w-4" /> CSV Export
+                    </Button>
                     <Button
-                        className="gap-2"
+                        className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-6 rounded-xl"
                         onClick={() => navigate('/invoices/new')}
                     >
                         <Plus className="h-4 w-4" />
@@ -120,107 +141,123 @@ export default function Invoices() {
                 </div>
             </div>
 
-            {error && <Alert variant="error" message={error} className="mb-6" onClose={() => setError(null)} />}
+            {error && <Alert variant="error" message={error} className="mb-6 shadow-lg" onClose={() => setError(null)} />}
 
-            <Card>
-                <CardHeader className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                        <CardTitle>Invoice Records</CardTitle>
-                        <CardDescription>
-                            {filteredInvoices.length} result{filteredInvoices.length !== 1 ? 's' : ''} found
-                        </CardDescription>
-                    </div>
-
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        {/* Search */}
-                        <div className="relative w-full sm:w-64">
-                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                            <input
-                                type="text"
-                                placeholder="Search # or Customer..."
-                                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
+            <Card className="enterprise-card overflow-hidden">
+                <CardHeader className="border-b border-slate-100 bg-slate-50/50 p-8">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <CardTitle className="text-slate-900 border-none font-bold">Invoices & Records</CardTitle>
+                            <CardDescription className="text-slate-500 font-medium">
+                                Showing {filteredInvoices.length} transactions in your ledger.
+                            </CardDescription>
                         </div>
 
-                        {/* Status Filter */}
-                        <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 p-1">
-                            {['ALL', 'PAID', 'PENDING', 'OVERDUE'].map((status) => (
-                                <button
-                                    key={status}
-                                    onClick={() => setStatusFilter(status)}
-                                    className={cn(
-                                        'px-3 py-1 text-[10px] font-bold uppercase tracking-wider transition-all rounded-md',
-                                        statusFilter === status
-                                            ? 'bg-white text-blue-600 shadow-sm'
-                                            : 'text-slate-500 hover:text-slate-700'
-                                    )}
-                                >
-                                    {status}
-                                </button>
-                            ))}
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                            <div className="relative w-full sm:w-64">
+                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Order #, Customer..."
+                                    className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-shadow"
+                                    value={search}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                />
+                            </div>
+
+                             <div className="flex items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50 p-1">
+                                {['ALL', 'PAID', 'PENDING'].map((status) => (
+                                    <button
+                                        key={status}
+                                        onClick={() => {
+                                            setStatusFilter(status);
+                                            setCurrentPage(1);
+                                        }}
+                                        className={cn(
+                                            'px-3 py-1 text-[10px] font-black uppercase tracking-widest transition-all rounded-lg',
+                                            statusFilter === status
+                                                ? 'bg-white text-blue-600 shadow-sm'
+                                                : 'text-slate-500 hover:text-slate-700'
+                                        )}
+                                    >
+                                        {status}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </CardHeader>
 
-                <CardContent>
-                    {loading ? (
-                        <TableSkeleton />
-                    ) : filteredInvoices.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400">
-                            <Receipt className="mb-3 h-12 w-12 opacity-20" />
-                            <p className="font-medium">No invoices found</p>
-                            <p className="mt-1 text-sm">Create your first invoice to get started.</p>
-                        </div>
-                    ) : (
-                        <Table>
+                <CardContent className="p-0 overflow-x-auto">
+                    <div className="min-w-[800px]">
+                         <Table>
                             <TableHeader>
-                                <TableRow>
-                                    <TableHead>Invoice #</TableHead>
-                                    <TableHead>Customer</TableHead>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead>Amount</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
+                                <TableRow className="bg-slate-50 border-b border-slate-100">
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500 pl-8 py-4" onClick={() => handleSort('id')}>Invoice info</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('customerName')}>Customer</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('invoiceDate')}>Timeline</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('totalAmount')}>Amount</TableHead>
+                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
+                                    <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredInvoices.map((inv) => {
-                                    const amount = inv.grandTotal ?? inv.totalAmount ?? 0;
-                                    const customer = inv.customerName ?? inv.customer?.name ?? '—';
-                                    const date = inv.invoiceDate ?? inv.createdAt;
-
-                                    return (
-                                        <TableRow key={inv.id}>
-                                            <TableCell className="font-semibold text-slate-900">
-                                                {inv.invoiceNumber || `#${inv.id}`}
-                                            </TableCell>
-                                            <TableCell className="text-slate-600">{customer}</TableCell>
-                                            <TableCell className="text-slate-500">
-                                                {date ? new Date(date).toLocaleDateString() : '—'}
-                                            </TableCell>
-                                            <TableCell className="font-medium">{fmt(amount)}</TableCell>
-                                            <TableCell>
-                                                <StatusBadge status={inv.paymentStatus ?? inv.status} />
-                                            </TableCell>
-                                            <TableCell className="text-right">
+                                 {paginatedInvoices.map((invoice) => (
+                                    <TableRow key={invoice.id} className="group border-slate-50">
+                                        <TableCell className="font-bold text-slate-900 pl-8 py-6 leading-none">
+                                            {invoice.invoiceNumber || `#INV-${invoice.formattedId || invoice.id || 'N/A'}`}
+                                        </TableCell>
+                                        <TableCell className="text-slate-600 font-bold uppercase tracking-tighter text-xs">{invoice.customerName || invoice.customer?.name || 'Walk-in'}</TableCell>
+                                        <TableCell className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+                                            {new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
+                                        </TableCell>
+                                        <TableCell className="font-black text-slate-900 text-lg tabular-nums">{fmt(invoice.totalAmount || invoice.grandTotal || 0)}</TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={invoice.paymentStatus ?? invoice.status} />
+                                        </TableCell>
+                                        <TableCell className="text-right pr-8">
+                                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="h-8 w-8 p-0"
-                                                    onClick={() => navigate(`/invoices/${inv.id}`)}
+                                                    className="h-9 w-9 p-0 rounded-full hover:bg-blue-50 dark:hover:bg-blue-500/10"
+                                                    title="View Details"
+                                                    onClick={() => navigate(`/invoices/${invoice.id}`)}
                                                 >
-                                                    <Eye className="h-4 w-4 text-slate-400 hover:text-blue-500" />
+                                                    <Eye size={16} className="text-slate-400" />
                                                 </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-9 w-9 p-0 rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
+                                                    title="Download PDF"
+                                                    onClick={() => handleDownloadPDF(invoice)}
+                                                >
+                                                    <Download size={16} className="text-emerald-500/70" />
+                                                </Button>
+                                                <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                                                    <MoreVertical size={16} className="text-slate-400" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
                             </TableBody>
                         </Table>
-                    )}
+                    </div>
                 </CardContent>
+                
+                {!loading && filteredInvoices.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={filteredInvoices.length}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
             </Card>
         </MainLayout>
     );

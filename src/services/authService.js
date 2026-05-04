@@ -30,6 +30,16 @@ const authService = {
 
     if (result?.token) {
       localStorage.setItem('token', result.token);
+
+      // Save user profile for RBAC and UI personalization
+      const userProfile = {
+        id: result.userId,
+        name: result.name,
+        email: result.email,
+        roles: result.roles || [], // Backend returns array
+        tenantId: result.tenantId
+      };
+      localStorage.setItem('user', JSON.stringify(userProfile));
     }
 
     return result;

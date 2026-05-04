@@ -4,13 +4,16 @@ import {
     Plus,
     RefreshCw,
     Search,
-    AlertTriangle,
-    ArrowRightLeft,
-    History,
-    MoreVertical,
     TrendingUp,
     ShieldAlert,
-    Clock,
+    AlertTriangle,
+    ArrowRightLeft,
+    MoreVertical,
+    History,
+    FileDown,
+    Layers,
+    Warehouse,
+    Upload
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import inventoryService from '../services/inventoryService';
@@ -18,7 +21,6 @@ import MainLayout from '../layouts/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Alert from '../components/ui/Alert';
-import StockMovementModal from '../components/StockMovementModal';
 import {
     Table,
     TableHeader,
@@ -27,39 +29,31 @@ import {
     TableHead,
     TableCell,
 } from '../components/ui/Table';
+import StockMovementModal from '../components/StockMovementModal';
+import ImportModal from '../components/ImportModal';
+import ItemModal from '../components/ItemModal';
 import { cn } from '../utils/cn';
+import { exportToCSV, flattenData } from '../utils/exportUtils';
+import { TableSkeleton } from '../components/ui/Skeleton';
+import Pagination from '../components/ui/Pagination';
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-function StockBadge({ qty, threshold }) {
-    const isLow = qty <= (threshold ?? 5);
-    const isOut = qty <= 0;
-
+function StockBadge({ qty, threshold = 5 }) {
+    if (qty <= 0) return (
+        <span className="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-rose-700 border border-rose-100">
+            Out of Stock
+        </span>
+    );
+    if (qty <= threshold) return (
+        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-700 border border-amber-100">
+            Low Stock
+        </span>
+    );
     return (
-        <span className={cn(
-            'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold leading-none border',
-            isOut
-                ? 'bg-rose-50 text-rose-700 border-rose-100'
-                : isLow
-                    ? 'bg-amber-50 text-amber-700 border-amber-100'
-                    : 'bg-emerald-50 text-emerald-700 border-emerald-100'
-        )}>
-            {isOut ? 'Out of Stock' : isLow ? 'Low Stock' : 'In Stock'}
+        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100">
+            In Stock
         </span>
     );
 }
-
-function TableSkeleton() {
-    return (
-        <div className="animate-pulse space-y-4">
-            {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-16 rounded-xl bg-slate-50" />
-            ))}
-        </div>
-    );
-}
-
-// ─── Inventory Page ───────────────────────────────────────────────────────────
 
 export default function Inventory() {
     const navigate = useNavigate();
@@ -67,9 +61,14 @@ export default function Inventory() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [search, setSearch] = useState('');
+    const [sortConfig, setSortConfig] = useState({ key: 'itemName', direction: 'asc' });
 
-    // Modal state
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 12;
+
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [isItemModalOpen, setIsItemModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
 
     const fetchData = useCallback(async () => {
@@ -78,8 +77,8 @@ export default function Inventory() {
         try {
             const data = await inventoryService.getAll();
             setRecords(Array.isArray(data) ? data : []);
-        } catch (err) {
-            setError(err.message ?? 'Failed to load inventory.');
+        } catch {
+            setError('Failed to load inventory.');
         } finally {
             setLoading(false);
         }
@@ -87,163 +86,225 @@ export default function Inventory() {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
-    // ── Metrics ───────────────────────────────────────────────────────────────
-    const metrics = {
-        totalItems: records.length,
-        lowStock: records.filter(r => r.availableQty <= (r.lowStockThreshold || 5)).length,
-        outOfStock: records.filter(r => r.availableQty <= 0).length,
+    const handleSort = (key) => {
+        setSortConfig(prev => ({
+            key,
+            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+        }));
+        setCurrentPage(1);
     };
 
-    const filteredRecords = records.filter(r =>
-        (r.itemName ?? '').toLowerCase().includes(search.toLowerCase()) ||
-        (r.sku ?? r.itemId ?? '').toString().toLowerCase().includes(search.toLowerCase())
+    const handleExport = () => {
+        const exportData = flattenData(filteredRecords);
+        exportToCSV(exportData, 'inventory-report');
+    };
+
+    const sortedRecords = [...records].sort((a, b) => {
+        if (!sortConfig.key) return 0;
+        const aVal = a[sortConfig.key] ?? '';
+        const bVal = b[sortConfig.key] ?? '';
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    const filteredRecords = sortedRecords.filter(r =>
+        (r.name ?? r.itemName ?? '').toLowerCase().includes(search.toLowerCase()) ||
+        (r.barcode ?? r.sku ?? r.itemId ?? '').toString().toLowerCase().includes(search.toLowerCase())
     );
 
+    const paginatedRecords = filteredRecords.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    const metrics = {
+        totalItems: records.length,
+        available: records.reduce((acc, r) => acc + (Number(r.availableQty) || 0), 0),
+        lowStock: records.filter(r => (Number(r.availableQty) || 0) <= (Number(r.lowStockThreshold) || 5) && Number(r.availableQty) > 0).length,
+        totalValue: records.reduce((acc, r) => acc + ((Number(r.availableQty) || 0) * (Number(r.costPrice) || 0)), 0),
+        outOfStock: records.filter(r => (Number(r.availableQty) || 0) <= 0).length,
+    };
+
     return (
-        <MainLayout title="Inventory">
-            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Inventory Control</h1>
-                    <p className="text-sm text-slate-500">Monitor stock levels and manage item availability.</p>
+        <MainLayout title="Logistics Center">
+            {/* ── Elite Header ────────────────────────────────────────────────── */}
+            <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between no-print">
+                <div className="flex items-center gap-5">
+                    <div className="h-14 w-14 rounded-[1.25rem] bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
+                        <Package size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none">Inventory</h1>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Stock Management
+                        </p>
+                    </div>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="ghost" onClick={fetchData} disabled={loading}>
-                        <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-                    </Button>
-                    <Button variant="outline" className="gap-2" onClick={() => navigate('/inventory/history')}>
-                        <History className="h-4 w-4" /> History
-                    </Button>
-                    <Button className="gap-2 bg-blue-600 hover:bg-blue-700" onClick={() => { setSelectedItem(null); setIsModalOpen(true); }}>
-                        <Plus className="h-4 w-4" /> New Movement
+
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center bg-white dark:bg-slate-900 rounded-2xl p-1 shadow-sm border border-slate-100 dark:border-slate-800">
+                        <Button variant="ghost" size="sm" className="h-10 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 gap-2 text-xs font-bold text-slate-500" onClick={handleExport}>
+                            <FileDown size={14} /> Export
+                        </Button>
+                        <div className="w-px h-4 bg-slate-100 dark:bg-slate-800 mx-1" />
+                        <Button variant="ghost" size="sm" className="h-10 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 gap-2 text-xs font-bold text-slate-500" onClick={() => setIsImportModalOpen(true)}>
+                            <Upload size={14} /> Import
+                        </Button>
+                    </div>
+
+                    <Button onClick={() => setIsItemModalOpen(true)} className="h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/25 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 transition-all hover:scale-[1.02] active:scale-95">
+                        <Plus size={18} /> New Asset
                     </Button>
                 </div>
             </div>
 
-            {/* ── Status Cards ────────────────────────────────────────────────── */}
-            <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <Card className="border-l-4 border-l-blue-500 shadow-sm">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
-                            <Package size={24} />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Items</p>
-                            <p className="text-2xl font-black text-slate-900">{metrics.totalItems}</p>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="border-l-4 border-l-amber-500 shadow-sm">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="rounded-xl bg-amber-50 p-3 text-amber-600">
-                            <ShieldAlert size={24} />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Low Stock</p>
-                            <p className="text-2xl font-black text-slate-900">{metrics.lowStock}</p>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="border-l-4 border-l-rose-500 shadow-sm">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="rounded-xl bg-rose-50 p-3 text-rose-600">
-                            <AlertTriangle size={24} />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Out of Stock</p>
-                            <p className="text-2xl font-black text-slate-900">{metrics.outOfStock}</p>
-                        </div>
-                    </CardContent>
-                </Card>
+            {/* ── Glassmorphic Metrics ────────────────────────────────────────── */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+                <StatusCard
+                    title="Total Items"
+                    value={metrics.totalItems}
+                    icon={Package}
+                    colorClass="from-blue-500 to-blue-600"
+                    subtitle="Unique SKUs"
+                />
+                <StatusCard
+                    title="Available Stock"
+                    value={metrics.available}
+                    icon={Layers}
+                    colorClass="from-indigo-500 to-indigo-600"
+                    subtitle="Ready to Sell"
+                />
+                <StatusCard
+                    title="Stock Value"
+                    value={new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(metrics.totalValue)}
+                    icon={TrendingUp}
+                    colorClass="from-emerald-500 to-emerald-600"
+                    subtitle="Total Valuation"
+                />
+                <StatusCard
+                    title="Low Stock"
+                    value={metrics.lowStock}
+                    icon={ShieldAlert}
+                    colorClass={metrics.lowStock > 0 ? "from-rose-500 to-rose-600" : "from-slate-400 to-slate-500"}
+                    subtitle="Needs Refill"
+                />
             </div>
 
-            {error && <Alert variant="error" message={error} className="mb-6" onClose={() => setError(null)} />}
+            {error && <Alert variant="error" message={error} className="mb-8 border-none bg-rose-50/50 backdrop-blur-md" onClose={() => setError(null)} />}
 
-            {/* ── Main List ───────────────────────────────────────────────────── */}
-            <Card className="shadow-xl shadow-slate-200/50">
-                <CardHeader className="border-b border-slate-50 bg-slate-50/50">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            {/* ── Main Availability Table ────────────────────────────────────── */}
+            <Card className="border-none bg-white dark:bg-slate-900 shadow-2xl shadow-slate-200/50 dark:shadow-none rounded-[2.5rem] overflow-hidden">
+                <CardHeader className="p-10 border-b border-slate-50 dark:border-slate-800">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <CardTitle>Catalog & Availability</CardTitle>
-                            <CardDescription>
-                                {filteredRecords.length} items found in your catalog.
-                            </CardDescription>
+                            <CardTitle className="text-xl font-black text-slate-900 dark:text-white tracking-tight border-none p-0">Stock Availability</CardTitle>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Current Inventory Levels</p>
                         </div>
 
-                        <div className="relative w-full lg:w-72">
-                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <div className="relative w-full lg:w-96 group">
+                            <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Search by name or SKU..."
-                                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                                placeholder="Search by name, SKU or barcode..."
+                                className="w-full h-14 rounded-2xl border-none bg-slate-50 dark:bg-slate-800/50 pl-14 pr-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600"
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             />
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
                     {loading ? (
-                        <div className="p-6"><TableSkeleton /></div>
-                    ) : filteredRecords.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
-                            <TrendingUp size={48} className="mb-4" />
-                            <p className="font-semibold text-lg">No inventory records</p>
-                            <p className="text-sm">Start by adding products or stock movements.</p>
-                        </div>
+                        <div className="p-10"><TableSkeleton rows={8} /></div>
                     ) : (
-                        <Table>
+                        <Table className="border-separate border-spacing-0">
                             <TableHeader>
-                                <TableRow className="bg-slate-50/10 hover:bg-transparent">
-                                    <TableHead>Item / SKU</TableHead>
-                                    <TableHead>Qty Available</TableHead>
-                                    <TableHead>Damaged/Expired</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Min. Level</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
+                                    <TableRow className="bg-slate-50/30 dark:bg-slate-800/30 hover:bg-transparent border-none">
+                                        <TableHead className="pl-10 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 cursor-pointer" onClick={() => handleSort('itemName')}>Product Name</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">SKU / Batch</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Expiry</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center cursor-pointer" onClick={() => handleSort('availableQty')}>Available</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Price</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</TableHead>
+                                        <TableHead className="pr-10 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</TableHead>
+                                    </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredRecords.map((r) => (
-                                    <TableRow key={r.id}>
-                                        <TableCell>
-                                            <div className="flex flex-col">
-                                                <span className="font-bold text-slate-900">{r.itemName || 'Unnamed Item'}</span>
-                                                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                                                    SKU: {r.sku || r.itemId || '—'}
+                                {paginatedRecords.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={8} className="py-24 text-center">
+                                            <p className="text-xs font-black text-slate-300 uppercase tracking-[0.3em]">No Assets Found in Matrix</p>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : paginatedRecords.map((r) => (
+                                    <TableRow key={r.id ?? r.itemId} className="group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 border-none transition-colors">
+                                        <TableCell className="pl-10 py-6">
+                                            <div className="flex items-center gap-5">
+                                                <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 shadow-sm group-hover:scale-110 transition-transform">
+                                                    <Package size={20} />
+                                                </div>
+                                                <span className="text-base font-black text-slate-900 dark:text-white tracking-tight leading-none group-hover:text-blue-600 transition-colors">
+                                                    {r.itemName || r.name || 'UNNAMED'}
                                                 </span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-lg font-black text-slate-700">{r.availableQty}</span>
-                                                <span className="text-xs text-slate-400">units</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest font-mono leading-none">
+                                                    {r.sku || r.barcode || r.itemId || '—'}
+                                                </span>
+                                                {r.batchNo && (
+                                                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">
+                                                        Batch: {r.batchNo}
+                                                    </span>
+                                                )}
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex flex-col text-xs space-y-0.5">
-                                                <span className="text-rose-600/70 font-medium">Damaged: {r.damagedQty || 0}</span>
-                                                <span className="text-orange-600/70 font-medium">Expired: {r.expiredQty || 0}</span>
-                                            </div>
+                                            <span className={cn(
+                                                "text-[10px] font-black uppercase tracking-widest",
+                                                r.expiryDate && new Date(r.expiryDate) < new Date() ? "text-rose-500" : "text-slate-400"
+                                            )}>
+                                                {r.expiryDate ? new Date(r.expiryDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—'}
+                                            </span>
                                         </TableCell>
                                         <TableCell>
-                                            <StockBadge qty={r.availableQty} threshold={r.lowStockThreshold} />
+                                            <span className="text-[10px] font-bold text-slate-500">
+                                                {r.categoryName || '—'}
+                                            </span>
                                         </TableCell>
-                                        <TableCell className="text-slate-500 font-medium italic">
-                                            {r.lowStockThreshold || 5} units
+                                        <TableCell className="text-center">
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-lg font-black text-slate-900 dark:text-white tabular-nums">
+                                                    {Number(r.availableQty ?? 0).toLocaleString()}
+                                                </span>
+                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Sellable</span>
+                                            </div>
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <div className="flex justify-end gap-1">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-8 w-8 p-0"
-                                                    title="Stock Adjustment"
-                                                    onClick={() => { setSelectedItem(r); setIsModalOpen(true); }}
-                                                >
-                                                    <ArrowRightLeft size={16} className="text-slate-400 hover:text-blue-500" />
+                                            <div className="flex flex-col items-end">
+                                                <span className="text-sm font-black text-slate-900 dark:text-white tracking-tighter tabular-nums">
+                                                    {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(r.sellingPrice || 0)}
+                                                </span>
+                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Unit Rate</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <StockBadge qty={Number(r.availableQty ?? 0)} threshold={r.lowStockThreshold} />
+                                        </TableCell>
+                                        <TableCell className="pr-10 text-right">
+                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                                                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-blue-600 hover:text-white shadow-sm" onClick={() => { setSelectedItem(r); setIsModalOpen(true); }}>
+                                                    <ArrowRightLeft size={16} />
                                                 </Button>
-                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Settings">
-                                                    <MoreVertical size={16} className="text-slate-400" />
+                                                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-slate-900 hover:text-white shadow-sm" onClick={() => { setSelectedItem(r); setIsItemModalOpen(true); }}>
+                                                    <MoreVertical size={16} />
                                                 </Button>
                                             </div>
                                         </TableCell>
@@ -253,14 +314,49 @@ export default function Inventory() {
                         </Table>
                     )}
                 </CardContent>
+                
+                {!loading && filteredRecords.length > 0 && (
+                    <div className="p-10 border-t border-slate-50 dark:border-slate-800">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalItems={filteredRecords.length}
+                            itemsPerPage={itemsPerPage}
+                            onPageChange={setCurrentPage}
+                        />
+                    </div>
+                )}
             </Card>
 
             <StockMovementModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => { setIsModalOpen(false); setSelectedItem(null); }}
                 onSuccess={fetchData}
                 initialItem={selectedItem}
             />
+
+            <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onSuccess={fetchData} />
+            <ItemModal isOpen={isItemModalOpen} onClose={() => setIsItemModalOpen(false)} onSuccess={fetchData} />
         </MainLayout>
+    );
+}
+
+function StatusCard({ title, value, icon: Icon, colorClass, subtitle }) {
+    return (
+        <Card className="border-none bg-white dark:bg-slate-900 shadow-xl shadow-slate-100/50 dark:shadow-none p-8 rounded-[2rem] group hover:scale-[1.02] transition-all cursor-default relative overflow-hidden">
+            <div className={cn("absolute top-0 right-0 h-32 w-32 translate-x-12 -translate-y-12 rounded-full opacity-[0.03] group-hover:scale-150 transition-transform bg-gradient-to-br", colorClass)} />
+            <div className="flex items-center gap-6 relative z-10">
+                <div className={cn("h-16 w-16 rounded-2xl flex items-center justify-center text-white shadow-lg bg-gradient-to-br", colorClass)}>
+                    <Icon size={32} />
+                </div>
+                <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">{title}</p>
+                    <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mb-2 tracking-tighter tabular-nums">{value}</p>
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-tight flex items-center gap-1.5">
+                        <span className="h-1 w-1 rounded-full bg-slate-200 dark:bg-slate-700" />
+                        {subtitle}
+                    </p>
+                </div>
+            </div>
+        </Card>
     );
 }

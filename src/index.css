@@ -1,6 +1,99 @@
 @import "tailwindcss";
 
-body {
-  margin: 0;
-  min-width: 320px;
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  
+  /* Enterprise Primary Colors */
+  --color-brand-primary: #3b82f6;
+  --color-sidebar-bg: #0f172a; /* slate-900 */
+  --color-page-bg: #f8fafc;    /* slate-50 */
+}
+
+/* 
+  Tailwind v4: Class-based Dark Mode
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply antialiased font-sans transition-colors duration-300;
+    background-color: var(--color-page-bg);
+    color: #1e293b; /* slate-800 */
+  }
+
+  html.dark body {
+    background-color: #0b0f19;
+    color: #f1f5f9;
+  }
+
+  /* Standard Professional Heading Styling */
+  h1, h2, h3, h4 {
+    @apply tracking-tight font-bold text-slate-900 dark:text-white;
+  }
+}
+
+@layer utilities {
+  .enterprise-card {
+    @apply bg-white border border-slate-100 shadow-sm rounded-2xl;
+  }
+  
+  .dark .enterprise-card {
+    @apply bg-slate-900 border border-slate-800 shadow-xl shadow-black/20 rounded-2xl;
+  }
+
+  /* Smooth sidebar transition */
+  .sidebar-active-indicator {
+    @apply absolute right-3 h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)];
+  }
+
+  /* Pastel Icon Boxes */
+  .icon-box-blue { @apply bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400; }
+  .icon-box-rose { @apply bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400; }
+  .icon-box-emerald { @apply bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400; }
+  .icon-box-amber { @apply bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400; }
+}
+
+@media print {
+  /* Hide UI elements during print */
+  header, aside, .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Thermal Receipt Specific styles (80mm width) */
+  .thermal-receipt {
+    width: 300px !important; /* Roughly 80mm */
+    font-size: 10pt !important;
+    padding: 10px !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 auto !important;
+    color: black !important;
+  }
+
+  .thermal-receipt * {
+    color: black !important;
+    border-color: #eee !important;
+  }
+
+  .thermal-receipt table {
+    width: 100% !important;
+  }
+
+  .thermal-receipt .text-4xl {
+    font-size: 14pt !important;
+  }
+
+  .thermal-receipt .p-12 {
+    padding: 10px !important;
+  }
 }

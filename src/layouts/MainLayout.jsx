@@ -1,32 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 
 /**
- * MainLayout provides the structural wrapper for the entire dashboard
- * Including responsive sidebar and sticky topbar
+ * MainLayout – The standardized shell for all internal SaaS pages
  */
-export default function MainLayout({ children, title }) {
-  return (
-    <div className="flex min-h-screen bg-slate-50/50">
-      {/* Sidebar - fixed and hidden on mobile if needed, but here standard desktop sidebar */}
-      <Sidebar />
+export default function MainLayout({ children }) {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
-      {/* Main Content Area */}
-      <div className="flex flex-1 flex-col">
-        <Topbar title={title} />
-        
-        <main className="flex-1 p-6 lg:p-10">
-          <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {children}
-          </div>
-        </main>
+    return (
+        <div className="flex min-h-screen transition-colors duration-500">
+            {/* Overlay backdrop for mobile & Tablets */}
+            {sidebarOpen && (
+                <div 
+                    className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden transition-opacity duration-300"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
 
-        {/* Optional Footer */}
-        <footer className="border-t border-slate-200 bg-white py-4 px-6 text-center text-xs text-slate-400">
-          &copy; {new Date().getFullYear()} BizFlow Enterprise. All rights reserved.
-        </footer>
-      </div>
-    </div>
-  );
+            {/* Sidebar with state control */}
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+            <div className="flex flex-1 flex-col overflow-x-hidden">
+                {/* Topbar with mobile menu toggle */}
+                <Topbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+
+                {/* Main Content Area */}
+                <main className="flex-1 p-4 md:p-8">
+                    <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        {children}
+                    </div>
+                </main>
+            </div>
+        </div>
+    );
 }

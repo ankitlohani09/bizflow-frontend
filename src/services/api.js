@@ -58,9 +58,14 @@ api.interceptors.response.use(
     // Provide a human-readable message so UI can display it
     const message =
       error.response?.data?.message ||
+      error.response?.data?.error || // Some Spring Boot errors use 'error' field
       error.message ||
-      'An unexpected error occurred';
-    return Promise.reject(new Error(message));
+      'An unexpected server error occurred';
+    
+    // Create an error object that carries the full response for debugging
+    const enrichedError = new Error(message);
+    enrichedError.response = error.response;
+    return Promise.reject(enrichedError);
   }
 );
 

@@ -1,23 +1,28 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import authService from '../services/authService';
 
 /**
- * ProtectedRoute
- *
- * Wraps any route that requires authentication.
- * If no token is found in localStorage → redirects to /login.
- * If authenticated → renders the child route (via <Outlet />).
- *
- * Usage in router:
- *   <Route element={<ProtectedRoute />}>
- *     <Route path="/dashboard" element={<Dashboard />} />
- *   </Route>
+ * ProtectedRoute – Enforces authentication and Role-Based Access Control (RBAC)
+ * 
+ * @param {string[]} allowedRoles - List of roles permitted to access this route
  */
-export default function ProtectedRoute() {
-    if (!authService.isAuthenticated()) {
-        // replace: true means the login page won't be in browser history
+export default function ProtectedRoute({ allowedRoles = [] }) {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const token = localStorage.getItem('token');
+    
+    // 1. Auth Check – require both token and profile
+    if (!user || !token) {
         return <Navigate to="/login" replace />;
+    }
+
+    // 2. Role Check (if required)
+    // Backend returns 'roles' as an array. We check if any user role matches allowedRoles.
+    if (allowedRoles.length > 0) {
+        const hasAccess = user.roles?.some(role => allowedRoles.includes(role));
+        if (!hasAccess) {
+            console.warn(`Access denied for roles: ${user.roles?.join(', ')}. Required: ${allowedRoles.join(', ')}`);
+            return <Navigate to="/dashboard" replace />;
+        }
     }
 
     return <Outlet />;
