@@ -27,6 +27,7 @@ import {
     TableCell,
 } from '../components/ui/Table';
 import { cn } from '../utils/cn';
+import Pagination from '../components/ui/Pagination';
 
 const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
@@ -55,6 +56,10 @@ export default function Purchases() {
     const [error, setError] = useState(null);
     const [search, setSearch] = useState('');
 
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -73,6 +78,12 @@ export default function Purchases() {
     const filteredPurchases = purchases.filter(p =>
         (p.supplierName || p.supplier?.name || '').toLowerCase().includes(search.toLowerCase()) ||
         (p.id || '').toString().toLowerCase().includes(search.toLowerCase())
+    );
+
+    // Paginated results
+    const paginatedPurchases = filteredPurchases.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -115,7 +126,10 @@ export default function Purchases() {
                                 placeholder="Search vendor or PO #..."
                                 className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all font-medium"
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             />
                         </div>
                     </div>
@@ -146,7 +160,7 @@ export default function Purchases() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredPurchases.map((p) => (
+                                {paginatedPurchases.map((p) => (
                                     <TableRow key={p.id} className="group border-slate-50">
                                         <TableCell className="pl-8 py-6">
                                             <span className="font-bold text-slate-400 font-mono text-xs uppercase tracking-tighter">#PO-{p.id}</span>
@@ -181,6 +195,15 @@ export default function Purchases() {
                         </Table>
                     )}
                 </CardContent>
+                
+                {!loading && filteredPurchases.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={filteredPurchases.length}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
             </Card>
         </MainLayout>
     );

@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    RotateCcw, 
     Search, 
-    Filter, 
-    Calendar, 
     User, 
     Package,
-    ArrowUpRight,
     Loader2,
-    AlertCircle
+    AlertCircle,
+    RotateCcw
 } from 'lucide-react';
 import MainLayout from '../layouts/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import Pagination from '../components/ui/Pagination';
 import returnService from '../services/returnService';
-import { formatCurrency as fmt } from '../utils/formatCurrency';
 
 export default function Returns() {
     const [returns, setReturns] = useState([]);
@@ -24,13 +21,17 @@ export default function Returns() {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
     useEffect(() => {
         async function fetchReturns() {
             setLoading(true);
             try {
                 const data = await returnService.getReturnHistory();
                 setReturns(Array.isArray(data) ? data : []);
-            } catch (err) {
+            } catch {
                 setError('Failed to sync returns log.');
             } finally {
                 setLoading(false);
@@ -43,6 +44,12 @@ export default function Returns() {
         r.itemName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         r.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         String(r.invoiceId).includes(searchTerm)
+    );
+
+    // Paginated results
+    const paginatedReturns = filteredReturns.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     if (loading) {
@@ -70,7 +77,10 @@ export default function Returns() {
                             placeholder="Search by Invoice or Client..." 
                             className="pl-9 w-72 h-11 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition-all font-medium"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(1);
+                            }}
                         />
                     </div>
                 </div>
@@ -95,8 +105,8 @@ export default function Returns() {
                                 <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Timestamp</TableHead>
                             </TableRow>
                         </TableHeader>
-                        <TableBody>
-                            {filteredReturns.length === 0 ? (
+                                <TableBody>
+                            {paginatedReturns.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={5} className="h-64 text-center">
                                         <div className="flex flex-col items-center gap-2 opacity-20">
@@ -106,7 +116,7 @@ export default function Returns() {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filteredReturns.map((r, idx) => (
+                                paginatedReturns.map((r, idx) => (
                                     <TableRow key={idx} className="group border-slate-50 dark:border-slate-800/50">
                                         <TableCell className="pl-8 py-6">
                                             <div className="flex flex-col">
@@ -157,6 +167,15 @@ export default function Returns() {
                         </TableBody>
                     </Table>
                 </CardContent>
+                
+                {!loading && filteredReturns.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={filteredReturns.length}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
             </Card>
         </MainLayout>
     );

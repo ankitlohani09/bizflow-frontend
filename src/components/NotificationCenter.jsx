@@ -14,43 +14,43 @@ export default function NotificationCenter() {
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
 
-    const fetchAlerts = async () => {
-        try {
-            const [items, invoices] = await Promise.all([
-                inventoryService.getAll(),
-                invoiceService.getAll()
-            ]);
-
-            const alerts = [
-                ...items.filter(it => (it.availableQty || 0) <= (it.lowStockThreshold || 5))
-                    .map(it => ({
-                        id: `stock-${it.id}`,
-                        type: 'LOW_STOCK',
-                        title: 'Low Stock Alert',
-                        message: `${it.itemName || 'Product'} is down to ${it.availableQty} units.`,
-                        icon: AlertTriangle,
-                        color: 'text-amber-500',
-                        bgColor: 'bg-amber-50'
-                    })),
-                ...invoices.filter(inv => (inv.paymentStatus || inv.status) === 'PENDING')
-                    .map(inv => ({
-                        id: `pay-${inv.id}`,
-                        type: 'PENDING_PAYMENT',
-                        title: 'Pending Payment',
-                        message: `Invoice ${inv.invoiceNumber || ('#INV-' + inv.id)} for ${inv.customerName || 'Walk-in'} is unpaid.`,
-                        icon: Clock,
-                        color: 'text-blue-500',
-                        bgColor: 'bg-blue-50'
-                    }))
-            ];
-
-            setNotifications(alerts);
-        } catch (err) {
-            console.error('Notification fetch error:', err);
-        }
-    };
-
     useEffect(() => {
+        const fetchAlerts = async () => {
+            try {
+                const [items, invoices] = await Promise.all([
+                    inventoryService.getAll(),
+                    invoiceService.getAll()
+                ]);
+
+                const alerts = [
+                    ...items.filter(it => (it.availableQty || 0) <= (it.lowStockThreshold || 5))
+                        .map(it => ({
+                            id: `stock-${it.id}`,
+                            type: 'LOW_STOCK',
+                            title: 'Low Stock Alert',
+                            message: `${it.itemName || 'Product'} is down to ${it.availableQty} units.`,
+                            icon: AlertTriangle,
+                            color: 'text-amber-500',
+                            bgColor: 'bg-amber-50'
+                        })),
+                    ...invoices.filter(inv => (inv.paymentStatus || inv.status) === 'PENDING')
+                        .map(inv => ({
+                            id: `pay-${inv.id}`,
+                            type: 'PENDING_PAYMENT',
+                            title: 'Pending Payment',
+                            message: `Invoice ${inv.invoiceNumber || ('#INV-' + inv.id)} for ${inv.customerName || 'Walk-in'} is unpaid.`,
+                            icon: Clock,
+                            color: 'text-blue-500',
+                            bgColor: 'bg-blue-50'
+                        }))
+                ];
+
+                setNotifications(alerts);
+            } catch (err) {
+                console.error('Notification fetch error:', err);
+            }
+        };
+
         fetchAlerts();
         const interval = setInterval(fetchAlerts, 60000); // Poll every minute
         return () => clearInterval(interval);

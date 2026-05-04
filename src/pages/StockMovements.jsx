@@ -6,8 +6,7 @@ import {
     ArrowUpCircle, 
     ArrowDownCircle, 
     AlertCircle,
-    Search,
-    Filter
+    Search
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import inventoryService from '../services/inventoryService';
@@ -25,17 +24,15 @@ export default function StockMovements() {
     const navigate = useNavigate();
     const [movements, setMovements] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [search, setSearch] = useState('');
 
     const fetchData = useCallback(async () => {
         setLoading(true);
-        setError(null);
         try {
             const data = await inventoryService.getStockMovements();
             setMovements(Array.isArray(data) ? data : []);
         } catch (err) {
-            setError(err.message ?? 'Failed to retrieve audit trail.');
+            console.error(err.message ?? 'Failed to retrieve audit trail.');
         } finally {
             setLoading(false);
         }

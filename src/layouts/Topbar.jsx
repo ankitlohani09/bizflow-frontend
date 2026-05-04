@@ -3,7 +3,6 @@ import { Sun, Moon, User, Menu, Maximize, Minimize } from 'lucide-react';
 import GlobalSearch from '../components/GlobalSearch';
 import NotificationCenter from '../components/NotificationCenter';
 import { useTheme } from '../context/ThemeContext';
-import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 
 /**
@@ -12,7 +11,6 @@ import i18n from '../i18n';
 export default function Topbar({ onToggleSidebar }) {
     const { isDarkMode, toggleTheme } = useTheme();
     const [isFullscreen, setIsFullscreen] = React.useState(false);
-    const { t } = useTranslation();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     const changeLanguage = (lng) => {

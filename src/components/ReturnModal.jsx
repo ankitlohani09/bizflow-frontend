@@ -7,7 +7,6 @@ import returnService from '../services/returnService';
 
 export default function ReturnModal({ isOpen, onClose, onSuccess, invoice }) {
     const [submitting, setSubmitting] = useState(false);
-    const [error, setError] = useState(null);
     const [form, setForm] = useState({
         itemId: '',
         quantity: 1,
@@ -20,7 +19,6 @@ export default function ReturnModal({ isOpen, onClose, onSuccess, invoice }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
-        setError(null);
         try {
             await returnService.processReturn({
                 invoiceId: invoice.id,
@@ -30,8 +28,8 @@ export default function ReturnModal({ isOpen, onClose, onSuccess, invoice }) {
             });
             onSuccess();
             onClose();
-        } catch (err) {
-            setError(err.message || 'Return processing failed.');
+        } catch {
+            console.error('Return processing failed.');
         } finally {
             setSubmitting(false);
         }

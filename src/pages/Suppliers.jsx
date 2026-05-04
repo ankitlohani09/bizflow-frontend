@@ -25,6 +25,7 @@ import {
     TableCell,
 } from '../components/ui/Table';
 import SupplierModal from '../components/SupplierModal';
+import Pagination from '../components/ui/Pagination';
 import { cn } from '../utils/cn';
 
 export default function Suppliers() {
@@ -32,6 +33,10 @@ export default function Suppliers() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [search, setSearch] = useState('');
+
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     // Modal state
     const [modal, setModal] = useState({ isOpen: false, data: null });
@@ -55,6 +60,12 @@ export default function Suppliers() {
         (s.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
         (s.contactPerson ?? '').toLowerCase().includes(search.toLowerCase()) ||
         (s.email ?? '').toLowerCase().includes(search.toLowerCase())
+    );
+
+    // Paginated results
+    const paginatedSuppliers = filteredSuppliers.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -93,7 +104,10 @@ export default function Suppliers() {
                                 placeholder="Search by name, contact..."
                                 className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-shadow"
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             />
                         </div>
                     </div>
@@ -123,7 +137,7 @@ export default function Suppliers() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredSuppliers.map((s) => (
+                                {paginatedSuppliers.map((s) => (
                                     <TableRow key={s.id} className="group border-slate-50">
                                         <TableCell className="pl-8 py-6">
                                             <div className="flex items-center gap-4">
@@ -168,6 +182,15 @@ export default function Suppliers() {
                         </Table>
                     )}
                 </CardContent>
+                
+                {!loading && filteredSuppliers.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={filteredSuppliers.length}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
             </Card>
 
             <SupplierModal

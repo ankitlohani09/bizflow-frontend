@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
-import { cn } from '../utils/cn';
 
 /**
  * MainLayout – The standardized shell for all internal SaaS pages

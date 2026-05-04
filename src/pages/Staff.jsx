@@ -5,18 +5,12 @@ import {
     RefreshCw,
     Search,
     UserCheck,
-    UserX,
     Mail,
     Phone,
-    Briefcase,
     Calendar,
-    MoreVertical,
-    TrendingUp,
     Shield,
-    DollarSign,
     FileDown,
-    Pencil,
-    Trash2
+    Pencil
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import staffService from '../services/staffService';
@@ -35,9 +29,8 @@ import {
 import StaffModal from '../components/StaffModal';
 import { exportToCSV, flattenData } from '../utils/exportUtils';
 import { cn } from '../utils/cn';
+import Pagination from '../components/ui/Pagination';
 
-const fmt = (val) =>
-    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -93,6 +86,10 @@ export default function Staff() {
     const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
 
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
     // Modal state
     const [modal, setModal] = useState({ isOpen: false, data: null });
 
@@ -116,6 +113,7 @@ export default function Staff() {
             key,
             direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
         }));
+        setCurrentPage(1);
     };
 
     const handleExportCSV = () => {
@@ -135,6 +133,12 @@ export default function Staff() {
         (s.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
         (s.role ?? '').toLowerCase().includes(search.toLowerCase()) ||
         (s.email ?? '').toLowerCase().includes(search.toLowerCase())
+    );
+
+    // Paginated results
+    const paginatedStaff = filteredStaff.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     const stats = {
@@ -220,7 +224,10 @@ export default function Staff() {
                                 placeholder="Search Name, Role or CID..."
                                 className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow font-medium"
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             />
                         </div>
                     </div>
@@ -245,7 +252,7 @@ export default function Staff() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {filteredStaff.map((staffMember) => (
+                                    {paginatedStaff.map((staffMember) => (
                                         <TableRow 
                                             key={staffMember.id} 
                                             className={cn(
@@ -300,6 +307,15 @@ export default function Staff() {
                         </div>
                     )}
                 </CardContent>
+                
+                {!loading && filteredStaff.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={filteredStaff.length}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
             </Card>
 
             <StaffModal

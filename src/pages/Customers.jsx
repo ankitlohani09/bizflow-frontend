@@ -31,9 +31,7 @@ import { TableSkeleton } from '../components/ui/Skeleton';
 import CustomerForm from '../components/CustomerForm';
 import { cn } from '../utils/cn';
 import { exportToCSV, flattenData } from '../utils/exportUtils';
-
-const fmt = (val) =>
-    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
+import Pagination from '../components/ui/Pagination';
 
 function Avatar({ name }) {
     return (
@@ -74,6 +72,10 @@ export default function Customers() {
     const [loadError, setLoadError] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
 
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
     // Which modal is open
     const [modal, setModal] = useState(null); 
     const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -105,6 +107,7 @@ export default function Customers() {
             key,
             direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
         }));
+        setCurrentPage(1);
     };
 
     const handleExportCSV = () => {
@@ -149,6 +152,12 @@ export default function Customers() {
             (c.city ?? '').toLowerCase().includes(q)
         );
     });
+
+    // Paginated results
+    const paginatedCustomers = filteredCustomers.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     return (
         <MainLayout title="Customer Relations">
@@ -197,7 +206,10 @@ export default function Customers() {
                                 placeholder="Search Name, Email, or Region..."
                                 className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white font-medium"
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             />
                         </div>
                     </div>
@@ -218,7 +230,7 @@ export default function Customers() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredCustomers.map((customer) => (
+                                {paginatedCustomers.map((customer) => (
                                     <TableRow key={customer.id} className="dark:border-slate-800 dark:hover:bg-slate-800/40 group">
                                         <TableCell className="pl-8 py-6">
                                             <div className="flex items-center gap-4">
@@ -280,6 +292,15 @@ export default function Customers() {
                         </Table>
                     )}
                 </CardContent>
+                
+                {!loading && filteredCustomers.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={filteredCustomers.length}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
             </Card>
 
             <Modal isOpen={modal === 'add' || modal === 'edit'} onClose={() => setModal(null)} title={modal === 'edit' ? 'Update Profile' : 'Register New Client'} size="lg">

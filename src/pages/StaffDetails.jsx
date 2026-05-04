@@ -73,7 +73,7 @@ export default function StaffDetails() {
             await new Promise(r => setTimeout(r, 1000));
             alert('Payroll processed successfully!');
             fetchData();
-        } catch (err) {
+        } catch {
             setError('Failed to process payroll.');
         } finally {
             setSubmitting(false);

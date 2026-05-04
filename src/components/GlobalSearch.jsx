@@ -96,7 +96,7 @@ export default function GlobalSearch() {
             {isOpen && results.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-2 min-w-[300px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 z-50">
                     <div className="p-2">
-                        {results.map((item, idx) => (
+                        {results.map((item) => (
                             <button
                                 key={`${item.type}-${item.id}`}
                                 onClick={() => handleSelect(item)}

@@ -38,7 +38,7 @@ export default function ImportModal({ isOpen, onClose, onSuccess }) {
                 setFile(selectedFile);
                 setStats({ total: data.length, success: 0, failed: 0 });
                 setError(null);
-            } catch (err) {
+            } catch {
                 setError('Failed to parse file. Ensure it is a valid Excel/CSV.');
             }
         };
@@ -65,10 +65,16 @@ export default function ImportModal({ isOpen, onClose, onSuccess }) {
                     // Normalize data mapping
                     const itemData = {
                         name: row.Name || row.name || row.Item || '',
-                        sku: row.SKU || row.sku || row.Code || '',
+                        barcode: row.SKU || row.sku || row.Code || row.Barcode || '',
                         category: row.Category || row.category || 'General',
-                        basePrice: Number(row.Price || row['Base Price'] || row.price || 0),
-                        unit: row.Unit || row.unit || 'pcs'
+                        sellingPrice: Number(row.Price || row['Base Price'] || row.price || row['Selling Price'] || 0),
+                        costPrice: Number(row['Cost Price'] || row.cost || 0),
+                        unit: row.Unit || row.unit || 'pcs',
+                        type: row.Type || row.type || 'PRODUCT',
+                        trackInventory: true,
+                        taxRate: 0,
+                        hasVariants: false,
+                        isActive: true
                     };
 
                     if (itemData.name) {
@@ -79,7 +85,7 @@ export default function ImportModal({ isOpen, onClose, onSuccess }) {
                     }
 
                     setStats(prev => ({ ...prev, success: successCount, failed: failedCount }));
-                } catch (err) {
+                } catch {
                     failedCount++;
                     setStats(prev => ({ ...prev, success: successCount, failed: failedCount }));
                 }

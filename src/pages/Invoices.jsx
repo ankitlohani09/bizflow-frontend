@@ -20,6 +20,7 @@ import Alert from '../components/ui/Alert';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
 import { TableSkeleton } from '../components/ui/Skeleton';
+import Pagination from '../components/ui/Pagination';
 import { cn } from '../utils/cn';
 
 const fmt = (val) =>
@@ -50,6 +51,10 @@ export default function Invoices() {
     const [error, setError] = useState(null);
     const [sortConfig, setSortConfig] = useState({ key: 'id', direction: 'desc' });
 
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
     // Filters
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
@@ -74,6 +79,7 @@ export default function Invoices() {
             key,
             direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
         }));
+        setCurrentPage(1);
     };
 
     const handleExportCSV = () => {
@@ -104,6 +110,12 @@ export default function Invoices() {
 
         return matchesSearch && matchesStatus;
     });
+
+    // Paginated results
+    const paginatedInvoices = filteredInvoices.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     return (
         <MainLayout title="Invoices">
@@ -149,7 +161,10 @@ export default function Invoices() {
                                     placeholder="Order #, Customer..."
                                     className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-shadow"
                                     value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
                                 />
                             </div>
 
@@ -157,7 +172,10 @@ export default function Invoices() {
                                 {['ALL', 'PAID', 'PENDING'].map((status) => (
                                     <button
                                         key={status}
-                                        onClick={() => setStatusFilter(status)}
+                                        onClick={() => {
+                                            setStatusFilter(status);
+                                            setCurrentPage(1);
+                                        }}
                                         className={cn(
                                             'px-3 py-1 text-[10px] font-black uppercase tracking-widest transition-all rounded-lg',
                                             statusFilter === status
@@ -187,7 +205,7 @@ export default function Invoices() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                 {filteredInvoices.map((invoice) => (
+                                 {paginatedInvoices.map((invoice) => (
                                     <TableRow key={invoice.id} className="group border-slate-50">
                                         <TableCell className="font-bold text-slate-900 pl-8 py-6 leading-none">
                                             {invoice.invoiceNumber || `#INV-${invoice.formattedId || invoice.id || 'N/A'}`}
@@ -231,6 +249,15 @@ export default function Invoices() {
                         </Table>
                     </div>
                 </CardContent>
+                
+                {!loading && filteredInvoices.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={filteredInvoices.length}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
             </Card>
         </MainLayout>
     );

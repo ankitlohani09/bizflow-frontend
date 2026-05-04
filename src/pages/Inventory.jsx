@@ -31,9 +31,11 @@ import {
 } from '../components/ui/Table';
 import StockMovementModal from '../components/StockMovementModal';
 import ImportModal from '../components/ImportModal';
+import ItemModal from '../components/ItemModal';
 import { cn } from '../utils/cn';
 import { exportToCSV, flattenData } from '../utils/exportUtils';
 import { TableSkeleton } from '../components/ui/Skeleton';
+import Pagination from '../components/ui/Pagination';
 
 function StockBadge({ qty, threshold = 5 }) {
     if (qty <= 0) return (
@@ -61,9 +63,12 @@ export default function Inventory() {
     const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: 'itemName', direction: 'asc' });
 
-    // Modal state
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 12;
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [isItemModalOpen, setIsItemModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
 
     const fetchData = useCallback(async () => {
@@ -72,8 +77,8 @@ export default function Inventory() {
         try {
             const data = await inventoryService.getAll();
             setRecords(Array.isArray(data) ? data : []);
-        } catch (err) {
-            setError(err.message ?? 'Failed to load inventory.');
+        } catch {
+            setError('Failed to load inventory.');
         } finally {
             setLoading(false);
         }
@@ -86,6 +91,7 @@ export default function Inventory() {
             key,
             direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
         }));
+        setCurrentPage(1);
     };
 
     const handleExport = () => {
@@ -103,167 +109,202 @@ export default function Inventory() {
     });
 
     const filteredRecords = sortedRecords.filter(r =>
-        (r.itemName ?? r.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
-        (r.sku ?? r.itemId ?? '').toString().toLowerCase().includes(search.toLowerCase())
+        (r.name ?? r.itemName ?? '').toLowerCase().includes(search.toLowerCase()) ||
+        (r.barcode ?? r.sku ?? r.itemId ?? '').toString().toLowerCase().includes(search.toLowerCase())
+    );
+
+    const paginatedRecords = filteredRecords.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     const metrics = {
         totalItems: records.length,
-        available: records.reduce((acc, r) => acc + (r.availableQty || 0), 0),
-        lowStock: records.filter(r => r.availableQty <= (r.lowStockThreshold || 5)).length,
-        reserved: records.reduce((acc, r) => acc + (r.reservedQty || 0), 0),
-        damaged: records.reduce((acc, r) => acc + (r.damagedQty || 0), 0),
-        expired: records.reduce((acc, r) => acc + (r.expiredQty || 0), 0),
+        available: records.reduce((acc, r) => acc + (Number(r.availableQty) || 0), 0),
+        lowStock: records.filter(r => (Number(r.availableQty) || 0) <= (Number(r.lowStockThreshold) || 5) && Number(r.availableQty) > 0).length,
+        totalValue: records.reduce((acc, r) => acc + ((Number(r.availableQty) || 0) * (Number(r.costPrice) || 0)), 0),
+        outOfStock: records.filter(r => (Number(r.availableQty) || 0) <= 0).length,
     };
 
     return (
         <MainLayout title="Logistics Center">
-            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between no-print">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Inventory</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Monitor real-time availability and warehouse movements.</p>
+            {/* ── Elite Header ────────────────────────────────────────────────── */}
+            <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between no-print">
+                <div className="flex items-center gap-5">
+                    <div className="h-14 w-14 rounded-[1.25rem] bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
+                        <Package size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none">Inventory</h1>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Stock Management
+                        </p>
+                    </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" className="gap-2 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" onClick={handleExport}>
-                        <FileDown className="h-4 w-4" /> Export Ledger
-                    </Button>
-                    <Button variant="outline" size="sm" className="gap-2 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" onClick={() => setIsImportModalOpen(true)}>
-                        <Upload className="h-4 w-4" /> Bulk Import
-                    </Button>
-                    <Button variant="outline" size="sm" className="gap-2 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" onClick={() => navigate('/stock-movements')}>
-                        <History className="h-4 w-4" /> Audit Logs
-                    </Button>
-                </div>
-                <div className="flex gap-2">
-                    <Button onClick={() => setIsModalOpen(true)} className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
-                        <Plus size={16} /> Adjustment
+
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center bg-white dark:bg-slate-900 rounded-2xl p-1 shadow-sm border border-slate-100 dark:border-slate-800">
+                        <Button variant="ghost" size="sm" className="h-10 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 gap-2 text-xs font-bold text-slate-500" onClick={handleExport}>
+                            <FileDown size={14} /> Export
+                        </Button>
+                        <div className="w-px h-4 bg-slate-100 dark:bg-slate-800 mx-1" />
+                        <Button variant="ghost" size="sm" className="h-10 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 gap-2 text-xs font-bold text-slate-500" onClick={() => setIsImportModalOpen(true)}>
+                            <Upload size={14} /> Import
+                        </Button>
+                    </div>
+
+                    <Button onClick={() => setIsItemModalOpen(true)} className="h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/25 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 transition-all hover:scale-[1.02] active:scale-95">
+                        <Plus size={18} /> New Asset
                     </Button>
                 </div>
             </div>
 
-            {/* ── Status Cards ────────────────────────────────────────────────── */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-4 mb-8">
+            {/* ── Glassmorphic Metrics ────────────────────────────────────────── */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
                 <StatusCard
-                    title="Available Pool"
+                    title="Total Items"
+                    value={metrics.totalItems}
+                    icon={Package}
+                    colorClass="from-blue-500 to-blue-600"
+                    subtitle="Unique SKUs"
+                />
+                <StatusCard
+                    title="Available Stock"
                     value={metrics.available}
-                    icon={Warehouse}
-                    colorClass="icon-box-blue"
-                    subtitle="Sellable assets"
-                />
-                <StatusCard
-                    title="Reserved"
-                    value={metrics.reserved}
                     icon={Layers}
-                    colorClass="icon-box-indigo"
-                    subtitle="Pending fulfillment"
+                    colorClass="from-indigo-500 to-indigo-600"
+                    subtitle="Ready to Sell"
                 />
                 <StatusCard
-                    title="Damaged"
-                    value={metrics.damaged}
+                    title="Stock Value"
+                    value={new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(metrics.totalValue)}
+                    icon={TrendingUp}
+                    colorClass="from-emerald-500 to-emerald-600"
+                    subtitle="Total Valuation"
+                />
+                <StatusCard
+                    title="Low Stock"
+                    value={metrics.lowStock}
                     icon={ShieldAlert}
-                    colorClass="icon-box-amber"
-                    subtitle="Loss/Damage log"
-                />
-                <StatusCard
-                    title="Expired"
-                    value={metrics.expired}
-                    icon={AlertTriangle}
-                    colorClass="icon-box-rose"
-                    subtitle="Critical depletion"
+                    colorClass={metrics.lowStock > 0 ? "from-rose-500 to-rose-600" : "from-slate-400 to-slate-500"}
+                    subtitle="Needs Refill"
                 />
             </div>
 
-            {error && <Alert variant="error" message={error} className="mb-6" onClose={() => setError(null)} />}
+            {error && <Alert variant="error" message={error} className="mb-8 border-none bg-rose-50/50 backdrop-blur-md" onClose={() => setError(null)} />}
 
-            {/* ── Main List ───────────────────────────────────────────────────── */}
-            <Card className="enterprise-card overflow-hidden mb-12">
-                <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            {/* ── Main Availability Table ────────────────────────────────────── */}
+            <Card className="border-none bg-white dark:bg-slate-900 shadow-2xl shadow-slate-200/50 dark:shadow-none rounded-[2.5rem] overflow-hidden">
+                <CardHeader className="p-10 border-b border-slate-50 dark:border-slate-800">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <CardTitle className="tracking-tighter font-bold text-slate-900 border-none">Availability Matrix</CardTitle>
-                            <CardDescription>
-                                Real-time stock levels across all categories.
-                            </CardDescription>
+                            <CardTitle className="text-xl font-black text-slate-900 dark:text-white tracking-tight border-none p-0">Stock Availability</CardTitle>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Current Inventory Levels</p>
                         </div>
 
-                        <div className="relative w-full lg:w-80">
-                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <div className="relative w-full lg:w-96 group">
+                            <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Search by SKU or Item Name..."
-                                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                                placeholder="Search by name, SKU or barcode..."
+                                className="w-full h-14 rounded-2xl border-none bg-slate-50 dark:bg-slate-800/50 pl-14 pr-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600"
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             />
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
                     {loading ? (
-                        <div className="p-8"><TableSkeleton rows={6} /></div>
+                        <div className="p-10"><TableSkeleton rows={8} /></div>
                     ) : (
-                        <Table>
+                        <Table className="border-separate border-spacing-0">
                             <TableHeader>
-                                <TableRow className="bg-transparent hover:bg-transparent border-none">
-                                    <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 dark:hover:text-white" onClick={() => handleSort('itemName')}>Item / Classification</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-center" onClick={() => handleSort('availableQty')}>Sellable</TableHead>
-                                    <TableHead className="text-center">Reserved</TableHead>
-                                    <TableHead className="text-right">Unit Price</TableHead>
-                                    <TableHead>Network Status</TableHead>
-                                    <TableHead className="text-right pr-8">Actions</TableHead>
-                                </TableRow>
+                                    <TableRow className="bg-slate-50/30 dark:bg-slate-800/30 hover:bg-transparent border-none">
+                                        <TableHead className="pl-10 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 cursor-pointer" onClick={() => handleSort('itemName')}>Product Name</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">SKU / Batch</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Expiry</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center cursor-pointer" onClick={() => handleSort('availableQty')}>Available</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Price</TableHead>
+                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</TableHead>
+                                        <TableHead className="pr-10 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</TableHead>
+                                    </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredRecords.map((r) => (
-                                    <TableRow key={r.id} className="group dark:border-slate-800 dark:hover:bg-slate-800/40">
-                                        <TableCell className="pl-8 py-6">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-10 w-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500">
-                                                    <Layers size={18} />
+                                {paginatedRecords.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={8} className="py-24 text-center">
+                                            <p className="text-xs font-black text-slate-300 uppercase tracking-[0.3em]">No Assets Found in Matrix</p>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : paginatedRecords.map((r) => (
+                                    <TableRow key={r.id ?? r.itemId} className="group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 border-none transition-colors">
+                                        <TableCell className="pl-10 py-6">
+                                            <div className="flex items-center gap-5">
+                                                <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 shadow-sm group-hover:scale-110 transition-transform">
+                                                    <Package size={20} />
                                                 </div>
-                                                <div className="flex flex-col">
-                                                    <span className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tighter leading-none">{r.itemName || r.name || 'UNNAMED_ASSET'}</span>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1.5 font-mono">
-                                                        SKU: {r.sku || r.itemId || '—'}
+                                                <span className="text-base font-black text-slate-900 dark:text-white tracking-tight leading-none group-hover:text-blue-600 transition-colors">
+                                                    {r.itemName || r.name || 'UNNAMED'}
+                                                </span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest font-mono leading-none">
+                                                    {r.sku || r.barcode || r.itemId || '—'}
+                                                </span>
+                                                {r.batchNo && (
+                                                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">
+                                                        Batch: {r.batchNo}
                                                     </span>
-                                                </div>
+                                                )}
                                             </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className={cn(
+                                                "text-[10px] font-black uppercase tracking-widest",
+                                                r.expiryDate && new Date(r.expiryDate) < new Date() ? "text-rose-500" : "text-slate-400"
+                                            )}>
+                                                {r.expiryDate ? new Date(r.expiryDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—'}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="text-[10px] font-bold text-slate-500">
+                                                {r.categoryName || '—'}
+                                            </span>
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <div className="flex flex-col items-center">
-                                                <span className="text-xl font-black text-slate-700 dark:text-white tabular-nums">{r.availableQty}</span>
-                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest leading-none mt-1">Ready</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <div className="flex flex-col items-center">
-                                                <span className="text-xl font-black text-slate-400 dark:text-slate-500 tabular-nums">{r.reservedQty || 0}</span>
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1 font-mono">Hold</span>
+                                                <span className="text-lg font-black text-slate-900 dark:text-white tabular-nums">
+                                                    {Number(r.availableQty ?? 0).toLocaleString()}
+                                                </span>
+                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Sellable</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex flex-col items-end">
                                                 <span className="text-sm font-black text-slate-900 dark:text-white tracking-tighter tabular-nums">
-                                                    {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(r.price || r.unitPrice || 0)}
+                                                    {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(r.sellingPrice || 0)}
                                                 </span>
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Base Rate</span>
+                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Unit Rate</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <StockBadge qty={r.availableQty} threshold={r.lowStockThreshold} />
+                                            <StockBadge qty={Number(r.availableQty ?? 0)} threshold={r.lowStockThreshold} />
                                         </TableCell>
-                                        <TableCell className="text-right pr-8">
-                                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-9 w-9 p-0 rounded-full hover:bg-blue-50 dark:hover:bg-blue-500/10"
-                                                    onClick={() => { setSelectedItem(r); setIsModalOpen(true); }}
-                                                >
-                                                    <ArrowRightLeft size={14} className="text-slate-400 hover:text-blue-500" />
+                                        <TableCell className="pr-10 text-right">
+                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                                                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-blue-600 hover:text-white shadow-sm" onClick={() => { setSelectedItem(r); setIsModalOpen(true); }}>
+                                                    <ArrowRightLeft size={16} />
                                                 </Button>
-                                                <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
-                                                    <MoreVertical size={14} className="text-slate-400" />
+                                                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-slate-900 hover:text-white shadow-sm" onClick={() => { setSelectedItem(r); setIsItemModalOpen(true); }}>
+                                                    <MoreVertical size={16} />
                                                 </Button>
                                             </div>
                                         </TableCell>
@@ -273,6 +314,17 @@ export default function Inventory() {
                         </Table>
                     )}
                 </CardContent>
+                
+                {!loading && filteredRecords.length > 0 && (
+                    <div className="p-10 border-t border-slate-50 dark:border-slate-800">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalItems={filteredRecords.length}
+                            itemsPerPage={itemsPerPage}
+                            onPageChange={setCurrentPage}
+                        />
+                    </div>
+                )}
             </Card>
 
             <StockMovementModal
@@ -282,26 +334,27 @@ export default function Inventory() {
                 initialItem={selectedItem}
             />
 
-            <ImportModal
-                isOpen={isImportModalOpen}
-                onClose={() => setIsImportModalOpen(false)}
-                onSuccess={fetchData}
-            />
+            <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onSuccess={fetchData} />
+            <ItemModal isOpen={isItemModalOpen} onClose={() => setIsItemModalOpen(false)} onSuccess={fetchData} />
         </MainLayout>
     );
 }
 
 function StatusCard({ title, value, icon: Icon, colorClass, subtitle }) {
     return (
-        <Card className="enterprise-card h-full p-8 transition-all hover:shadow-md">
-            <div className="flex items-center gap-6">
-                <div className={cn("p-4 rounded-2xl shrink-0 transition-transform", colorClass)}>
-                    <Icon size={28} />
+        <Card className="border-none bg-white dark:bg-slate-900 shadow-xl shadow-slate-100/50 dark:shadow-none p-8 rounded-[2rem] group hover:scale-[1.02] transition-all cursor-default relative overflow-hidden">
+            <div className={cn("absolute top-0 right-0 h-32 w-32 translate-x-12 -translate-y-12 rounded-full opacity-[0.03] group-hover:scale-150 transition-transform bg-gradient-to-br", colorClass)} />
+            <div className="flex items-center gap-6 relative z-10">
+                <div className={cn("h-16 w-16 rounded-2xl flex items-center justify-center text-white shadow-lg bg-gradient-to-br", colorClass)}>
+                    <Icon size={32} />
                 </div>
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{title}</p>
-                    <p className="text-3xl font-black text-slate-900 leading-none mb-1">{value}</p>
-                    <p className="text-[10px] font-bold text-slate-400 tracking-tight">{subtitle}</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">{title}</p>
+                    <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mb-2 tracking-tighter tabular-nums">{value}</p>
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-tight flex items-center gap-1.5">
+                        <span className="h-1 w-1 rounded-full bg-slate-200 dark:bg-slate-700" />
+                        {subtitle}
+                    </p>
                 </div>
             </div>
         </Card>

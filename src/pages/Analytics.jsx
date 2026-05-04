@@ -38,7 +38,7 @@ const fmt = (val) =>
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function MetricCard({ title, value, subtitle, trend, icon: Icon, colorClass }) {
+function MetricCard({ title, value, subtitle, trend, icon: Icon, colorClass }) { // eslint-disable-line no-unused-vars
     const isPositive = trend >= 0;
     return (
         <Card className="enterprise-card h-full p-8 transition-all hover:shadow-md">

@@ -13,6 +13,10 @@ import {
     Globe,
     User,
     LogOut,
+    Check,
+    Loader2,
+    X,
+    Percent,
 } from 'lucide-react';
 import MainLayout from '../layouts/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
@@ -24,6 +28,8 @@ import authService from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { Palette, Sparkles, Image as ImageIcon } from 'lucide-react';
+import paymentModeService from '../services/paymentModeService';
+import taxRuleService from '../services/taxRuleService';
 
 /**
  * Settings Page – System configuration and Master Data
@@ -33,9 +39,104 @@ export default function Settings() {
     const { branding, updateBranding } = useTheme();
     const [activeTab, setActiveTab] = useState('master');
     const [successMsg, setSuccessMsg] = useState(null);
-    
-    // Internal state for form
     const [localBranding, setLocalBranding] = useState(branding);
+
+    // ── Tax Rules state ──────────────────────────────────────────────
+    const [taxRules, setTaxRules] = useState([]);
+    const [trLoading, setTrLoading] = useState(false);
+    const [trError, setTrError] = useState(null);
+    const [newTaxRule, setNewTaxRule] = useState({ name: '', rate: '', taxType: 'GST' });
+    const [trSaving, setTrSaving] = useState(false);
+
+    // ── Payment Modes state ────────────────────────────────────────────
+    const [paymentModes, setPaymentModes] = useState([]);
+    const [pmLoading, setPmLoading] = useState(false);
+    const [pmError, setPmError] = useState(null);
+    const [newModeName, setNewModeName] = useState('');
+    const [pmSaving, setPmSaving] = useState(false);
+
+    useEffect(() => {
+        if (activeTab === 'master') {
+            loadPaymentModes();
+            loadTaxRules();
+        }
+    }, [activeTab]);
+
+    async function loadPaymentModes() {
+        setPmLoading(true);
+        setPmError(null);
+        try {
+            const data = await paymentModeService.getAll();
+            setPaymentModes(Array.isArray(data) ? data : []);
+        } catch {
+            setPmError('Failed to load payment modes.');
+        } finally {
+            setPmLoading(false);
+        }
+    }
+
+    async function handleAddMode(e) {
+        e.preventDefault();
+        if (!newModeName.trim()) return;
+        setPmSaving(true);
+        try {
+            await paymentModeService.create({ name: newModeName.trim(), isActive: true });
+            setNewModeName('');
+            await loadPaymentModes();
+            setSuccessMsg('Payment mode added.');
+        } catch {
+            setPmError('Failed to add payment mode.');
+        } finally {
+            setPmSaving(false);
+        }
+    }
+
+    async function handleDeleteMode(id) {
+        try {
+            await paymentModeService.delete(id);
+            await loadPaymentModes();
+        } catch {
+            setPmError('Failed to delete mode.');
+        }
+    }
+
+    async function loadTaxRules() {
+        setTrLoading(true);
+        setTrError(null);
+        try {
+            const data = await taxRuleService.getAll();
+            setTaxRules(Array.isArray(data) ? data : []);
+        } catch {
+            setTrError('Failed to load tax rules.');
+        } finally {
+            setTrLoading(false);
+        }
+    }
+
+    async function handleAddTaxRule(e) {
+        e.preventDefault();
+        if (!newTaxRule.name.trim() || !newTaxRule.rate) return;
+        setTrSaving(true);
+        try {
+            await taxRuleService.create({ ...newTaxRule, rate: parseFloat(newTaxRule.rate) });
+            setNewTaxRule({ name: '', rate: '', taxType: 'GST' });
+            await loadTaxRules();
+            setSuccessMsg('Tax rule added.');
+        } catch {
+            setTrError('Failed to add tax rule.');
+        } finally {
+            setTrSaving(false);
+        }
+    }
+
+    async function handleDeleteTaxRule(id) {
+        try {
+            await taxRuleService.delete(id);
+            await loadTaxRules();
+        } catch {
+            setTrError('Failed to delete tax rule.');
+        }
+    }
 
     const handleLogout = () => {
         authService.logout();
@@ -89,13 +190,143 @@ export default function Settings() {
                     {successMsg && <Alert variant="success" message={successMsg} className="mb-4" onClose={() => setSuccessMsg(null)} />}
 
                     {activeTab === 'master' && (
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <MasterDataCard title="Product Categories" icon={Layers} color="icon-box-blue" />
-                            <MasterDataCard title="Measurement Units" icon={Box} color="icon-box-emerald" />
-                            <MasterDataCard title="Payment Modes" icon={CreditCard} color="icon-box-indigo" />
-                            <Card className="border-dashed border-2 border-slate-200 bg-white flex flex-col items-center justify-center p-8 text-center opacity-40 rounded-2xl">
-                                <Plus size={32} />
-                                <p className="mt-2 text-[10px] font-black uppercase tracking-widest">Add Data Layer</p>
+                        <div className="space-y-6">
+                            {/* Payment Modes */}
+                            <Card className="border-none bg-white dark:bg-slate-900 shadow-xl rounded-[2rem] overflow-hidden">
+                                <CardHeader className="p-8 border-b border-slate-50 dark:border-slate-800">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
+                                            <CreditCard size={18} />
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-slate-900 dark:text-white border-none font-black text-base p-0">Payment Modes</CardTitle>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configure accepted payment methods</p>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-8 space-y-6">
+                                    {pmError && <Alert variant="error" message={pmError} onClose={() => setPmError(null)} />}
+                                    <form onSubmit={handleAddMode} className="flex items-center gap-3">
+                                        <Input
+                                            placeholder="New mode name (e.g. Cash, UPI, Card)"
+                                            value={newModeName}
+                                            onChange={(e) => setNewModeName(e.target.value)}
+                                            className="flex-1"
+                                        />
+                                        <Button
+                                            type="submit"
+                                            disabled={pmSaving || !newModeName.trim()}
+                                            className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-lg shadow-blue-500/20"
+                                        >
+                                            {pmSaving ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                                            Add
+                                        </Button>
+                                    </form>
+
+                                    {pmLoading ? (
+                                        <div className="flex justify-center py-8">
+                                            <Loader2 size={24} className="animate-spin text-blue-500" />
+                                        </div>
+                                    ) : paymentModes.length === 0 ? (
+                                        <p className="text-center text-xs font-black text-slate-300 uppercase tracking-widest py-8">No payment modes defined yet.</p>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {paymentModes.map((mode) => (
+                                                <div key={mode.id} className="flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl group hover:bg-blue-50/50 transition-all">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-8 w-8 rounded-lg bg-white dark:bg-slate-700 flex items-center justify-center shadow-sm">
+                                                            <CreditCard size={14} className="text-blue-500" />
+                                                        </div>
+                                                        <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight">{mode.name}</span>
+                                                        {mode.isActive !== false && (
+                                                            <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full uppercase tracking-widest">Active</span>
+                                                        )}
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteMode(mode.id)}
+                                                        className="h-8 w-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+
+                            {/* Tax Rules */}
+                            <Card className="border-none bg-white dark:bg-slate-900 shadow-xl rounded-[2rem] overflow-hidden">
+                                <CardHeader className="p-8 border-b border-slate-50 dark:border-slate-800">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-10 w-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg">
+                                            <Percent size={18} />
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-slate-900 dark:text-white border-none font-black text-base p-0">Tax Rules (GST/VAT)</CardTitle>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage reusable tax configurations</p>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-8 space-y-6">
+                                    {trError && <Alert variant="error" message={trError} onClose={() => setTrError(null)} />}
+                                    <form onSubmit={handleAddTaxRule} className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        <Input
+                                            placeholder="Rule Name (e.g. GST 18%)"
+                                            value={newTaxRule.name}
+                                            onChange={(e) => setNewTaxRule({ ...newTaxRule, name: e.target.value })}
+                                        />
+                                        <Input
+                                            type="number"
+                                            placeholder="Rate (%)"
+                                            value={newTaxRule.rate}
+                                            onChange={(e) => setNewTaxRule({ ...newTaxRule, rate: e.target.value })}
+                                        />
+                                        <Button
+                                            type="submit"
+                                            disabled={trSaving || !newTaxRule.name.trim() || !newTaxRule.rate}
+                                            className="h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-lg shadow-emerald-500/20"
+                                        >
+                                            {trSaving ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                                            Add Rule
+                                        </Button>
+                                    </form>
+
+                                    {trLoading ? (
+                                        <div className="flex justify-center py-8">
+                                            <Loader2 size={24} className="animate-spin text-emerald-500" />
+                                        </div>
+                                    ) : taxRules.length === 0 ? (
+                                        <p className="text-center text-xs font-black text-slate-300 uppercase tracking-widest py-8">No tax rules defined yet.</p>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {taxRules.map((rule) => (
+                                                <div key={rule.id} className="flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl group hover:bg-emerald-50/50 transition-all">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-8 w-8 rounded-lg bg-white dark:bg-slate-700 flex items-center justify-center shadow-sm">
+                                                            <Percent size={14} className="text-emerald-500" />
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight">{rule.name}</span>
+                                                            <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">{rule.rate}% {rule.taxType}</span>
+                                                        </div>
+                                                        {rule.isActive !== false && (
+                                                            <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full uppercase tracking-widest ml-2">Active</span>
+                                                        )}
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteTaxRule(rule.id)}
+                                                        className="h-8 w-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </CardContent>
                             </Card>
                         </div>
                     )}
@@ -232,7 +463,7 @@ export default function Settings() {
     );
 }
 
-function MasterDataCard({ title, icon: Icon, color }) {
+function MasterDataCard({ title, icon: Icon, color }) { // eslint-disable-line no-unused-vars
     return (
         <Card className="enterprise-card p-6 transition-all hover:shadow-md cursor-pointer group">
             <div className="flex flex-row items-center justify-between pb-2">

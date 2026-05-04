@@ -86,8 +86,8 @@ export default function Dashboard() {
             setRecentInvoices(invs.slice(0, 5));
             setInsights(ai);
             setPredictions(pred.slice(0, 4));
-        } catch (err) {
-            setError(err.message ?? 'Failed to load executive summary.');
+        } catch {
+            setError('Failed to load executive summary.');
         } finally {
             setLoading(false);
         }
@@ -381,7 +381,7 @@ export default function Dashboard() {
     );
 }
 
-function MetricCard({ title, value, subtitle, icon: Icon, colorClass }) {
+function MetricCard({ title, value, subtitle, icon: Icon, colorClass }) { // eslint-disable-line no-unused-vars
     return (
         <Card className="enterprise-card h-full p-8 transition-all hover:shadow-md">
             <div className="flex items-center gap-6">
