@@ -58,7 +58,7 @@ export default function Topbar({ onToggleSidebar }) {
         <header className="sticky top-0 z-40 flex h-20 items-center justify-between border-b border-slate-100 bg-white/80 px-6 backdrop-blur-xl dark:border-slate-900 dark:bg-slate-950/80 transition-all duration-300">
             {/* Left Section: Mobile Menu & Search */}
             <div className="flex flex-1 items-center gap-6">
-                <motion.button 
+                <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={onToggleSidebar}
                     className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 lg:hidden dark:bg-slate-900 dark:text-slate-400"
@@ -94,7 +94,7 @@ export default function Topbar({ onToggleSidebar }) {
                 </motion.button>
 
                 {/* Language Switcher */}
-                <select 
+                <select
                     onChange={(e) => changeLanguage(e.target.value)}
                     value={i18n.language}
                     className="h-10 rounded-xl bg-slate-50 px-3 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-100 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 focus:outline-none transition-all"
@@ -111,7 +111,7 @@ export default function Topbar({ onToggleSidebar }) {
 
                 {/* User Profile */}
                 <div className="relative" ref={menuRef}>
-                    <motion.button 
+                    <motion.button
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -121,8 +121,16 @@ export default function Topbar({ onToggleSidebar }) {
                             <p className="text-sm font-black text-slate-900 dark:text-white leading-tight tracking-tight">{user.name || 'Ankit Lohani'}</p>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500">{user.role || 'Store Owner'}</p>
                         </div>
-                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20 font-black text-sm ring-4 ring-indigo-500/10 transition-transform group-hover:scale-105">
-                            {(user.name || 'A').charAt(0)}
+                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20 font-black text-sm ring-4 ring-indigo-500/10 transition-transform group-hover:scale-105 overflow-hidden">
+                            {user.profilePictureUrl ? (
+                                <img
+                                    src={(import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1') + user.profilePictureUrl}
+                                    className="h-full w-full object-cover"
+                                    alt="Avatar"
+                                />
+                            ) : (
+                                (user.name || 'A').charAt(0)
+                            )}
                         </div>
                         <ChevronDown size={14} className={cn("text-slate-400 transition-transform duration-300", showProfileMenu && "rotate-180")} />
                     </motion.button>
@@ -136,42 +144,42 @@ export default function Topbar({ onToggleSidebar }) {
                                 transition={{ duration: 0.2, ease: "easeOut" }}
                                 className="absolute right-0 mt-4 w-64 rounded-3xl bg-white p-2 shadow-2xl shadow-indigo-500/10 ring-1 ring-slate-100 dark:bg-slate-950 dark:ring-slate-900"
                             >
-                                <div className="p-4 border-b border-slate-50 dark:border-slate-900 mb-2">
-                                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Account</p>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{user.email || 'admin@bizflow.com'}</p>
+                                <div className="p-5 bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 mb-2">
+                                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1.5">Signed in as</p>
+                                    <p className="text-sm font-black text-slate-900 dark:text-white truncate">{user.email || 'admin@bizflow.com'}</p>
                                 </div>
-                                
+
                                 <div className="space-y-1">
-                                    <button 
-                                        onClick={() => { navigate('/settings'); setShowProfileMenu(false); }}
-                                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-indigo-400 transition-all"
+                                    <button
+                                        onClick={() => { navigate('/settings', { state: { tab: 'account' } }); setShowProfileMenu(false); }}
+                                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-primary transition-all"
                                     >
                                         <User size={18} />
-                                        Profile Edit
+                                        My Profile
                                     </button>
-                                    <button 
-                                        onClick={() => { navigate('/settings'); setShowProfileMenu(false); }}
-                                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-indigo-400 transition-all"
+                                    <button
+                                        onClick={() => { navigate('/settings', { state: { tab: 'security' } }); setShowProfileMenu(false); }}
+                                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-primary transition-all"
                                     >
                                         <ShieldCheck size={18} />
-                                        Security & Password
+                                        Security
                                     </button>
-                                    <button 
-                                        onClick={() => { navigate('/settings'); setShowProfileMenu(false); }}
+                                    <button
+                                        onClick={() => { navigate('/settings', { state: { tab: 'branding' } }); setShowProfileMenu(false); }}
                                         className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-indigo-400 transition-all"
                                     >
                                         <Settings size={18} />
-                                        Other Settings
+                                        Shop Settings
                                     </button>
                                 </div>
 
                                 <div className="mt-2 pt-2 border-t border-slate-50 dark:border-slate-900">
-                                    <button 
+                                    <button
                                         onClick={handleLogout}
                                         className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50 transition-all"
                                     >
                                         <LogOut size={18} />
-                                        Sign Out
+                                        Logout
                                     </button>
                                 </div>
                             </motion.div>

@@ -25,19 +25,31 @@ import Alert from '../components/ui/Alert';
 import Input from '../components/ui/Input';
 import { cn } from '../utils/cn';
 import authService from '../services/authService';
-import { useNavigate } from 'react-router-dom';
+import brandingService from '../services/brandingService';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { Palette, Sparkles, Image as ImageIcon } from 'lucide-react';
 import paymentModeService from '../services/paymentModeService';
 import taxRuleService from '../services/taxRuleService';
+import userService from '../services/userService';
 
 /**
  * Settings Page – System configuration and Master Data
  */
 export default function Settings() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { branding, updateBranding } = useTheme();
     const [activeTab, setActiveTab] = useState('master');
+
+    // Handle tab switching from navigation state
+    useEffect(() => {
+        if (location.state?.tab) {
+            setActiveTab(location.state.tab);
+            // Clear state to avoid switching back on refresh
+            window.history.replaceState({}, document.title);
+        }
+    }, [location]);
     const [successMsg, setSuccessMsg] = useState(null);
     const [localBranding, setLocalBranding] = useState(branding);
 
@@ -172,17 +184,17 @@ export default function Settings() {
                 {/* ── Sidebar Navigation ────────────────────────────────────────── */}
                 <div className="w-full lg:w-64 flex flex-col gap-2">
                     {[
-                        { id: 'master', label: 'Master Data', icon: Database },
+                        { id: 'master', label: 'Shop Settings', icon: SettingsIcon },
                         { id: 'company', label: 'Company Profile', icon: Building },
                         { id: 'branding', label: 'Branding', icon: Palette },
-                        { id: 'account', label: 'Account', icon: User },
+                        { id: 'account', label: 'My Profile', icon: User },
                         { id: 'security', label: 'Security', icon: ShieldCheck },
                     ].map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all",
+                                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all w-full text-left",
                                 activeTab === tab.id
                                     ? "bg-slate-900 text-white shadow-md shadow-slate-200"
                                     : "text-slate-500 hover:bg-white hover:text-slate-900"
@@ -192,15 +204,6 @@ export default function Settings() {
                             {tab.label}
                         </button>
                     ))}
-                    <div className="mt-8 pt-8 border-t border-slate-100">
-                        <button
-                            onClick={handleLogout}
-                            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-rose-600 hover:bg-rose-50 transition-all w-full"
-                        >
-                            <LogOut size={18} />
-                            Sign Out
-                        </button>
-                    </div>
                 </div>
 
                 {/* ── Content Area ──────────────────────────────────────────────── */}
@@ -229,11 +232,12 @@ export default function Settings() {
                                             <Input
                                                 placeholder="New mode name (e.g. Cash, UPI, Card)"
                                                 value={newModeName}
+                                                autoComplete="off"
                                                 onChange={(e) => setNewModeName(e.target.value)}
                                                 className="w-full"
                                             />
                                             {editingPm && (
-                                                <button 
+                                                <button
                                                     type="button"
                                                     onClick={cancelPmEdit}
                                                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors"
@@ -247,8 +251,8 @@ export default function Settings() {
                                             disabled={pmSaving || !newModeName.trim()}
                                             className={cn(
                                                 "h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-lg transition-all",
-                                                editingPm 
-                                                    ? "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20" 
+                                                editingPm
+                                                    ? "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20"
                                                     : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20"
                                             )}
                                         >
@@ -377,8 +381,8 @@ export default function Settings() {
                     {activeTab === 'company' && (
                         <Card className="enterprise-card overflow-hidden">
                             <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
-                                <CardTitle className="text-slate-900 border-none font-bold">Corporate Profile</CardTitle>
-                                <CardDescription className="text-slate-500 font-medium">This information appears on your invoices and reports.</CardDescription>
+                                <CardTitle className="text-slate-900 border-none font-bold">Company Profile</CardTitle>
+                                <CardDescription className="text-slate-500 font-medium">This information will appear on your invoices and reports.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6 p-8">
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -418,35 +422,41 @@ export default function Settings() {
                                     <div className="space-y-4">
                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Primary Identity Color</label>
                                         <div className="flex items-center gap-4">
-                                            <input 
-                                                type="color" 
+                                            <input
+                                                type="color"
                                                 className="h-12 w-20 rounded-xl cursor-pointer border-none bg-transparent"
                                                 value={localBranding.primaryColor}
                                                 onChange={(e) => setLocalBranding(prev => ({ ...prev, primaryColor: e.target.value }))}
                                             />
                                             <div className="flex-1">
-                                                <Input 
-                                                    value={localBranding.primaryColor} 
+                                                <Input
+                                                    value={localBranding.primaryColor}
                                                     onChange={(e) => setLocalBranding(prev => ({ ...prev, primaryColor: e.target.value }))}
-                                                    placeholder="#3b82f6" 
+                                                    placeholder="#3b82f6"
                                                 />
                                             </div>
                                         </div>
                                     </div>
-                                    <Input 
-                                        label="Public Product Name" 
-                                        value={localBranding.companyName} 
+                                    <Input
+                                        label="Public Product Name"
+                                        value={localBranding.companyName}
                                         onChange={(e) => setLocalBranding(prev => ({ ...prev, companyName: e.target.value }))}
                                     />
                                 </div>
 
-                                <div 
+                                <div
                                     className="p-8 rounded-3xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-white transition-all overflow-hidden relative"
                                     onClick={() => document.getElementById('logo-upload').click()}
                                 >
                                     {localBranding.logoUrl ? (
                                         <div className="relative h-24 w-full flex items-center justify-center">
-                                            <img src={localBranding.logoUrl} alt="Logo Preview" className="h-full object-contain" />
+                                            <img
+                                                src={localBranding.logoUrl.startsWith('blob:') || localBranding.logoUrl.startsWith('data:')
+                                                    ? localBranding.logoUrl
+                                                    : `http://localhost:8080${localBranding.logoUrl.startsWith('/') ? '' : '/'}${localBranding.logoUrl}`}
+                                                alt="Logo Preview"
+                                                className="h-full object-contain"
+                                            />
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-[10px] font-black uppercase">Click to Change</div>
                                         </div>
                                     ) : (
@@ -458,25 +468,37 @@ export default function Settings() {
                                             <p className="text-[10px] text-slate-400 font-bold mt-1">PNG or SVG, max 500kb</p>
                                         </>
                                     )}
-                                    <input 
+                                    <input
                                         id="logo-upload"
-                                        type="file" 
-                                        hidden 
+                                        type="file"
+                                        hidden
                                         accept="image/*"
-                                        onChange={(e) => {
+                                        onChange={async (e) => {
                                             const file = e.target.files[0];
                                             if (file) {
-                                                const reader = new FileReader();
-                                                reader.onload = (f) => setLocalBranding(p => ({ ...p, logoUrl: f.target.result }));
-                                                reader.readAsDataURL(file);
+                                                // 1. Show instant local preview
+                                                const previewUrl = URL.createObjectURL(file);
+                                                setLocalBranding(p => ({ ...p, logoUrl: previewUrl }));
+
+                                                try {
+                                                    setSuccessMsg('Syncing logo with server...');
+                                                    const data = await brandingService.uploadLogo(file);
+
+                                                    // 2. Once uploaded, use the server URL
+                                                    setLocalBranding(p => ({ ...p, logoUrl: data.logoUrl }));
+                                                    setSuccessMsg('Branding asset synced successfully!');
+                                                } catch (error) {
+                                                    console.error('Logo upload failed:', error);
+                                                    setSuccessMsg('Upload failed, but showing local preview.');
+                                                }
                                             }
                                         }}
                                     />
                                 </div>
 
                                 <div className="pt-6 border-t border-slate-100 flex justify-end">
-                                    <Button 
-                                        className="bg-slate-900 hover:bg-black text-white px-10 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl shadow-xl shadow-slate-200" 
+                                    <Button
+                                        className="bg-slate-900 hover:bg-black text-white px-10 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl shadow-xl shadow-slate-200"
                                         onClick={() => {
                                             updateBranding(localBranding);
                                             setSuccessMsg('Branding updated. Your interface has been refreshed.');
@@ -490,14 +512,123 @@ export default function Settings() {
                     )}
 
                     {activeTab === 'account' && (
-                        <Card className="enterprise-card p-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs opacity-40">
-                            Account preferences coming soon.
+                        <Card className="enterprise-card overflow-hidden">
+                            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                                <CardTitle className="text-slate-900 border-none font-bold">Account Settings</CardTitle>
+                                <CardDescription className="text-slate-500 font-medium">Manage your personal information and profile visibility.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="p-8 space-y-10">
+                                {/* Profile Picture Section */}
+                                <div className="flex flex-col md:flex-row items-center gap-8">
+                                    <div className="relative group">
+                                        <div className="h-32 w-32 rounded-[2.5rem] bg-indigo-50 border-4 border-white shadow-2xl shadow-indigo-500/10 flex items-center justify-center overflow-hidden">
+                                            {JSON.parse(localStorage.getItem('user') || '{}').profilePictureUrl ? (
+                                                <img
+                                                    src={(import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1') + JSON.parse(localStorage.getItem('user') || '{}').profilePictureUrl}
+                                                    className="h-full w-full object-cover"
+                                                    alt="Profile"
+                                                />
+                                            ) : (
+                                                <User size={48} className="text-indigo-200" />
+                                            )}
+                                            <div
+                                                className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all cursor-pointer backdrop-blur-sm"
+                                                onClick={() => document.getElementById('profile-upload').click()}
+                                            >
+                                                <ImageIcon size={24} className="text-white" />
+                                            </div>
+                                        </div>
+                                        <input
+                                            id="profile-upload"
+                                            type="file"
+                                            hidden
+                                            accept="image/*"
+                                            onChange={async (e) => {
+                                                const file = e.target.files[0];
+                                                if (file) {
+                                                    try {
+                                                        const user = JSON.parse(localStorage.getItem('user') || '{}');
+                                                        const res = await userService.updateProfilePicture(user.id, file);
+                                                        localStorage.setItem('user', JSON.stringify(res));
+                                                        setSuccessMsg('Profile picture updated successfully.');
+                                                        window.location.reload(); // Refresh to update Topbar
+                                                    } catch (err) {
+                                                        setPmError('Failed to upload profile picture.');
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="space-y-2 text-center md:text-left">
+                                        <h3 className="text-lg font-black text-slate-900">Your Avatar</h3>
+                                        <p className="text-xs font-medium text-slate-500 max-w-xs leading-relaxed">
+                                            Click on the image to upload a new profile picture. Recommended size is 256x256px.
+                                        </p>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-rose-500 font-bold p-0 h-auto hover:bg-transparent"
+                                            onClick={async () => {
+                                                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                                                if (user.profilePictureUrl) {
+                                                    try {
+                                                        const res = await userService.deleteProfilePicture(user.id);
+                                                        localStorage.setItem('user', JSON.stringify(res));
+                                                        setSuccessMsg('Profile picture removed.');
+                                                        setTimeout(() => window.location.reload(), 1000);
+                                                    } catch (err) {
+                                                        // setAccountError('Failed to remove profile picture.');
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            Remove Picture
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <Input label="Display Name" defaultValue={JSON.parse(localStorage.getItem('user') || '{}').name} />
+                                    <Input label="Email Address" defaultValue={JSON.parse(localStorage.getItem('user') || '{}').email} disabled />
+                                    <Input label="Phone Number" defaultValue={JSON.parse(localStorage.getItem('user') || '{}').phone || 'Not provided'} />
+                                </div>
+
+                                <div className="pt-6 border-t border-slate-100 flex justify-end">
+                                    <Button className="bg-slate-900 text-white px-8 font-bold rounded-xl h-12 shadow-xl shadow-slate-200">
+                                        Save Account Data
+                                    </Button>
+                                </div>
+                            </CardContent>
                         </Card>
                     )}
 
                     {activeTab === 'security' && (
-                        <Card className="enterprise-card p-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs opacity-40">
-                            Security settings and API keys coming soon.
+                        <Card className="enterprise-card overflow-hidden">
+                            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                                <CardTitle className="text-slate-900 border-none font-bold">Security & Privacy</CardTitle>
+                                <CardDescription className="text-slate-500 font-medium">Update your password and manage security settings.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="p-8 space-y-8">
+                                {/* Local Honeypot to catch autofill within this card */}
+                                <div style={{ display: 'none' }} aria-hidden="true">
+                                    <input type="text" name="fake-username" tabIndex="-1" />
+                                    <input type="password" name="fake-password" tabIndex="-1" />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+                                    <div className="md:col-span-2">
+                                        <Input label="Current Password" type="password" placeholder="••••••••" autoComplete="current-password" />
+                                    </div>
+                                    <Input label="New Password" type="password" placeholder="••••••••" autoComplete="new-password" />
+                                    <Input label="Confirm New Password" type="password" placeholder="••••••••" autoComplete="new-password" />
+
+                                    <div className="md:col-span-2 pt-4">
+                                        <Button className="bg-primary text-white px-10 font-bold rounded-xl h-12 shadow-xl shadow-primary/10 w-full md:w-auto">
+                                            Change Password
+                                        </Button>
+                                    </div>
+                                </div>
+                            </CardContent>
                         </Card>
                     )}
                 </div>

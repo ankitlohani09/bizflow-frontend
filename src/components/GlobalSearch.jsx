@@ -75,18 +75,29 @@ export default function GlobalSearch() {
 
     return (
         <div className="relative w-full max-w-md" ref={containerRef}>
+            {/* Honeypot fields to catch browser autofill */}
+            <div style={{ display: 'none' }} aria-hidden="true">
+                <input type="text" name="username" tabIndex="-1" />
+                <input type="email" name="email" tabIndex="-1" />
+                <input type="password" name="password" tabIndex="-1" />
+            </div>
+            
             <div className={cn(
                 "flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 transition-all dark:border-slate-800 dark:bg-slate-900/50",
                 isOpen && "border-blue-500 ring-2 ring-blue-500/10 bg-white"
             )}>
                 <Search size={18} className="text-slate-400" />
                 <input
-                    type="text"
+                    type="search"
+                    id="bs-qs-55"
+                    name="bs-qs-55"
                     placeholder="Search anything (Cmd+K)..."
                     className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-slate-400 dark:text-white"
                     value={query}
+                    readOnly
+                    onFocus={(e) => e.target.readOnly = false}
+                    autoComplete="one-time-code"
                     onChange={(e) => setQuery(e.target.value)}
-                    onFocus={() => query.length > 0 && setIsOpen(true)}
                 />
                 {loading && <Loader2 size={16} className="animate-spin text-blue-500" />}
                 {query && !loading && <X size={16} className="cursor-pointer text-slate-400 hover:text-slate-600" onClick={() => setQuery('')} />}

@@ -48,14 +48,14 @@ function SidebarItem({ item }) {
                 cn(
                     'group relative flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300',
                     isActive
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-indigo-400'
+                        ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-primary dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-primary'
                 )
             }
         >
             {({ isActive }) => (
                 <>
-                    <Icon className={cn('h-4 w-4 shrink-0 transition-transform duration-300 group-hover:scale-110', isActive ? 'text-white' : 'text-slate-500 group-hover:text-indigo-600')} />
+                    <Icon className={cn('h-4 w-4 shrink-0 transition-transform duration-300 group-hover:scale-110', isActive ? 'text-white' : 'text-slate-500 group-hover:text-primary')} />
                     <span className="tracking-tight">{t(item.label)}</span>
                     {isActive && (
                         <motion.div
@@ -91,9 +91,15 @@ export default function Sidebar({ isOpen, onClose }) {
             </button>
 
             <div className="flex h-24 shrink-0 items-center gap-4 px-8">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-xl shadow-indigo-500/20">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-xl shadow-primary/20">
                     {branding.logoUrl ? (
-                        <img src={branding.logoUrl} alt="Logo" className="h-7 w-auto object-contain" />
+                        <img 
+                            src={branding.logoUrl.startsWith('http') 
+                                ? branding.logoUrl 
+                                : `http://localhost:8080${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`} 
+                            alt="Logo" 
+                            className="h-7 w-auto object-contain" 
+                        />
                     ) : (
                         <Store className="h-6 w-6" />
                     )}
