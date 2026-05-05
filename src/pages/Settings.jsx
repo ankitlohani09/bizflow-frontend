@@ -54,6 +54,7 @@ export default function Settings() {
     const [pmError, setPmError] = useState(null);
     const [newModeName, setNewModeName] = useState('');
     const [pmSaving, setPmSaving] = useState(false);
+    const [editingPm, setEditingPm] = useState(null); // Track mode being edited
 
     useEffect(() => {
         if (activeTab === 'master') {
@@ -80,15 +81,32 @@ export default function Settings() {
         if (!newModeName.trim()) return;
         setPmSaving(true);
         try {
-            await paymentModeService.create({ name: newModeName.trim(), isActive: true });
+            if (editingPm) {
+                await paymentModeService.update(editingPm.id, { ...editingPm, name: newModeName.trim() });
+                setSuccessMsg('Payment mode updated.');
+            } else {
+                await paymentModeService.create({ name: newModeName.trim(), isActive: true });
+                setSuccessMsg('Payment mode added.');
+            }
             setNewModeName('');
+            setEditingPm(null);
             await loadPaymentModes();
-            setSuccessMsg('Payment mode added.');
         } catch {
-            setPmError('Failed to add payment mode.');
+            setPmError(editingPm ? 'Failed to update payment mode.' : 'Failed to add payment mode.');
         } finally {
             setPmSaving(false);
         }
+    }
+
+    function handleEditMode(mode) {
+        setEditingPm(mode);
+        setNewModeName(mode.name);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelPmEdit() {
+        setEditingPm(null);
+        setNewModeName('');
     }
 
     async function handleDeleteMode(id) {
@@ -207,19 +225,35 @@ export default function Settings() {
                                 <CardContent className="p-8 space-y-6">
                                     {pmError && <Alert variant="error" message={pmError} onClose={() => setPmError(null)} />}
                                     <form onSubmit={handleAddMode} className="flex items-center gap-3">
-                                        <Input
-                                            placeholder="New mode name (e.g. Cash, UPI, Card)"
-                                            value={newModeName}
-                                            onChange={(e) => setNewModeName(e.target.value)}
-                                            className="flex-1"
-                                        />
+                                        <div className="relative flex-1">
+                                            <Input
+                                                placeholder="New mode name (e.g. Cash, UPI, Card)"
+                                                value={newModeName}
+                                                onChange={(e) => setNewModeName(e.target.value)}
+                                                className="w-full"
+                                            />
+                                            {editingPm && (
+                                                <button 
+                                                    type="button"
+                                                    onClick={cancelPmEdit}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                            )}
+                                        </div>
                                         <Button
                                             type="submit"
                                             disabled={pmSaving || !newModeName.trim()}
-                                            className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-lg shadow-blue-500/20"
+                                            className={cn(
+                                                "h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-lg transition-all",
+                                                editingPm 
+                                                    ? "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20" 
+                                                    : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20"
+                                            )}
                                         >
-                                            {pmSaving ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-                                            Add
+                                            {pmSaving ? <Loader2 size={16} className="animate-spin" /> : (editingPm ? <Save size={16} /> : <Plus size={16} />)}
+                                            {editingPm ? 'Update' : 'Add'}
                                         </Button>
                                     </form>
 
@@ -242,13 +276,22 @@ export default function Settings() {
                                                             <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full uppercase tracking-widest">Active</span>
                                                         )}
                                                     </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleDeleteMode(mode.id)}
-                                                        className="h-8 w-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
+                                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleEditMode(mode)}
+                                                            className="h-8 w-8 rounded-lg text-slate-300 hover:text-blue-500 hover:bg-blue-50 flex items-center justify-center"
+                                                        >
+                                                            <Palette size={14} />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDeleteMode(mode.id)}
+                                                            className="h-8 w-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>

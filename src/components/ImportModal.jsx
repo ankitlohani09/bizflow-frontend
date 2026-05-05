@@ -103,15 +103,15 @@ export default function ImportModal({ isOpen, onClose, onSuccess }) {
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Bulk Inventory Import">
+        <Modal isOpen={isOpen} onClose={onClose} title="Add Many Items">
             <div className="space-y-6">
                 {!file ? (
                     <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl p-12 bg-slate-50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer group" onClick={() => document.getElementById('file-upload').click()}>
                         <div className="h-16 w-16 rounded-2xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
                             <Upload size={32} />
                         </div>
-                        <p className="mt-4 text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter">Upload Excel or CSV</p>
-                        <p className="text-[10px] text-slate-400 font-bold mt-1">Headers: Name, SKU, Category, Price, Unit</p>
+                        <p className="mt-4 text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter">Upload List File (Excel/CSV)</p>
+                        <p className="text-[10px] text-slate-400 font-bold mt-1">Columns: Name, SKU, Price, Unit</p>
                         <input id="file-upload" type="file" accept=".xlsx, .xls, .csv" hidden onChange={handleFileChange} />
                     </div>
                 ) : (
@@ -121,7 +121,7 @@ export default function ImportModal({ isOpen, onClose, onSuccess }) {
                                 <FileSpreadsheet className="text-emerald-600" size={20} />
                                 <div>
                                     <p className="text-xs font-black text-slate-900 dark:text-emerald-400 uppercase tracking-tighter">{file.name}</p>
-                                    <p className="text-[10px] text-emerald-600/60 font-bold">{stats.total} Records Identified</p>
+                                    <p className="text-[10px] text-emerald-600/60 font-bold">{stats.total} Items Found</p>
                                 </div>
                             </div>
                             <Button variant="ghost" size="sm" onClick={() => setFile(null)} className="h-8 w-8 p-0 rounded-full">
@@ -132,14 +132,14 @@ export default function ImportModal({ isOpen, onClose, onSuccess }) {
                         {preview.length > 0 && (
                             <div className="rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
                                 <div className="bg-slate-50 dark:bg-slate-800/50 px-4 py-2 border-b border-slate-100 dark:border-slate-800">
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Data Preview</p>
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Preview Items</p>
                                 </div>
                                 <div className="p-4 max-h-40 overflow-y-auto">
                                     <table className="w-full text-[10px] font-bold">
                                         <thead>
                                             <tr className="text-slate-400 text-left border-b border-slate-50 dark:border-slate-800">
-                                                <th className="pb-1">Name</th>
-                                                <th className="pb-1">SKU</th>
+                                                <th className="pb-1">Item Name</th>
+                                                <th className="pb-1">Code</th>
                                                 <th className="pb-1 text-right">Price</th>
                                             </tr>
                                         </thead>
@@ -164,7 +164,7 @@ export default function ImportModal({ isOpen, onClose, onSuccess }) {
                 {importing && (
                     <div className="space-y-2">
                         <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                            <span>Importing Data...</span>
+                            <span>Saving Items...</span>
                             <span>{Math.round((stats.success + stats.failed) / stats.total * 100)}%</span>
                         </div>
                         <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -174,7 +174,7 @@ export default function ImportModal({ isOpen, onClose, onSuccess }) {
                             />
                         </div>
                         <div className="flex gap-4 text-[9px] font-black uppercase tracking-widest">
-                            <span className="text-emerald-500">{stats.success} Success</span>
+                            <span className="text-emerald-500">{stats.success} Done</span>
                             <span className="text-rose-500">{stats.failed} Failed</span>
                         </div>
                     </div>
@@ -190,7 +190,7 @@ export default function ImportModal({ isOpen, onClose, onSuccess }) {
                         disabled={!file || importing}
                     >
                         {importing ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
-                        Start Import
+                        Start Saving
                     </Button>
                 </div>
             </div>

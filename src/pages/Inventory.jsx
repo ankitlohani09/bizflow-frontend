@@ -155,7 +155,7 @@ export default function Inventory() {
                     </div>
 
                     <Button onClick={() => setIsItemModalOpen(true)} className="h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/25 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 transition-all hover:scale-[1.02] active:scale-95">
-                        <Plus size={18} /> New Asset
+                        <Plus size={18} /> New Item
                     </Button>
                 </div>
             </div>

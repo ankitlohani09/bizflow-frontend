@@ -2,35 +2,25 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 /**
- * Standard text input with label support
+ * Modern Input component with refined borders and focus effects
  */
-const Input = React.forwardRef(({ 
-  className, 
-  type = 'text', 
-  label, 
-  error, 
-  ...props 
-}, ref) => {
+const Input = React.forwardRef(({ className, type = 'text', label, ...props }, ref) => {
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <label className="text-sm font-medium text-slate-700">
+        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">
           {label}
         </label>
       )}
       <input
         type={type}
         className={cn(
-          'flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50',
-          error && 'border-rose-500 focus-visible:ring-rose-500',
+          'flex h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold tracking-tight transition-all placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400',
           className
         )}
         ref={ref}
         {...props}
       />
-      {error && (
-        <p className="text-xs font-medium text-rose-500">{error}</p>
-      )}
     </div>
   );
 });

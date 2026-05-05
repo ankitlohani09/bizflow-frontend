@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
     Users,
@@ -21,17 +22,13 @@ import authService from '../services/authService';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
-/**
- * Sidebar navigation items
- * Each `path` matches a route in App.jsx.
- */
 const menuItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-    { label: 'Analytics', icon: TrendingUp, path: '/analytics' },
+    { label: 'Reports', icon: TrendingUp, path: '/analytics' },
     { label: 'Customers', icon: Users, path: '/customers' },
     { label: 'Suppliers', icon: Users, path: '/suppliers' },
     { label: 'Inventory', icon: Package, path: '/inventory' },
-    { label: 'Audit Logs', icon: History, path: '/stock-movements' },
+    { label: 'Stock Movements', icon: History, path: '/stock-movements' },
     { label: 'Invoices', icon: FileText, path: '/invoices' },
     { label: 'Returns', icon: RotateCcw, path: '/returns' },
     { label: 'Purchases', icon: ShoppingCart, path: '/purchases' },
@@ -47,30 +44,28 @@ function SidebarItem({ item }) {
     return (
         <NavLink
             to={item.path}
-            title={item.label}
             className={({ isActive }) =>
                 cn(
-                    'group relative flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200',
+                    'group relative flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300',
                     isActive
-                        ? 'bg-blue-600/10 text-white shadow-soft'
-                        : 'text-slate-400 hover:bg-white/5 hover:text-slate-100'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-indigo-400'
                 )
             }
         >
             {({ isActive }) => (
                 <>
-                    <div className="flex items-center gap-3.5">
-                        <Icon
-                            className={cn(
-                                'h-4 w-4 shrink-0 transition-colors',
-                                isActive
-                                    ? 'text-blue-500'
-                                    : 'text-slate-500 group-hover:text-slate-300'
-                            )}
+                    <Icon className={cn('h-4 w-4 shrink-0 transition-transform duration-300 group-hover:scale-110', isActive ? 'text-white' : 'text-slate-500 group-hover:text-indigo-600')} />
+                    <span className="tracking-tight">{t(item.label)}</span>
+                    {isActive && (
+                        <motion.div
+                            layoutId="sidebar-active"
+                            className="absolute left-2 h-5 w-1 rounded-full bg-white/40"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.3 }}
                         />
-                        <span className="tracking-tight">{t(item.label)}</span>
-                    </div>
-                    {isActive && <div className="sidebar-active-indicator" />}
+                    )}
                 </>
             )}
         </NavLink>
@@ -82,56 +77,57 @@ export default function Sidebar({ isOpen, onClose }) {
     const { branding } = useTheme();
     const { t } = useTranslation();
 
-    function handleLogout() {
-        authService.logout();
-        navigate('/login', { replace: true });
-    }
-
     return (
         <aside className={cn(
-            "fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-slate-950 border-r border-white/5 transition-transform duration-300 lg:relative lg:translate-x-0",
+            "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white border-r border-slate-100 transition-transform duration-500 ease-out dark:bg-slate-950 dark:border-slate-900 lg:relative lg:translate-x-0",
             isOpen ? "translate-x-0" : "-translate-x-full"
         )}>
+            {/* Mobile Close Button */}
             <button
                 onClick={onClose}
-                className="absolute right-[-40px] top-4 flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white lg:hidden"
+                className="absolute right-[-3rem] top-4 flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-xl text-slate-900 lg:hidden dark:bg-slate-900 dark:text-white"
             >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
             </button>
 
-            <div className="flex h-20 shrink-0 items-center gap-3 border-b border-white/10 px-5 bg-slate-900">
-                {branding.logoUrl ? (
-                    <img src={branding.logoUrl} alt="Logo" className="h-10 w-auto max-w-[40px] object-contain" />
-                ) : (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 text-white shadow-md shadow-blue-500/20">
-                        <Store className="h-4 w-4" />
-                    </div>
-                )}
+            <div className="flex h-24 shrink-0 items-center gap-4 px-8">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-xl shadow-indigo-500/20">
+                    {branding.logoUrl ? (
+                        <img src={branding.logoUrl} alt="Logo" className="h-7 w-auto object-contain" />
+                    ) : (
+                        <Store className="h-6 w-6" />
+                    )}
+                </div>
                 <div>
-                    <p className="text-sm font-black leading-none tracking-tight text-white uppercase">
+                    <h2 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
                         {branding.companyName || 'BizFlow'}
-                    </p>
-                    <p className="mt-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                        Enterprise
+                    </h2>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                        Shop POS
                     </p>
                 </div>
             </div>
 
-            <nav className="flex-1 space-y-1.5 px-4 py-8 overflow-y-auto custom-scrollbar">
-                <p className="px-5 mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500/50">
-                    {t('Main Menu')}
+            <nav className="flex-1 space-y-1.5 px-6 py-6 overflow-y-auto custom-scrollbar">
+                <p className="px-4 mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                    {t('Menu')}
                 </p>
-                {menuItems.map((item) => (
-                    <SidebarItem key={item.path} item={item} />
-                ))}
+                <div className="space-y-1">
+                    {menuItems.map((item) => (
+                        <SidebarItem key={item.path} item={item} />
+                    ))}
+                </div>
             </nav>
 
-            <div className="border-t border-white/5 p-4">
+            <div className="p-6">
                 <button
-                    onClick={handleLogout}
-                    className="group flex w-full items-center gap-3.5 rounded-xl px-5 py-4 text-sm font-bold text-slate-500 transition-all hover:bg-rose-500/10 hover:text-rose-500"
+                    onClick={() => {
+                        authService.logout();
+                        navigate('/login', { replace: true });
+                    }}
+                    className="flex w-full items-center gap-3.5 rounded-2xl px-5 py-4 text-sm font-bold text-slate-500 transition-all hover:bg-rose-500/10 hover:text-rose-500"
                 >
-                    <LogOut className="h-4 w-4 shrink-0 transition-colors group-hover:text-rose-500" />
+                    <LogOut className="h-4 w-4 shrink-0" />
                     {t('Logout')}
                 </button>
             </div>

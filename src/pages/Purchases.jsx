@@ -113,9 +113,9 @@ export default function Purchases() {
                 <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <CardTitle className="text-slate-900 border-none font-bold">Procurement Records</CardTitle>
+                            <CardTitle className="text-slate-900 border-none font-bold">Purchase Records</CardTitle>
                             <CardDescription className="text-slate-500 font-medium capitalize">
-                                {filteredPurchases.length} stock replenishments in your ledger.
+                                {filteredPurchases.length} stock purchases in your ledger.
                             </CardDescription>
                         </div>
 

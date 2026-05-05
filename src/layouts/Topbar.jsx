@@ -1,17 +1,40 @@
 import React from 'react';
-import { Sun, Moon, User, Menu, Maximize, Minimize } from 'lucide-react';
+import { Sun, Moon, User, Menu, Maximize, Minimize, Command, ChevronDown, ShieldCheck, LogOut, Settings } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import GlobalSearch from '../components/GlobalSearch';
 import NotificationCenter from '../components/NotificationCenter';
 import { useTheme } from '../context/ThemeContext';
 import i18n from '../i18n';
+import { useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
+import { cn } from '../utils/cn';
 
 /**
- * Topbar – Global search, notifications, and theme controls
+ * Modernized Topbar with glassmorphism and refined profile section
  */
 export default function Topbar({ onToggleSidebar }) {
     const { isDarkMode, toggleTheme } = useTheme();
+    const navigate = useNavigate();
     const [isFullscreen, setIsFullscreen] = React.useState(false);
+    const [showProfileMenu, setShowProfileMenu] = React.useState(false);
+    const menuRef = React.useRef(null);
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    // Click outside handler
+    React.useEffect(() => {
+        function handleClickOutside(event) {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setShowProfileMenu(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleLogout = () => {
+        authService.logout();
+        navigate('/login');
+    };
 
     const changeLanguage = (lng) => {
         i18n.changeLanguage(lng);
@@ -32,64 +55,128 @@ export default function Topbar({ onToggleSidebar }) {
     };
 
     return (
-        <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 md:px-8 dark:border-slate-800 dark:bg-slate-900 transition-colors">
+        <header className="sticky top-0 z-40 flex h-20 items-center justify-between border-b border-slate-100 bg-white/80 px-6 backdrop-blur-xl dark:border-slate-900 dark:bg-slate-950/80 transition-all duration-300">
             {/* Left Section: Mobile Menu & Search */}
-            <div className="flex flex-1 items-center gap-4">
-                <button 
+            <div className="flex flex-1 items-center gap-6">
+                <motion.button 
+                    whileTap={{ scale: 0.9 }}
                     onClick={onToggleSidebar}
-                    className="p-2 -ml-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 lg:hidden dark:bg-slate-900 dark:text-slate-400"
                     aria-label="Toggle Sidebar"
                 >
-                    <Menu className="h-6 w-6" />
-                </button>
+                    <Menu className="h-5 w-5" />
+                </motion.button>
                 <div className="flex-1 max-w-xl">
                     <GlobalSearch />
                 </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
                 {/* Theme Toggle */}
-                <button
+                <motion.button
+                    whileTap={{ scale: 0.9 }}
                     onClick={toggleTheme}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 transition-all hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 transition-all hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
                     title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                 >
-                    {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-                </button>
+                    {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+                </motion.button>
 
                 {/* Full Screen Toggle */}
-                <button
+                <motion.button
+                    whileTap={{ scale: 0.9 }}
                     onClick={toggleFullScreen}
-                    className="hidden md:flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 transition-all hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
+                    className="hidden md:flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 transition-all hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
                     title={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
                 >
-                    {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
-                </button>
+                    {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
+                </motion.button>
 
                 {/* Language Switcher */}
                 <select 
                     onChange={(e) => changeLanguage(e.target.value)}
                     value={i18n.language}
-                    className="h-10 rounded-xl bg-slate-50 px-2 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:bg-slate-100 dark:bg-slate-900/50 dark:border-slate-800 dark:hover:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="h-10 rounded-xl bg-slate-50 px-3 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-100 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 focus:outline-none transition-all"
                 >
                     <option value="en">EN</option>
                     <option value="hi">HI</option>
                     <option value="hg">HG</option>
                 </select>
 
+                <div className="h-6 w-[1px] bg-slate-100 dark:bg-slate-900 mx-2" />
+
                 {/* Notifications */}
                 <NotificationCenter />
 
                 {/* User Profile */}
-                <div className="ml-2 flex items-center gap-3 border-l border-slate-100 pl-6 dark:border-slate-800">
-                    <div className="flex flex-col text-right">
-                        <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{user.name || 'User'}</p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{user.role || 'Staff'}</p>
-                    </div>
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg shadow-blue-500/20 font-black">
-                        {(user.name || 'U').charAt(0)}
-                    </div>
+                <div className="relative" ref={menuRef}>
+                    <motion.button 
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        onClick={() => setShowProfileMenu(!showProfileMenu)}
+                        className="ml-2 flex items-center gap-3 pl-4 py-1.5 pr-1.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all duration-300"
+                    >
+                        <div className="hidden flex-col text-right sm:flex">
+                            <p className="text-sm font-black text-slate-900 dark:text-white leading-tight tracking-tight">{user.name || 'Ankit Lohani'}</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500">{user.role || 'Store Owner'}</p>
+                        </div>
+                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20 font-black text-sm ring-4 ring-indigo-500/10 transition-transform group-hover:scale-105">
+                            {(user.name || 'A').charAt(0)}
+                        </div>
+                        <ChevronDown size={14} className={cn("text-slate-400 transition-transform duration-300", showProfileMenu && "rotate-180")} />
+                    </motion.button>
+
+                    <AnimatePresence>
+                        {showProfileMenu && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                transition={{ duration: 0.2, ease: "easeOut" }}
+                                className="absolute right-0 mt-4 w-64 rounded-3xl bg-white p-2 shadow-2xl shadow-indigo-500/10 ring-1 ring-slate-100 dark:bg-slate-950 dark:ring-slate-900"
+                            >
+                                <div className="p-4 border-b border-slate-50 dark:border-slate-900 mb-2">
+                                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Account</p>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{user.email || 'admin@bizflow.com'}</p>
+                                </div>
+                                
+                                <div className="space-y-1">
+                                    <button 
+                                        onClick={() => { navigate('/settings'); setShowProfileMenu(false); }}
+                                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-indigo-400 transition-all"
+                                    >
+                                        <User size={18} />
+                                        Profile Edit
+                                    </button>
+                                    <button 
+                                        onClick={() => { navigate('/settings'); setShowProfileMenu(false); }}
+                                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-indigo-400 transition-all"
+                                    >
+                                        <ShieldCheck size={18} />
+                                        Security & Password
+                                    </button>
+                                    <button 
+                                        onClick={() => { navigate('/settings'); setShowProfileMenu(false); }}
+                                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-indigo-400 transition-all"
+                                    >
+                                        <Settings size={18} />
+                                        Other Settings
+                                    </button>
+                                </div>
+
+                                <div className="mt-2 pt-2 border-t border-slate-50 dark:border-slate-900">
+                                    <button 
+                                        onClick={handleLogout}
+                                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50 transition-all"
+                                    >
+                                        <LogOut size={18} />
+                                        Sign Out
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
         </header>

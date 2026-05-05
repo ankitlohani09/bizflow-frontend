@@ -45,24 +45,34 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
 
     const loadDependencies = async () => {
         setLoading(true);
+        setError(null);
         try {
-            const [cats, uns, trs] = await Promise.all([
+            const [catsRes, unsRes, trsRes] = await Promise.allSettled([
                 categoryService.getAll(),
                 unitService.getAll(),
                 taxRuleService.getAll()
             ]);
-            setCategories(Array.isArray(cats) ? cats : []);
-            setUnits(Array.isArray(uns) ? uns : []);
-            setTaxRules(Array.isArray(trs) ? trs : []);
 
-            // Set defaults if not already set
+            const cats = catsRes.status === 'fulfilled' ? (Array.isArray(catsRes.value) ? catsRes.value : []) : [];
+            const uns = unsRes.status === 'fulfilled' ? (Array.isArray(unsRes.value) ? unsRes.value : []) : [];
+            const trs = trsRes.status === 'fulfilled' ? (Array.isArray(trsRes.value) ? trsRes.value : []) : [];
+
+            setCategories(cats);
+            setUnits(uns);
+            setTaxRules(trs);
+
+            // Set defaults safely
             setForm(f => ({
                 ...f,
                 categoryId: f.categoryId || (cats.length > 0 ? cats[0].id : ''),
                 unitId: f.unitId || (uns.length > 0 ? uns[0].id : '')
             }));
+
+            if (catsRes.status === 'rejected' || unsRes.status === 'rejected') {
+                console.error('Some dependencies failed to load');
+            }
         } catch (err) {
-            setError('Failed to load form dependencies.');
+            setError('Could not load categories or units. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -132,19 +142,19 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Register New Item">
+        <Modal isOpen={isOpen} onClose={onClose} title="Add New Item">
             <form onSubmit={handleSubmit} className="space-y-6">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-12 gap-3">
                         <Loader2 className="animate-spin text-blue-500" size={32} />
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Synchronizing Catalog...</p>
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Loading List...</p>
                     </div>
                 ) : (
                     <>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="col-span-2">
                                 <Input
-                                    label="Product Name"
+                                    label="Item Name"
                                     placeholder="E.g. Wireless Mouse"
                                     value={form.name}
                                     onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -152,7 +162,7 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
                                 />
                             </div>
                             <Input
-                                label="Barcode / SKU"
+                                label="Code / Barcode"
                                 placeholder="FC-001"
                                 value={form.barcode}
                                 onChange={(e) => setForm({ ...form, barcode: e.target.value })}
@@ -247,8 +257,8 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
                                     value={form.taxRuleId}
                                     onChange={(e) => {
                                         const rule = taxRules.find(r => r.id.toString() === e.target.value);
-                                        setForm({ 
-                                            ...form, 
+                                        setForm({
+                                            ...form,
                                             taxRuleId: e.target.value,
                                             taxRate: rule ? rule.rate : 0
                                         });
@@ -280,7 +290,7 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
                     <Button type="button" variant="ghost" className="flex-1 font-bold" onClick={onClose}>Cancel</Button>
                     <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white gap-2 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20" disabled={submitting || loading}>
                         {submitting ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
-                        Save Product
+                        Save Item
                     </Button>
                 </div>
             </form>

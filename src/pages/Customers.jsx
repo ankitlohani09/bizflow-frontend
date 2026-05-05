@@ -46,11 +46,11 @@ function DeleteConfirm({ customer, onConfirm, onCancel, deleting }) {
         <div className="p-6">
             <div className="flex items-center gap-4 text-rose-600 mb-6">
                 <AlertCircle size={32} className="opacity-20" />
-                <h3 className="text-xl font-black uppercase tracking-tighter">Confirm Deletion</h3>
+                <h3 className="text-xl font-black uppercase tracking-tighter">Delete Customer</h3>
             </div>
             <p className="text-slate-600 dark:text-slate-400 text-sm font-medium mb-8">
-                Are you absolutely sure you want to revoke the relationship with <span className="font-black text-slate-900 dark:text-white uppercase tracking-tighter">{customer?.name}</span>? 
-                This action is irreversible and will archive all associated history.
+                Are you sure you want to delete <span className="font-black text-slate-900 dark:text-white uppercase tracking-tighter">{customer?.name}</span>? 
+                This will remove all their data from the shop records.
             </p>
             <div className="flex justify-end gap-3">
                 <Button variant="ghost" onClick={onCancel} className="font-bold text-slate-400">Cancel</Button>
@@ -59,7 +59,7 @@ function DeleteConfirm({ customer, onConfirm, onCancel, deleting }) {
                     onClick={onConfirm}
                     disabled={deleting}
                 >
-                    {deleting ? 'Processing...' : 'Delete Relation'}
+                    {deleting ? 'Deleting...' : 'Delete Now'}
                 </Button>
             </div>
         </div>
@@ -117,7 +117,7 @@ export default function Customers() {
 
     const handleFormSuccess = () => {
         setModal(null);
-        setFeedback({ variant: 'success', message: 'Customer database synchronized successfully.' });
+        setFeedback({ variant: 'success', message: 'Customer details saved successfully.' });
         loadCustomers();
     };
 
@@ -125,7 +125,7 @@ export default function Customers() {
         setDeleting(true);
         try {
             await customerService.delete(selectedCustomer.id);
-            setFeedback({ variant: 'success', message: 'Customer record successfully expunged.' });
+            setFeedback({ variant: 'success', message: 'Customer deleted successfully.' });
             loadCustomers();
         } catch (err) {
             setFeedback({ variant: 'error', message: err.message ?? 'Failed to delete customer.' });
@@ -160,11 +160,11 @@ export default function Customers() {
     );
 
     return (
-        <MainLayout title="Customer Relations">
+        <MainLayout title="Customer List">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Customers</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Manage your relationships and acquisition history.</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Keep track of your regular shop customers.</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="ghost" onClick={loadCustomers} disabled={loading} className="dark:text-slate-400">
@@ -222,11 +222,11 @@ export default function Customers() {
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-transparent hover:bg-transparent border-none">
-                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white pl-8 py-4 text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('name')}>Identification</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('phone')}>Contact Info</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest text-center" onClick={() => handleSort('loyaltyPoints')}>Reward Points</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('city')}>Region</TableHead>
-                                    <TableHead className="text-right pr-8 text-[9px] font-black uppercase tracking-widest">Actions</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white pl-8 py-4 text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('name')}>Customer Name</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('phone')}>Phone No.</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest text-center" onClick={() => handleSort('loyaltyPoints')}>Points</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-white text-[9px] font-black uppercase tracking-widest" onClick={() => handleSort('city')}>City</TableHead>
+                                    <TableHead className="text-right pr-8 text-[9px] font-black uppercase tracking-widest">Options</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -303,10 +303,10 @@ export default function Customers() {
                 )}
             </Card>
 
-            <Modal isOpen={modal === 'add' || modal === 'edit'} onClose={() => setModal(null)} title={modal === 'edit' ? 'Update Profile' : 'Register New Client'} size="lg">
+            <Modal isOpen={modal === 'add' || modal === 'edit'} onClose={() => setModal(null)} title={modal === 'edit' ? 'Edit Customer' : 'Add New Customer'} size="lg">
                 <CustomerForm customer={modal === 'edit' ? selectedCustomer : null} onSuccess={handleFormSuccess} onCancel={() => setModal(null)} />
             </Modal>
-            <Modal isOpen={modal === 'delete'} onClose={() => setModal(null)} title="Revoke Relation" size="sm">
+            <Modal isOpen={modal === 'delete'} onClose={() => setModal(null)} title="Delete Customer" size="sm">
                 <DeleteConfirm customer={selectedCustomer} onConfirm={handleDeleteConfirm} onCancel={() => setModal(null)} deleting={deleting} />
             </Modal>
         </MainLayout>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Plus, X, Users, Loader2, Barcode,
     CreditCard, Layers,
     ArrowLeft, CheckCircle2, Search, Trash2,
     AlertCircle, Minus, ShoppingCart, Info,
-    Receipt, Tag, Calendar
+    Receipt, Tag, Calendar, Wallet, Banknote, Sparkles, Package,
+    Smartphone, QrCode, Landmark, Image as ImageIcon, UserPlus, Database, Phone, User, MapPin, Mail
 } from 'lucide-react';
 import invoiceService from '../services/invoiceService';
 import customerService from '../services/customerService';
@@ -18,9 +20,74 @@ const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
 
 /**
- * InvoiceForm – Optimized Compact POS
- * Refined version focused on efficiency, readability, and speed.
+ * QuickAddCustomerModal - Now with Address field
  */
+function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [form, setForm] = useState({ name: '', phone: '', email: '', address: '' });
+
+    if (!isOpen) return null;
+
+    async function handleSave(e) {
+        e.preventDefault();
+        if (!form.name || !form.phone) return setError('Name and Phone are mandatory.');
+        setLoading(true);
+        setError(null);
+        try {
+            const result = await customerService.create(form);
+            onSuccess(result);
+            onClose();
+        } catch (err) {
+            setError(err.message || 'Failed to save customer.');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-slate-700 uppercase tracking-widest">Quick Register Customer</h3>
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+                </div>
+                <form onSubmit={handleSave} className="p-6 space-y-4">
+                    {error && <div className="p-3 bg-rose-50 text-rose-600 text-xs font-bold rounded-lg">{error}</div>}
+                    
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name *</label>
+                        <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+                            <input autoFocus value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold" placeholder="Customer Name" />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Mobile Number *</label>
+                        <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+                            <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold" placeholder="10-digit Mobile" />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Shipping Address</label>
+                        <div className="relative">
+                            <MapPin className="absolute left-3 top-3 text-slate-300" size={14} />
+                            <textarea rows={2} value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className="w-full pl-9 pr-4 pt-2 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold resize-none" placeholder="Enter full address" />
+                        </div>
+                    </div>
+
+                    <button disabled={loading} type="submit" className="w-full h-12 bg-indigo-600 text-white rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+                        {loading ? <Loader2 className="animate-spin" /> : <>Complete Registration & Select</>}
+                    </button>
+                </form>
+            </motion.div>
+        </div>
+    );
+}
+
 export default function InvoiceForm() {
     const navigate = useNavigate();
     const barcodeRef = useRef(null);
@@ -32,25 +99,24 @@ export default function InvoiceForm() {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
-    // Item search
     const [itemSearch, setItemSearch] = useState('');
     const [showItemDropdown, setShowItemDropdown] = useState(false);
-
-    // Customer search
     const [customerSearch, setCustomerSearch] = useState('');
     const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
-
     const [barcode, setBarcode] = useState('');
     const [paymentModes, setPaymentModes] = useState([]);
+    const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
 
     const [form, setForm] = useState({
-        customerId: '',
-        customerName: '',
+        customerId: '', 
+        customerName: 'Walk-in Customer',
+        customerPhone: '',
+        customerAddress: '',
         invoiceDate: new Date().toISOString().split('T')[0],
         items: [],
         discountAmount: 0,
         selectedPaymentModeId: '',
-        splitPayments: [],   // [{paymentModeId, name, amount}] when split mode active
+        splitPayments: [],
         notes: '',
     });
 
@@ -70,7 +136,7 @@ export default function InvoiceForm() {
                     setForm(p => ({ ...p, selectedPaymentModeId: activeModes[0].id }));
                 }
             } catch {
-                setError('POS Engine: Connection failure. Please check server.');
+                setError('POS: Service Sync Error.');
             } finally {
                 setLoading(false);
             }
@@ -78,7 +144,6 @@ export default function InvoiceForm() {
         loadData();
     }, []);
 
-    // Close dropdowns on outside click
     useEffect(() => {
         function handleClick(e) {
             if (!e.target.closest('#item-search-box')) setShowItemDropdown(false);
@@ -115,9 +180,12 @@ export default function InvoiceForm() {
         ).slice(0, 6);
     }, [customers, customerSearch]);
 
-    // ── Handlers ──────────────────────────────────────────────────
     function selectCustomer(c) {
-        setForm(p => ({ ...p, customerId: c.id, customerName: c.name }));
+        if (c === 'walk-in') {
+            setForm(p => ({ ...p, customerId: '', customerName: 'Walk-in Customer', customerPhone: '', customerAddress: '' }));
+        } else {
+            setForm(p => ({ ...p, customerId: c.id, customerName: c.name, customerPhone: c.phone || '', customerAddress: c.address || '' }));
+        }
         setCustomerSearch('');
         setShowCustomerDropdown(false);
     }
@@ -138,13 +206,12 @@ export default function InvoiceForm() {
                     taxRate: Number(product.taxRate) || 0,
                     taxRuleId: product.taxRuleId || null,
                     subtotal: product.sellingPrice || 0,
+                    stock: product.availableQty || 0
                 }]
             }));
         }
         setItemSearch('');
         setShowItemDropdown(false);
-        // refocus item search for rapid adding
-        setTimeout(() => itemSearchRef.current?.focus(), 50);
     }
 
     function removeItem(index) {
@@ -179,22 +246,25 @@ export default function InvoiceForm() {
 
     async function handleSubmit(e) {
         e.preventDefault();
-        if (!form.customerId) return setError('Customer ID required to post ledger.');
-        if (form.items.length === 0) return setError('Cart empty. Add items to settle.');
-        if (!form.selectedPaymentModeId && form.splitPayments.length === 0)
-            return setError('Select a payment mode.');
+        
+        // ── Validations ──
+        if (form.items.length === 0) return setError('Please add items to cart.');
+        
+        const invalidQty = form.items.some(i => Number(i.quantity) <= 0);
+        if (invalidQty) return setError('Quantity must be greater than 0.');
 
         if (form.splitPayments.length > 0) {
-            const splitTotal = form.splitPayments.reduce((a, s) => a + (Number(s.amount) || 0), 0);
-            if (Math.abs(splitTotal - totals.grandTotal) > 0.01)
-                return setError(`Split mismatch: Offset is ${fmt(totals.grandTotal - splitTotal)}`);
+            const totalPaid = form.splitPayments.reduce((acc, s) => acc + Number(s.amount), 0);
+            if (Math.abs(totalPaid - totals.grandTotal) > 0.01) {
+                return setError(`Split total mismatch. Paid: ${fmt(totalPaid)}, Due: ${fmt(totals.grandTotal)}`);
+            }
         }
 
         setSubmitting(true);
         setError(null);
         try {
             const payload = {
-                customerId: Number(form.customerId),
+                customerId: form.customerId ? Number(form.customerId) : null,
                 invoiceDate: form.invoiceDate,
                 subtotal: totals.subtotal,
                 taxAmount: totals.taxAmount,
@@ -218,494 +288,200 @@ export default function InvoiceForm() {
             const result = await invoiceService.create(payload);
             navigate(`/invoices/${result.id}`, { replace: true });
         } catch (err) {
-            setError(err.message || 'Synchronization Error. Please verify network.');
+            setError(err.message || 'Transaction Posting Failed.');
         } finally {
             setSubmitting(false);
         }
     }
 
     if (loading) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-slate-50/50">
-                <div className="text-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-blue-600 mx-auto mb-2" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Syncing Catalog...</p>
-                </div>
-            </div>
-        );
+        return <div className="flex h-screen items-center justify-center bg-white"><Loader2 className="animate-spin text-indigo-600" /></div>;
     }
 
-    const splitTotal = form.splitPayments.reduce((a, s) => a + (Number(s.amount) || 0), 0);
-    const splitVariance = totals.grandTotal - splitTotal;
-    const splitBalanced = form.splitPayments.length === 0 || Math.abs(splitVariance) < 0.01;
-
     return (
-        <MainLayout title="POS Terminal">
-            <div className="max-w-6xl mx-auto px-6 py-8">
+        <MainLayout title="Terminal">
+            <QuickAddCustomerModal 
+                isOpen={isQuickAddOpen} 
+                onClose={() => setIsQuickAddOpen(false)} 
+                onSuccess={(c) => { setCustomers(p => [c, ...p]); selectCustomer(c); }} 
+            />
+            
+            <div className="h-[calc(100vh-64px)] bg-slate-50/50 overflow-hidden">
+                <div className="max-w-[1700px] mx-auto h-full px-4 pt-4 flex flex-col">
 
-                {/* ── Header ── */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => navigate('/invoices')}
-                            className="h-10 w-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-900 hover:bg-white border border-transparent hover:border-slate-200 transition-all shadow-sm hover:shadow-md"
-                        >
-                            <ArrowLeft size={20} />
-                        </button>
-                        <div>
-                            <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-1">POS Terminal</h1>
-                            <div className="flex items-center gap-2">
-                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Session</p>
+                    {/* ── Compact Header ── */}
+                    <div className="flex items-center justify-between mb-4 px-2">
+                        <div className="flex items-center gap-4">
+                            <h1 className="text-lg font-bold text-slate-800 tracking-tight">POS Terminal</h1>
+                            <div className="flex items-center gap-2 px-2 py-0.5 bg-indigo-50 border border-indigo-100 rounded text-[10px] font-bold text-indigo-600 uppercase tracking-widest">
+                                <Database size={10} /> Active Inventory
                             </div>
                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        <form onSubmit={handleBarcodeScan} className="relative group">
-                            <Barcode className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" size={16} />
-                            <input
-                                ref={barcodeRef}
-                                type="text"
-                                placeholder="Scan Barcode..."
-                                value={barcode}
-                                onChange={(e) => setBarcode(e.target.value)}
-                                className="h-11 w-64 rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 outline-none transition-all placeholder:font-medium"
-                            />
-                        </form>
-                    </div>
-                </div>
-
-                {error && (
-                    <div className="mb-6 flex items-start gap-3 rounded-2xl border-none bg-rose-50 px-6 py-4 text-sm text-rose-600 shadow-sm animate-in fade-in slide-in-from-top-2">
-                        <AlertCircle size={18} className="mt-0.5 shrink-0" />
-                        <span className="flex-1 font-bold leading-snug">{error}</span>
-                        <button onClick={() => setError(null)} className="text-rose-300 hover:text-rose-500">
-                            <X size={18} />
-                        </button>
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-                        {/* ── Left Stage ── */}
-                        <div className="lg:col-span-8 space-y-6">
-
-                            {/* Section: Sale Info */}
-                            <div className="rounded-[2rem] border-none bg-white p-8 shadow-sm">
-                                <div className="flex items-center gap-2 mb-6">
-                                    <Users size={16} className="text-blue-500" />
-                                    <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Account Selection</h2>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div id="customer-search-box" className="relative">
-                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Customer Name</label>
-                                        {form.customerId ? (
-                                            <div className="flex items-center justify-between h-14 px-5 rounded-2xl border-2 border-blue-500/20 bg-blue-50 transition-all shadow-sm">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
-                                                        <Users size={16} />
-                                                    </div>
-                                                    <span className="text-base font-black text-blue-700 truncate">{form.customerName}</span>
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setForm(p => ({ ...p, customerId: '', customerName: '' }))}
-                                                    className="h-8 w-8 flex items-center justify-center rounded-lg text-blue-400 hover:text-blue-600 hover:bg-blue-100 transition-all"
-                                                >
-                                                    <X size={16} />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div className="relative group">
-                                                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500" />
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Search customers..."
-                                                        value={customerSearch}
-                                                        onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); }}
-                                                        onFocus={() => setShowCustomerDropdown(true)}
-                                                        className="w-full h-14 rounded-2xl border border-slate-100 bg-slate-50/50 pl-12 pr-4 text-base font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-400 transition-all"
-                                                    />
-                                                </div>
-                                                {showCustomerDropdown && (
-                                                    <div className="absolute top-full mt-2 left-0 w-full bg-white rounded-3xl border border-slate-100 shadow-2xl z-50 overflow-hidden animate-in zoom-in-95 duration-200">
-                                                        {filteredCustomers.length > 0 ? filteredCustomers.map(c => (
-                                                            <button
-                                                                key={c.id}
-                                                                type="button"
-                                                                onClick={() => selectCustomer(c)}
-                                                                className="w-full text-left px-6 py-4 hover:bg-blue-50 transition-all border-b border-slate-50 last:border-0 flex items-center justify-between group"
-                                                            >
-                                                                <div>
-                                                                    <p className="text-sm font-black text-slate-900 group-hover:text-blue-700">{c.name}</p>
-                                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{c.phone || "No Mobile"}</p>
-                                                                </div>
-                                                                <ArrowLeft size={14} className="text-blue-500 opacity-0 group-hover:opacity-100 rotate-180 transition-all" />
-                                                            </button>
-                                                        )) : (
-                                                            <div className="py-8 text-center">
-                                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No matching records</p>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </>
-                                        )}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Billing Date</label>
-                                        <div className="relative">
-                                            <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
-                                            <input
-                                                type="date"
-                                                name="invoiceDate"
-                                                value={form.invoiceDate}
-                                                onChange={(e) => setForm(p => ({ ...p, invoiceDate: e.target.value }))}
-                                                required
-                                                className="w-full h-14 rounded-2xl border border-slate-100 bg-slate-50/50 pl-12 pr-4 text-base font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-400 transition-all cursor-pointer"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
+                        {error && (
+                            <div className="px-4 py-1.5 bg-rose-50 border border-rose-100 rounded text-rose-600 text-xs font-bold animate-in fade-in slide-in-from-top-1 flex items-center gap-2">
+                                <AlertCircle size={14} /> {error}
                             </div>
+                        )}
+                    </div>
 
-                            {/* Section: Cart Area */}
-                            <div className="rounded-[2rem] border-none bg-white overflow-hidden shadow-sm">
-                                <div className="flex items-center justify-between px-8 py-6 border-b border-slate-50">
-                                    <div className="flex items-center gap-3">
-                                        <ShoppingCart size={16} className="text-slate-400" />
-                                        <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Cart Items</h2>
-                                    </div>
-                                    {form.items.length > 0 && (
-                                        <span className="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/20">
-                                            {form.items.length} Items
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Smart Item Search */}
-                                <div id="item-search-box" className="relative px-8 py-6 bg-slate-50/30 border-b border-slate-50">
-                                    <div className="relative group">
-                                        <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500" />
+                    <form onSubmit={handleSubmit} className="flex-1 flex gap-4 min-h-0 pb-4">
+                        
+                        {/* ── LEFT COLUMN ── */}
+                        <div className="flex-[8] flex flex-col gap-4 min-w-0">
+                            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div id="item-search-box" className="relative">
+                                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
                                         <input
                                             ref={itemSearchRef}
                                             type="text"
-                                            placeholder="Find product by name or SKU..."
+                                            placeholder="Quick Product Search..."
                                             value={itemSearch}
                                             onChange={(e) => { setItemSearch(e.target.value); setShowItemDropdown(true); }}
                                             onFocus={() => setShowItemDropdown(true)}
-                                            className="w-full h-16 rounded-[1.5rem] border-none bg-white pl-16 pr-6 text-lg font-bold text-slate-900 shadow-sm focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300 placeholder:font-medium"
+                                            className="w-full h-10 pl-10 pr-4 rounded border border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none text-sm font-semibold transition-all shadow-inner"
                                         />
+                                        {showItemDropdown && (
+                                            <div className="absolute top-full mt-1 left-0 right-0 bg-white rounded-lg shadow-xl border border-slate-200 z-50 overflow-hidden">
+                                                {filteredInventory.map(p => (
+                                                    <button key={p.itemId} type="button" onClick={() => addItemToCart(p)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 border-b last:border-0 group">
+                                                        <div className="text-left">
+                                                            <p className="text-sm font-bold text-slate-900">{p.itemName}</p>
+                                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{p.sku}</p>
+                                                        </div>
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Stock: {p.availableQty}</span>
+                                                            <span className="text-sm font-bold text-indigo-600">{fmt(p.sellingPrice)}</span>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
+                                    <div className="relative">
+                                        <Barcode className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
+                                        <input type="text" placeholder="Barcode Entry..." value={barcode} onChange={(e) => setBarcode(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleBarcodeScan(e)} className="w-full h-10 pl-10 pr-4 rounded border border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none text-sm transition-all shadow-inner" />
+                                    </div>
+                                </div>
+                            </div>
 
-                                    {showItemDropdown && (
-                                        <div className="absolute top-[85%] left-8 right-8 bg-white rounded-[2rem] shadow-2xl z-40 border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
-                                            {filteredInventory.length > 0 ? filteredInventory.map(p => (
-                                                <button
-                                                    key={p.itemId}
-                                                    type="button"
-                                                    onClick={() => addItemToCart(p)}
-                                                    className="w-full flex items-center justify-between px-8 py-5 hover:bg-blue-600 hover:text-white transition-all border-b border-slate-50 last:border-0 group"
-                                                >
-                                                    <div className="text-left">
-                                                        <p className="text-base font-black tracking-tight">{p.itemName}</p>
-                                                        <div className="flex items-center gap-3 mt-1">
-                                                            {p.sku && <span className="text-[9px] font-bold uppercase tracking-widest opacity-60">SKU: {p.sku}</span>}
-                                                            <div className="flex items-center gap-1.5">
-                                                                <div className={cn("h-1.5 w-1.5 rounded-full", p.currentStock < 10 ? 'bg-orange-400' : 'bg-emerald-400')} />
-                                                                <span className="text-[9px] font-bold uppercase tracking-widest opacity-60">Stock: {p.currentStock}</span>
-                                                            </div>
+                            <div className="flex-1 bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col min-h-0">
+                                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-tight">
+                                        <ShoppingCart size={16} className="text-slate-400" /> Billing Items
+                                    </div>
+                                </div>
+                                <div className="flex-1 overflow-auto custom-scrollbar">
+                                    <table className="w-full text-left text-xs border-collapse">
+                                        <thead className="sticky top-0 bg-white shadow-sm z-10 text-slate-400 font-bold uppercase text-[9px] tracking-widest border-b border-slate-100">
+                                            <tr>
+                                                <th className="px-4 py-3">Item Detail</th>
+                                                <th className="px-4 py-3 text-center">Stock</th>
+                                                <th className="px-4 py-3">Price</th>
+                                                <th className="px-4 py-3">Subtotal</th>
+                                                <th className="px-4 py-3 text-center">Quantity</th>
+                                                <th className="px-4 py-3 text-center"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-50">
+                                            {form.items.map((item, index) => (
+                                                <tr key={index} className="hover:bg-slate-50/50 transition-colors">
+                                                    <td className="px-4 py-3">
+                                                        <p className="font-bold text-slate-800 leading-tight truncate max-w-[200px]">{item.itemName}</p>
+                                                        <p className="text-[9px] text-slate-400 font-bold uppercase">{item.sku}</p>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span className={cn("px-2 py-0.5 rounded text-[9px] font-bold", item.stock < 10 ? 'bg-rose-50 text-rose-500' : 'bg-slate-50 text-slate-500')}>
+                                                            {item.stock}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-3 font-semibold text-slate-600 tabular-nums">{fmt(item.unitPrice)}</td>
+                                                    <td className="px-4 py-3 font-bold text-slate-900 tabular-nums">{fmt(item.subtotal)}</td>
+                                                    <td className="px-4 py-3">
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <button type="button" onClick={() => updateItemField(index, 'quantity', Math.max(1, Number(item.quantity) - 1))} className="h-6 w-6 border border-slate-200 rounded flex items-center justify-center text-slate-400 hover:text-indigo-600"><Minus size={12} /></button>
+                                                            <input type="number" value={item.quantity} onChange={(e) => updateItemField(index, 'quantity', e.target.value)} className="w-8 text-center font-bold text-xs bg-transparent outline-none" />
+                                                            <button type="button" onClick={() => updateItemField(index, 'quantity', Number(item.quantity) + 1)} className="h-6 w-6 border border-slate-200 rounded flex items-center justify-center text-slate-400 hover:text-indigo-600"><Plus size={12} /></button>
                                                         </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-6">
-                                                        <p className="text-lg font-black group-hover:text-blue-100">{fmt(p.sellingPrice)}</p>
-                                                        <div className="h-10 w-10 rounded-full border-2 border-slate-100 flex items-center justify-center group-hover:border-white/50">
-                                                            <Plus size={18} />
-                                                        </div>
-                                                    </div>
-                                                </button>
-                                            )) : (
-                                                <div className="py-12 text-center">
-                                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No matching items</p>
-                                                </div>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center"><button type="button" onClick={() => removeItem(index)} className="text-slate-200 hover:text-rose-500"><Trash2 size={16} /></button></td>
+                                                </tr>
+                                            ))}
+                                            {form.items.length === 0 && (
+                                                <tr><td colSpan="6" className="px-4 py-20 text-center text-slate-300 font-bold uppercase text-[9px] tracking-widest">Cart is empty</td></tr>
                                             )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── RIGHT COLUMN ── */}
+                        <div className="flex-[4] flex flex-col gap-4 min-w-[350px]">
+                            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 space-y-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-tight"><Users size={16} className="text-indigo-600" /> Customer</div>
+                                    <button type="button" onClick={() => setIsQuickAddOpen(true)} className="flex items-center gap-1 text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded hover:bg-indigo-600 hover:text-white transition-all"><Plus size={12} /> QUICK ADD</button>
+                                </div>
+                                <div id="customer-search-box" className="space-y-2 relative">
+                                    <div className="relative">
+                                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
+                                        <input type="text" placeholder={form.customerName} value={customerSearch} onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); }} onFocus={() => setShowCustomerDropdown(true)} className="w-full h-9 pl-9 pr-3 rounded border border-slate-200 bg-slate-50 outline-none text-xs font-bold text-slate-700 focus:bg-white" />
+                                        {showCustomerDropdown && (
+                                            <div className="absolute top-full mt-1 left-0 w-full bg-white rounded-lg shadow-xl border border-slate-200 z-[100] overflow-hidden">
+                                                <button type="button" onClick={() => selectCustomer('walk-in')} className="w-full text-left px-3 py-2.5 hover:bg-slate-50 border-b border-slate-50 flex items-center gap-2"><Users size={12} className="text-indigo-600" /><span className="text-xs font-bold">Walk-in Customer</span></button>
+                                                {filteredCustomers.map(c => (
+                                                    <button key={c.id} type="button" onClick={() => selectCustomer(c)} className="w-full text-left px-3 py-2 hover:bg-slate-50 border-b border-slate-50 last:border-0"><p className="text-xs font-bold">{c.name}</p><p className="text-[9px] text-slate-400">{c.phone}</p></button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                    {form.customerPhone && (
+                                        <div className="p-3 bg-slate-50 rounded border border-slate-100 space-y-1.5">
+                                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600"><Phone size={10} className="text-indigo-500" /> {form.customerPhone}</div>
+                                            {form.customerAddress && <div className="flex items-start gap-2 text-[10px] font-bold text-slate-500"><MapPin size={10} className="text-indigo-500 mt-0.5 shrink-0" /> <span className="leading-relaxed">{form.customerAddress}</span></div>}
                                         </div>
                                     )}
                                 </div>
+                                <div className="space-y-1">
+                                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Date</label>
+                                    <input type="date" value={form.invoiceDate} onChange={(e) => setForm(p => ({ ...p, invoiceDate: e.target.value }))} className="w-full h-9 px-3 rounded border border-slate-200 bg-slate-50 outline-none text-xs font-bold text-slate-700" />
+                                </div>
+                            </div>
 
-                                {/* Cart List */}
-                                <div className="max-h-[500px] overflow-y-auto">
-                                    {form.items.length === 0 ? (
-                                        <div className="py-24 text-center">
-                                            <div className="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 opacity-40">
-                                                <ShoppingCart size={32} className="text-slate-400" />
-                                            </div>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">Scanning Mesh Terminal...</p>
+                            <div className="flex-1 bg-white rounded-lg shadow-sm border border-slate-200 p-4 flex flex-col gap-4 min-h-0 overflow-visible">
+                                <div className="space-y-2.5 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                    <div className="flex justify-between text-slate-500 font-bold text-[10px] uppercase"><span>Subtotal</span><span className="text-slate-800 tabular-nums">{fmt(totals.subtotal)}</span></div>
+                                    <div className="flex justify-between text-slate-500 font-bold text-[10px] uppercase"><span>Tax (GST)</span><span className="text-indigo-600 tabular-nums">+{fmt(totals.taxAmount)}</span></div>
+                                    <div className="pt-2 border-t border-slate-200 flex justify-between items-center"><span className="text-[10px] font-bold text-slate-400 uppercase">Discount</span><div className="flex items-center bg-white border border-slate-200 rounded px-2 py-0.5"><span className="text-[9px] text-slate-300 mr-1">₹</span><input type="number" value={form.discountAmount} onChange={(e) => setForm(p => ({ ...p, discountAmount: e.target.value }))} className="w-16 text-right font-bold text-xs outline-none" /></div></div>
+                                    <div className="pt-2 flex justify-between items-center border-t border-slate-200"><span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Amount Payable</span><span className="text-2xl font-black text-slate-900 tabular-nums">{fmt(totals.grandTotal)}</span></div>
+                                </div>
+
+                                <div className="flex-1 min-h-0 overflow-auto custom-scrollbar space-y-2">
+                                    <div className="flex items-center justify-between"><label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Payment</label><button type="button" onClick={() => setForm(p => ({ ...p, splitPayments: p.splitPayments.length > 0 ? [] : paymentModes.map(m => ({ paymentModeId: m.id, name: m.name, amount: 0 })) }))} className="text-[9px] font-bold text-indigo-600 underline">Split Mode</button></div>
+                                    {form.splitPayments.length === 0 ? (
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {paymentModes.map(mode => (
+                                                <button key={mode.id} type="button" onClick={() => setForm(p => ({ ...p, selectedPaymentModeId: mode.id }))} className={cn("px-3 py-3 rounded border text-[10px] font-bold uppercase transition-all", form.selectedPaymentModeId === mode.id ? "bg-indigo-600 border-indigo-600 text-white shadow-md" : "bg-white border-slate-200 text-slate-500 hover:border-indigo-100")}>{mode.name}</button>
+                                            ))}
                                         </div>
                                     ) : (
-                                        <div className="divide-y divide-slate-50">
-                                            {form.items.map((item, index) => (
-                                                <div key={index} className="flex items-center gap-8 p-8 hover:bg-slate-50/50 transition-colors group animate-in slide-in-from-left-4 duration-300">
-                                                    <div className="flex-1 min-w-0">
-                                                        <h4 className="text-lg font-black text-slate-900 tracking-tighter truncate leading-tight mb-1">{item.itemName}</h4>
-                                                        <div className="flex items-center gap-3">
-                                                            <Tag size={12} className="text-slate-300" />
-                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{item.sku || "No SKU"}</span>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="w-32">
-                                                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1.5 ml-1">Unit Rate</p>
-                                                        <div className="flex items-center bg-slate-100/50 px-3 py-1.5 rounded-xl border border-transparent focus-within:border-blue-200 focus-within:bg-white transition-all">
-                                                            <span className="text-[10px] font-bold text-slate-400 mr-1.5">₹</span>
-                                                            <input
-                                                                type="number"
-                                                                value={item.unitPrice}
-                                                                onChange={(e) => updateItemField(index, 'unitPrice', e.target.value)}
-                                                                className="w-full text-sm font-black text-slate-700 bg-transparent outline-none"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="w-36 flex flex-col items-center">
-                                                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1.5 text-center">Quantity</p>
-                                                        <div className="flex items-center gap-2 bg-slate-100/50 p-1.5 rounded-2xl border border-transparent group-hover:bg-white group-hover:shadow-sm transition-all">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => updateItemField(index, 'quantity', Math.max(1, Number(item.quantity) - 1))}
-                                                                className="h-9 w-9 rounded-xl bg-white text-slate-400 hover:text-blue-600 hover:shadow-sm transition-all active:scale-90"
-                                                            >
-                                                                <Minus size={16} />
-                                                            </button>
-                                                            <input
-                                                                type="number"
-                                                                value={item.quantity}
-                                                                onChange={(e) => updateItemField(index, 'quantity', e.target.value)}
-                                                                className="w-10 text-center text-base font-black text-slate-900 bg-transparent outline-none"
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => updateItemField(index, 'quantity', Number(item.quantity) + 1)}
-                                                                className="h-9 w-9 rounded-xl bg-white text-slate-400 hover:text-blue-600 hover:shadow-sm transition-all active:scale-90"
-                                                            >
-                                                                <Plus size={16} />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="w-40 text-right">
-                                                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Line Total</p>
-                                                        <p className="text-2xl font-black text-slate-900 tracking-tighter tabular-nums">{fmt(item.subtotal)}</p>
-                                                    </div>
-
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeItem(index)}
-                                                        className="h-12 w-12 flex items-center justify-center rounded-2xl text-slate-200 hover:text-rose-500 hover:bg-rose-50 transition-all opacity-0 group-hover:opacity-100"
-                                                    >
-                                                        <Trash2 size={20} />
-                                                    </button>
-                                                </div>
+                                        <div className="space-y-2">
+                                            {form.splitPayments.map((sp, idx) => (
+                                                <div key={sp.paymentModeId} className="flex items-center justify-between bg-slate-50 px-3 py-1.5 rounded border border-slate-100 text-[10px] font-bold"><span className="text-slate-400 uppercase">{sp.name}</span><input type="number" value={sp.amount} onChange={(e) => setForm(p => ({ ...p, splitPayments: p.splitPayments.map((s, i) => i === idx ? { ...s, amount: Number(e.target.value) } : s) }))} className="w-20 text-right bg-transparent outline-none" /></div>
                                             ))}
                                         </div>
                                     )}
                                 </div>
-                            </div>
 
-                            {/* Section: Payment Settlement */}
-                            <div className="rounded-[2rem] border-none bg-white p-8 shadow-sm">
-                                <div className="flex items-center gap-2 mb-8">
-                                    <CreditCard size={16} className="text-blue-500" />
-                                    <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Settlement Hub</h2>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between ml-1">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Payment Mode</label>
-                                            <button
-                                                type="button"
-                                                onClick={() => setForm(p => ({
-                                                    ...p,
-                                                    splitPayments: p.splitPayments.length > 0
-                                                        ? []
-                                                        : paymentModes.map(m => ({ paymentModeId: m.id, name: m.name, amount: 0 }))
-                                                }))}
-                                                className="text-[9px] font-black uppercase tracking-widest text-blue-500 hover:text-blue-700 flex items-center gap-1"
-                                            >
-                                                <Layers size={12} />
-                                                {form.splitPayments.length > 0 ? 'Single Mode' : 'Split Payment'}
-                                            </button>
-                                        </div>
-
-                                        {form.splitPayments.length === 0 ? (
-                                            <div className="grid grid-cols-2 gap-3">
-                                                {paymentModes.length === 0 ? (
-                                                    <p className="col-span-2 text-[10px] text-slate-400 font-bold text-center py-4 uppercase tracking-widest">
-                                                        No payment modes configured
-                                                    </p>
-                                                ) : paymentModes.map((mode) => (
-                                                    <button
-                                                        key={mode.id}
-                                                        type="button"
-                                                        onClick={() => setForm(p => ({ ...p, selectedPaymentModeId: mode.id }))}
-                                                        className={cn(
-                                                            "flex items-center gap-3 px-5 py-4 rounded-2xl border-2 transition-all duration-300",
-                                                            form.selectedPaymentModeId === mode.id
-                                                                ? "border-blue-600 bg-blue-600 text-white shadow-xl shadow-blue-500/20"
-                                                                : "border-slate-50 bg-slate-50 text-slate-500 hover:bg-slate-100"
-                                                        )}
-                                                    >
-                                                        <CreditCard size={18} />
-                                                        <span className="text-xs font-black uppercase tracking-widest truncate">{mode.name}</span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="rounded-3xl bg-slate-50 p-6 space-y-4 animate-in zoom-in-95">
-                                                {form.splitPayments.map((sp, idx) => (
-                                                    <div key={sp.paymentModeId} className="flex items-center justify-between bg-white px-5 py-3.5 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
-                                                        <div className="flex items-center gap-3">
-                                                            <CreditCard size={14} className="text-blue-400" />
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{sp.name}</span>
-                                                        </div>
-                                                        <div className="flex items-center">
-                                                            <span className="text-xs font-bold text-slate-300 mr-2">₹</span>
-                                                            <input
-                                                                type="number"
-                                                                value={sp.amount}
-                                                                onChange={(e) => setForm(p => ({
-                                                                    ...p,
-                                                                    splitPayments: p.splitPayments.map((s, i) =>
-                                                                        i === idx ? { ...s, amount: Number(e.target.value) } : s
-                                                                    )
-                                                                }))}
-                                                                className="w-24 text-right text-base font-black text-slate-900 outline-none"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                                <div className={cn(
-                                                    "flex justify-between items-center px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-sm",
-                                                    splitBalanced ? "bg-emerald-500 text-white shadow-emerald-500/20" : "bg-amber-100 text-amber-700"
-                                                )}>
-                                                    <span>{splitBalanced ? '✓ Balanced' : 'Deficit / Offset'}</span>
-                                                    <span>{splitBalanced ? '0.00' : fmt(splitVariance)}</span>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-4 block">Terminal Memo</label>
-                                        <textarea
-                                            name="notes"
-                                            value={form.notes}
-                                            onChange={(e) => setForm(p => ({ ...p, notes: e.target.value }))}
-                                            rows={8}
-                                            placeholder="Add private memos for this transaction..."
-                                            className="w-full rounded-[2rem] border-none bg-slate-50 p-8 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:ring-4 focus:ring-blue-500/5 focus:bg-white transition-all resize-none shadow-inner"
-                                        />
-                                    </div>
-                                </div>
+                                <button disabled={submitting || form.items.length === 0} type="submit" className={cn("w-full h-14 rounded-lg flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest transition-all", submitting || form.items.length === 0 ? "bg-slate-100 text-slate-300" : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-600/20")}>
+                                    {submitting ? <Loader2 className="animate-spin" /> : <>Finalize Sale <CheckCircle2 size={18} /></>}
+                                </button>
                             </div>
                         </div>
 
-                        {/* ── Right Stage: The Receipt Summary ── */}
-                        <div className="lg:col-span-4 sticky top-8">
-                            <div className="rounded-[3rem] border-none bg-slate-900 text-white overflow-hidden shadow-2xl relative">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 blur-[60px] rounded-full"></div>
-                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-600/10 blur-[60px] rounded-full"></div>
-
-                                <div className="px-10 py-10 border-b border-white/5 relative z-10">
-                                    <div className="flex items-center justify-between mb-10">
-                                        <div className="flex items-center gap-2">
-                                            <Receipt size={16} className="text-blue-500" />
-                                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">Checkout</h2>
-                                        </div>
-                                        <span className="text-[8px] font-black bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full uppercase tracking-widest border border-blue-500/30">L-ID: 742</span>
-                                    </div>
-
-                                    <div className="space-y-6">
-                                        <div className="flex justify-between items-center group/row">
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Subtotal</span>
-                                            <span className="text-lg font-black tracking-tight">{fmt(totals.subtotal)}</span>
-                                        </div>
-
-                                        <div className="flex justify-between items-center group/row">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Tax (GST)</span>
-                                                <span className="text-[8px] font-black text-slate-600 bg-white/5 px-2 py-1 rounded-lg border border-white/10">Per Item</span>
-                                            </div>
-                                            <span className="text-sm font-black text-emerald-400">+{fmt(totals.taxAmount)}</span>
-                                        </div>
-
-                                        <div className="flex justify-between items-center group/row">
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Adjustment</span>
-                                            <div className="flex items-center bg-white/5 rounded-xl px-4 py-2 border border-white/10 focus-within:border-blue-500/50 transition-all">
-                                                <span className="text-[10px] font-black text-slate-600 mr-2">₹</span>
-                                                <input
-                                                    type="number"
-                                                    value={form.discountAmount}
-                                                    onChange={(e) => setForm(p => ({ ...p, discountAmount: e.target.value }))}
-                                                    className="w-20 text-right text-sm font-black text-white outline-none"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="px-10 py-12 relative z-10">
-                                    <div className="mb-10 text-center">
-                                        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-blue-500 mb-4">Total Amount</p>
-                                        <div className="flex items-baseline justify-center gap-2">
-                                            <span className="text-2xl font-black text-slate-700">₹</span>
-                                            <h2 className="text-7xl font-black tracking-tighter tabular-nums leading-none">
-                                                {totals.grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-                                                <span className="text-2xl text-blue-600 font-black">.00</span>
-                                            </h2>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={submitting || form.items.length === 0 || !form.customerId || (!form.selectedPaymentModeId && form.splitPayments.length === 0)}
-                                        className={cn(
-                                            "w-full h-24 rounded-[2rem] flex flex-col items-center justify-center gap-2 text-base font-black uppercase tracking-[0.3em] transition-all duration-500 active:scale-95 shadow-2xl relative overflow-hidden group",
-                                            submitting || form.items.length === 0 || !form.customerId || (!form.selectedPaymentModeId && form.splitPayments.length === 0)
-                                                ? "bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5"
-                                                : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/40"
-                                        )}
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
-                                        {submitting ? (
-                                            <Loader2 className="h-8 w-8 animate-spin" />
-                                        ) : (
-                                            <>
-                                                <div className="flex items-center gap-3">
-                                                    Create Invoice <CheckCircle2 size={24} className="group-hover:rotate-12 transition-transform" />
-                                                </div>
-                                                <span className="text-[9px] font-bold text-blue-200/50 uppercase tracking-[0.4em] opacity-40">Finalize Transaction</span>
-                                            </>
-                                        )}
-                                    </button>
-
-                                    {!submitting && (!form.customerId || form.items.length === 0 || (!form.selectedPaymentModeId && form.splitPayments.length === 0)) && (
-                                        <p className="text-center text-[9px] font-black uppercase tracking-widest text-slate-600 mt-6 animate-pulse">
-                                            {!form.customerId ? 'Account Required' : form.items.length === 0 ? 'Cart Empty' : 'Select Payment Mode'}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </MainLayout>
     );

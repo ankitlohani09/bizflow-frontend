@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ThemeProvider } from './context/ThemeContext';
 import { Loader2 } from 'lucide-react';
@@ -27,9 +28,15 @@ const Settings = lazy(() => import('./pages/Settings'));
 function PageLoader() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
-        <span className="text-xs font-black uppercase tracking-[0.3em] text-slate-400">Loading Network...</span>
+      <div className="flex flex-col items-center gap-6">
+        <div className="relative">
+          <div className="h-16 w-16 rounded-2xl border-4 border-indigo-500/20 border-t-indigo-500 animate-spin" />
+          <Loader2 className="absolute inset-0 m-auto h-6 w-6 text-indigo-500 animate-pulse" />
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-500 animate-pulse">Initializing</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mt-1">BizFlow Enterprise</span>
+        </div>
       </div>
     </div>
   );
@@ -40,38 +47,40 @@ export default function App() {
     <ThemeProvider>
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<Login />} />
+          <AnimatePresence mode="wait">
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
 
-            {/* General access routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/customers" element={<Customers />} />
-              <Route path="/invoices" element={<Invoices />} />
-              <Route path="/invoices/new" element={<InvoiceForm />} />
-              <Route path="/invoices/:id" element={<InvoiceDetails />} />
-              <Route path="/inventory" element={<Inventory />} />
-              <Route path="/stock-movements" element={<StockMovements />} />
-              <Route path="/inventory/history" element={<StockHistory />} />
-              <Route path="/expenses" element={<Expenses />} />
-              <Route path="/suppliers" element={<Suppliers />} />
-              <Route path="/purchases" element={<Purchases />} />
-              <Route path="/purchases/new" element={<PurchaseForm />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/returns" element={<Returns />} />
-            </Route>
+              {/* General access routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/customers" element={<Customers />} />
+                <Route path="/invoices" element={<Invoices />} />
+                <Route path="/invoices/new" element={<InvoiceForm />} />
+                <Route path="/invoices/:id" element={<InvoiceDetails />} />
+                <Route path="/inventory" element={<Inventory />} />
+                <Route path="/stock-movements" element={<StockMovements />} />
+                <Route path="/inventory/history" element={<StockHistory />} />
+                <Route path="/expenses" element={<Expenses />} />
+                <Route path="/suppliers" element={<Suppliers />} />
+                <Route path="/purchases" element={<Purchases />} />
+                <Route path="/purchases/new" element={<PurchaseForm />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/returns" element={<Returns />} />
+              </Route>
 
-            {/* Admin and Owner Only */}
-            <Route element={<ProtectedRoute allowedRoles={['OWNER', 'ADMIN']} />}>
-              <Route path="/staff" element={<Staff />} />
-              <Route path="/staff/:id" element={<StaffDetails />} />
-              <Route path="/settings" element={<Settings />} />
-            </Route>
+              {/* Admin and Owner Only */}
+              <Route element={<ProtectedRoute allowedRoles={['OWNER', 'ADMIN']} />}>
+                <Route path="/staff" element={<Staff />} />
+                <Route path="/staff/:id" element={<StaffDetails />} />
+                <Route path="/settings" element={<Settings />} />
+              </Route>
 
-            {/* Default: redirect root to /dashboard (ProtectedRoute handles auth check) */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
+              {/* Default: redirect root to /dashboard (ProtectedRoute handles auth check) */}
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </AnimatePresence>
         </Suspense>
       </BrowserRouter>
     </ThemeProvider>
