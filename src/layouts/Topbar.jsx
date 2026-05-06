@@ -118,8 +118,12 @@ export default function Topbar({ onToggleSidebar }) {
                         className="ml-2 flex items-center gap-3 pl-4 py-1.5 pr-1.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all duration-300"
                     >
                         <div className="hidden flex-col text-right sm:flex">
-                            <p className="text-sm font-black text-slate-900 dark:text-white leading-tight tracking-tight">{user.name || 'Ankit Lohani'}</p>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500">{user.role || 'Store Owner'}</p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white leading-tight tracking-tight">
+                                {user.name || '--'}
+                            </p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500">
+                                {user.roles && user.roles.length > 0 ? user.roles[0] : 'Member'}
+                            </p>
                         </div>
                         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20 font-black text-sm ring-4 ring-indigo-500/10 transition-transform group-hover:scale-105 overflow-hidden">
                             {user.profilePictureUrl ? (

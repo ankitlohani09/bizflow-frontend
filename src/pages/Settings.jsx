@@ -451,9 +451,9 @@ export default function Settings() {
                                     {localBranding.logoUrl ? (
                                         <div className="relative h-24 w-full flex items-center justify-center">
                                             <img
-                                                src={localBranding.logoUrl.startsWith('blob:') || localBranding.logoUrl.startsWith('data:')
+                                                src={localBranding.logoUrl.startsWith('blob:') || localBranding.logoUrl.startsWith('data:') || localBranding.logoUrl.startsWith('http')
                                                     ? localBranding.logoUrl
-                                                    : `http://localhost:8080${localBranding.logoUrl.startsWith('/') ? '' : '/'}${localBranding.logoUrl}`}
+                                                    : `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}${localBranding.logoUrl.startsWith('/') ? '' : '/'}${localBranding.logoUrl}`}
                                                 alt="Logo Preview"
                                                 className="h-full object-contain"
                                             />
@@ -482,14 +482,17 @@ export default function Settings() {
 
                                                 try {
                                                     setSuccessMsg('Syncing logo with server...');
-                                                    const data = await brandingService.uploadLogo(file);
-
-                                                    // 2. Once uploaded, use the server URL
-                                                    setLocalBranding(p => ({ ...p, logoUrl: data.logoUrl }));
+                                                    const res = await brandingService.uploadLogo(file);
+                                                    
+                                                    // IMPORTANT: Get the actual server path from response
+                                                    const serverPath = res.logoUrl || res.path || res.url;
+                                                    
+                                                    // 2. Once uploaded, update state with SERVER URL, not blob
+                                                    setLocalBranding(p => ({ ...p, logoUrl: serverPath }));
                                                     setSuccessMsg('Branding asset synced successfully!');
                                                 } catch (error) {
                                                     console.error('Logo upload failed:', error);
-                                                    setSuccessMsg('Upload failed, but showing local preview.');
+                                                    setSuccessMsg('Upload failed.');
                                                 }
                                             }
                                         }}
@@ -499,8 +502,13 @@ export default function Settings() {
                                 <div className="pt-6 border-t border-slate-100 flex justify-end">
                                     <Button
                                         className="bg-slate-900 hover:bg-black text-white px-10 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl shadow-xl shadow-slate-200"
-                                        onClick={() => {
-                                            updateBranding(localBranding);
+                                        onClick={async () => {
+                                            // Final safety check: if it's a blob, don't save it
+                                            if (localBranding.logoUrl && localBranding.logoUrl.startsWith('blob:')) {
+                                                setSuccessMsg('Logo is still processing, please wait...');
+                                                return;
+                                            }
+                                            await updateBranding(localBranding);
                                             setSuccessMsg('Branding updated. Your interface has been refreshed.');
                                         }}
                                     >

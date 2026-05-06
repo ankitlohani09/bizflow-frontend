@@ -22,6 +22,8 @@ import Button from '../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
 import { cn } from '../utils/cn';
+import StaffAdvanceModal from '../components/StaffAdvanceModal';
+import AttendanceModal from '../components/AttendanceModal';
 
 const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
@@ -35,6 +37,8 @@ export default function StaffDetails() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
+    const [isAdvanceModalOpen, setIsAdvanceModalOpen] = useState(false);
+    const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -102,8 +106,8 @@ export default function StaffDetails() {
     return (
         <MainLayout title={`Staff Profile — ${staff?.name}`}>
             <div className="mb-8">
-                <Button 
-                    variant="ghost" 
+                <Button
+                    variant="ghost"
                     className="gap-2 text-slate-500 font-bold hover:bg-slate-100 rounded-xl"
                     onClick={() => navigate('/staff')}
                 >
@@ -169,7 +173,7 @@ export default function StaffDetails() {
                     {/* Payroll Summary Card */}
                     <Card className="enterprise-card p-6 bg-slate-950 text-white border-none relative overflow-hidden group">
                         <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-blue-500/10 blur-3xl group-hover:bg-blue-500/20 transition-all" />
-                        
+
                         <div className="flex items-center gap-4 mb-8">
                             <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
                                 <Wallet className="text-blue-400" size={20} />
@@ -200,7 +204,7 @@ export default function StaffDetails() {
                                 </div>
                             </div>
 
-                            <Button 
+                            <Button
                                 className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] py-6 rounded-2xl shadow-xl shadow-blue-500/20 gap-2"
                                 onClick={handleProcessPayroll}
                                 disabled={submitting || netPayout <= 0}
@@ -223,6 +227,12 @@ export default function StaffDetails() {
                                     </CardTitle>
                                     <CardDescription className="text-slate-400 text-xs mt-1 font-bold lowercase">Chronological log of check-ins and check-outs.</CardDescription>
                                 </div>
+                                <Button
+                                    className="gap-2 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg shadow-blue-500/20"
+                                    onClick={() => setIsAttendanceModalOpen(true)}
+                                >
+                                    Mark Attendance
+                                </Button>
                             </div>
                         </CardHeader>
                         <CardContent className="p-0 overflow-x-auto">
@@ -244,7 +254,7 @@ export default function StaffDetails() {
                                         attendance.map((log, i) => (
                                             <TableRow key={i} className="border-slate-50">
                                                 <TableCell className="pl-8 font-black text-slate-900">{log.date}</TableCell>
-                                                <TableCell className="font-bold text-slate-500">{log.checkIn}</TableCell>
+                                                <TableCell className="font-bold text-slate-500">{log.checkIn || '—'}</TableCell>
                                                 <TableCell className="font-bold text-slate-500">{log.checkOut || '—'}</TableCell>
                                                 <TableCell className="pr-8 text-right">
                                                     <span className={cn(
@@ -273,6 +283,12 @@ export default function StaffDetails() {
                                     </CardTitle>
                                     <CardDescription className="text-slate-400 text-xs mt-1 font-bold lowercase">Detailed tracking of financial advances and adjustments.</CardDescription>
                                 </div>
+                                <Button
+                                    className="gap-2 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl"
+                                    onClick={() => setIsAdvanceModalOpen(true)}
+                                >
+                                    Give Advance
+                                </Button>
                             </div>
                         </CardHeader>
                         <CardContent className="p-0 overflow-x-auto">
@@ -294,8 +310,8 @@ export default function StaffDetails() {
                                         advances.map((adv, i) => (
                                             <TableRow key={i} className="border-slate-50">
                                                 <TableCell className="pl-8 font-black text-slate-900 text-[10px] tracking-widest">#ADV-{adv.id}</TableCell>
-                                                <TableCell className="font-bold text-slate-500">{adv.date}</TableCell>
-                                                <TableCell className="font-bold text-slate-500 truncate max-w-[200px]">{adv.reason}</TableCell>
+                                                <TableCell className="font-bold text-slate-500">{adv.advanceDate}</TableCell>
+                                                <TableCell className="font-bold text-slate-500 truncate max-w-[200px]">{adv.notes}</TableCell>
                                                 <TableCell className="pr-8 text-right font-black text-rose-600">{fmt(adv.amount)}</TableCell>
                                             </TableRow>
                                         ))
@@ -306,6 +322,21 @@ export default function StaffDetails() {
                     </Card>
                 </div>
             </div>
+
+            <StaffAdvanceModal
+                isOpen={isAdvanceModalOpen}
+                onClose={() => setIsAdvanceModalOpen(false)}
+                onSuccess={fetchData}
+                staffId={id}
+            />
+
+            <AttendanceModal
+                isOpen={isAttendanceModalOpen}
+                onClose={() => setIsAttendanceModalOpen(false)}
+                onSuccess={fetchData}
+                staffId={id}
+                staffName={staff?.name}
+            />
         </MainLayout>
     );
 }

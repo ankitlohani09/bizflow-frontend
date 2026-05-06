@@ -7,16 +7,56 @@ import inventoryService from './inventoryService';
  * reportService – Client-side BI Engine for aggregating financial data
  */
 const reportService = {
+    // ── Helper: Data Cache ──────────────────────────────────────────────────
+    // Prevents redundant API calls during complex aggregation
+    _cache: {
+        data: null,
+        promise: null,
+        timestamp: 0
+    },
+
+    async _getRawData() {
+        const now = Date.now();
+        
+        // 1. If we have fresh data, return it
+        if (this._cache.data && (now - this._cache.timestamp < 2000)) {
+            return this._cache.data;
+        }
+
+        // 2. If a request is already in flight, return that promise
+        if (this._cache.promise) {
+            return this._cache.promise;
+        }
+
+        // 3. Otherwise, start a new request and cache the promise
+        this._cache.promise = (async () => {
+            try {
+                const [invoices, purchases, expenses, inventory] = await Promise.all([
+                    invoiceService.getAll(),
+                    purchaseService.getAll(),
+                    expenseService.getAll(),
+                    inventoryService.getAll()
+                ]);
+
+                const data = { invoices, purchases, expenses, inventory };
+                this._cache.data = data;
+                this._cache.timestamp = Date.now();
+                return data;
+            } finally {
+                // Clear the promise once finished
+                this._cache.promise = null;
+            }
+        })();
+
+        return this._cache.promise;
+    },
+
     /**
      * Get a comprehensive financial summary for the current month
      */
     async getFinancialSummary() {
         try {
-            const [invoices, purchases, expenses] = await Promise.all([
-                invoiceService.getAll(),
-                purchaseService.getAll(),
-                expenseService.getAll()
-            ]);
+            const { invoices, purchases, expenses } = await this._getRawData();
 
             const revenue = invoices
                 .filter(inv => (inv.paymentStatus || inv.status) === 'PAID')
@@ -53,11 +93,7 @@ const reportService = {
      */
     async getEnhancedAnalytics() {
         try {
-            const [invoices, purchases, expenses] = await Promise.all([
-                invoiceService.getAll(),
-                purchaseService.getAll(),
-                expenseService.getAll()
-            ]);
+            const { invoices, purchases, expenses } = await this._getRawData();
 
             // 1. Monthly Bucketing (Last 6 Months)
             const months = [];
@@ -204,10 +240,7 @@ const reportService = {
      */
     async getPredictiveInventory() {
         try {
-            const [invoices, inventory] = await Promise.all([
-                invoiceService.getAll(),
-                inventoryService.getAll()
-            ]);
+            const { invoices, inventory } = await this._getRawData();
 
             const itemVelocity = {};
             const thirtyDaysAgo = new Date();

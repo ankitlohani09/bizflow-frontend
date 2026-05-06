@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ThemeProvider } from './context/ThemeContext';
 import { Loader2 } from 'lucide-react';
+import { Toaster } from 'react-hot-toast';
 
 // Lazy load all pages
 const Login = lazy(() => import('./pages/Login'));
@@ -24,6 +25,12 @@ const PurchaseForm = lazy(() => import('./pages/PurchaseForm'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const Returns = lazy(() => import('./pages/Returns'));
 const Settings = lazy(() => import('./pages/Settings'));
+const KitchenOrders = lazy(() => import('./pages/KitchenOrders'));
+const AiInsights = lazy(() => import('./pages/AiInsights'));
+const Logs = lazy(() => import('./pages/Logs'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Tenants = lazy(() => import('./pages/Tenants'));
 
 function PageLoader() {
   return (
@@ -45,12 +52,15 @@ function PageLoader() {
 export default function App() {
   return (
     <ThemeProvider>
+      <Toaster position="top-right" reverseOrder={false} />
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
           <AnimatePresence mode="wait">
             <Routes>
               {/* Public routes */}
               <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* General access routes */}
               <Route element={<ProtectedRoute />}>
@@ -68,6 +78,7 @@ export default function App() {
                 <Route path="/purchases/new" element={<PurchaseForm />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/returns" element={<Returns />} />
+                <Route path="/kitchen-orders" element={<KitchenOrders />} />
               </Route>
 
               {/* Admin and Owner Only */}
@@ -75,6 +86,9 @@ export default function App() {
                 <Route path="/staff" element={<Staff />} />
                 <Route path="/staff/:id" element={<StaffDetails />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/ai-insights" element={<AiInsights />} />
+                <Route path="/logs" element={<Logs />} />
+                <Route path="/tenants" element={<Tenants />} />
               </Route>
 
               {/* Default: redirect root to /dashboard (ProtectedRoute handles auth check) */}

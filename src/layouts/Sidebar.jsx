@@ -15,7 +15,11 @@ import {
     Store,
     X,
     RotateCcw,
-    History
+    History,
+    ChefHat,
+    Sparkles,
+    Terminal,
+    Building2
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import authService from '../services/authService';
@@ -34,6 +38,10 @@ const menuItems = [
     { label: 'Purchases', icon: ShoppingCart, path: '/purchases' },
     { label: 'Expenses', icon: Wallet, path: '/expenses' },
     { label: 'Staff', icon: UserCog, path: '/staff' },
+    { label: 'Kitchen Orders', icon: ChefHat, path: '/kitchen-orders' },
+    { label: 'AI Insights', icon: Sparkles, path: '/ai-insights' },
+    { label: 'System Logs', icon: Terminal, path: '/logs' },
+    { label: 'Tenants', icon: Building2, path: '/tenants', superOnly: true },
     { label: 'Settings', icon: Settings, path: '/settings' },
 ];
 
@@ -94,9 +102,9 @@ export default function Sidebar({ isOpen, onClose }) {
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-xl shadow-primary/20">
                     {branding.logoUrl ? (
                         <img 
-                            src={branding.logoUrl.startsWith('http') 
+                            src={branding.logoUrl.startsWith('http') || branding.logoUrl.startsWith('blob:') || branding.logoUrl.startsWith('data:')
                                 ? branding.logoUrl 
-                                : `http://localhost:8080${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`} 
+                                : `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`} 
                             alt="Logo" 
                             className="h-7 w-auto object-contain" 
                         />
@@ -119,7 +127,13 @@ export default function Sidebar({ isOpen, onClose }) {
                     {t('Menu')}
                 </p>
                 <div className="space-y-1">
-                    {menuItems.map((item) => (
+                    {menuItems.filter(item => {
+                        if (item.superOnly) {
+                            const user = JSON.parse(localStorage.getItem('user') || '{}');
+                            return user.tenantId === 1 && (user.roles || []).includes('ADMIN');
+                        }
+                        return true;
+                    }).map((item) => (
                         <SidebarItem key={item.path} item={item} />
                     ))}
                 </div>

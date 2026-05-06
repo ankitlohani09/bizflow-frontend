@@ -238,50 +238,52 @@ export default function Dashboard() {
                                 <CardTitle className="text-indigo-600 dark:text-indigo-400">Sales Graph</CardTitle>
                                 <CardDescription>Sales performance over time</CardDescription>
                             </CardHeader>
-                            <CardContent className="h-96 pt-8 pr-8">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={analytics?.monthlyData}>
-                                        <defs>
-                                            <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.5} />
-                                        <XAxis
-                                            dataKey="name"
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }}
-                                            dy={15}
-                                        />
-                                        <YAxis
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }}
-                                            tickFormatter={(val) => `₹${val / 1000}k`}
-                                        />
-                                        <Tooltip
-                                            contentStyle={{
-                                                borderRadius: '24px',
-                                                border: 'none',
-                                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                                backdropFilter: 'blur(12px)',
-                                                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)'
-                                            }}
-                                            itemStyle={{ fontWeight: 900, fontSize: '12px' }}
-                                        />
-                                        <Area
-                                            type="monotone"
-                                            dataKey="sales"
-                                            stroke="#6366f1"
-                                            strokeWidth={4}
-                                            fillOpacity={1}
-                                            fill="url(#colorRev)"
-                                            animationDuration={2500}
-                                        />
-                                    </AreaChart>
-                                </ResponsiveContainer>
+                            <CardContent className="p-8">
+                                <div style={{ width: '100%', height: 400 }}>
+                                    <ResponsiveContainer>
+                                        <AreaChart data={analytics?.monthlyData}>
+                                            <defs>
+                                                <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                                                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.5} />
+                                            <XAxis
+                                                dataKey="name"
+                                                axisLine={false}
+                                                tickLine={false}
+                                                tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }}
+                                                dy={15}
+                                            />
+                                            <YAxis
+                                                axisLine={false}
+                                                tickLine={false}
+                                                tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }}
+                                                tickFormatter={(val) => `₹${val / 1000}k`}
+                                            />
+                                            <Tooltip
+                                                contentStyle={{
+                                                    borderRadius: '24px',
+                                                    border: 'none',
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                                    backdropFilter: 'blur(12px)',
+                                                    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)'
+                                                }}
+                                                itemStyle={{ fontWeight: 900, fontSize: '12px' }}
+                                            />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="sales"
+                                                stroke="#6366f1"
+                                                strokeWidth={4}
+                                                fillOpacity={1}
+                                                fill="url(#colorRev)"
+                                                animationDuration={2500}
+                                            />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </CardContent>
                         </Card>
 

@@ -15,22 +15,34 @@ export function ThemeProvider({ children }) {
         logoUrl: null
     });
 
+    const fetchInProgress = React.useRef(null);
+
     const fetchBranding = useCallback(async () => {
-        try {
-            const data = await brandingService.getSettings();
-            if (data) {
-                setBranding({
-                    primaryColor: data.primaryColor || '#6366f1',
-                    companyName: data.brandName || 'BizFlow',
-                    logoUrl: data.logoUrl || null
-                });
+        // If already fetching, return the existing promise
+        if (fetchInProgress.current) return fetchInProgress.current;
+
+        fetchInProgress.current = (async () => {
+            try {
+                const data = await brandingService.getSettings();
+                if (data) {
+                    const newBranding = {
+                        primaryColor: data.primaryColor || '#6366f1',
+                        companyName: data.brandName || 'BizFlow',
+                        logoUrl: data.logoUrl || null
+                    };
+                    setBranding(newBranding);
+                    localStorage.setItem('branding', JSON.stringify(newBranding));
+                }
+            } catch (error) {
+                console.error('Failed to fetch branding:', error);
+                const saved = localStorage.getItem('branding');
+                if (saved) setBranding(JSON.parse(saved));
+            } finally {
+                fetchInProgress.current = null;
             }
-        } catch (error) {
-            console.error('Failed to fetch branding:', error);
-            // Fallback to localStorage if offline/fail
-            const saved = localStorage.getItem('branding');
-            if (saved) setBranding(JSON.parse(saved));
-        }
+        })();
+
+        return fetchInProgress.current;
     }, []);
 
     useEffect(() => {
