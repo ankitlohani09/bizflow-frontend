@@ -17,16 +17,18 @@ import {
     Loader2,
     X,
     Percent,
+    MapPin,
+    Camera
 } from 'lucide-react';
+import tenantService from '../services/tenantService';
 import MainLayout from '../layouts/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Alert from '../components/ui/Alert';
 import Input from '../components/ui/Input';
 import { cn } from '../utils/cn';
-import authService from '../services/authService';
 import brandingService from '../services/brandingService';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { Palette, Sparkles, Image as ImageIcon } from 'lucide-react';
 import paymentModeService from '../services/paymentModeService';
@@ -37,7 +39,6 @@ import userService from '../services/userService';
  * Settings Page – System configuration and Master Data
  */
 export default function Settings() {
-    const navigate = useNavigate();
     const location = useLocation();
     const { branding, updateBranding } = useTheme();
     const [activeTab, setActiveTab] = useState('master');
@@ -55,43 +56,66 @@ export default function Settings() {
 
     // ── Tax Rules state ──────────────────────────────────────────────
     const [taxRules, setTaxRules] = useState([]);
-    const [trLoading, setTrLoading] = useState(false);
-    const [trError, setTrError] = useState(null);
     const [newTaxRule, setNewTaxRule] = useState({ name: '', rate: '', taxType: 'GST' });
-    const [trSaving, setTrSaving] = useState(false);
 
     // ── Payment Modes state ────────────────────────────────────────────
     const [paymentModes, setPaymentModes] = useState([]);
-    const [pmLoading, setPmLoading] = useState(false);
-    const [pmError, setPmError] = useState(null);
     const [newModeName, setNewModeName] = useState('');
-    const [pmSaving, setPmSaving] = useState(false);
     const [editingPm, setEditingPm] = useState(null); // Track mode being edited
+
+    // ── Tenant Attendance Settings ─────────────────────────────────────
+    const [tenant, setTenant] = useState(null);
+    const [tenantSaving, setTenantSaving] = useState(false);
 
     useEffect(() => {
         if (activeTab === 'master') {
             loadPaymentModes();
             loadTaxRules();
+            loadTenantSettings();
         }
     }, [activeTab]);
 
+    async function loadTenantSettings() {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (!user.tenantId) return;
+        try {
+            const data = await tenantService.getById(user.tenantId);
+            setTenant(data);
+        } catch (err) {
+            console.error('Failed to load tenant settings', err);
+        }
+    }
+
+    async function handleUpdateTenantSetting(field, value) {
+        if (!tenant) return;
+        setTenantSaving(true);
+        try {
+            const updated = { ...tenant, [field]: value };
+            const data = await tenantService.update(tenant.id, {
+                ...updated,
+                ownerName: JSON.parse(localStorage.getItem('user') || '{}').name
+            });
+            setTenant(data);
+            setSuccessMsg('Attendance security updated.');
+        } catch {
+            setSuccessMsg('Failed to update attendance settings.');
+        } finally {
+            setTenantSaving(false);
+        }
+    }
+
     async function loadPaymentModes() {
-        setPmLoading(true);
-        setPmError(null);
         try {
             const data = await paymentModeService.getAll();
             setPaymentModes(Array.isArray(data) ? data : []);
         } catch {
-            setPmError('Failed to load payment modes.');
-        } finally {
-            setPmLoading(false);
+            console.error('Failed to load payment modes.');
         }
     }
 
     async function handleAddMode(e) {
         e.preventDefault();
         if (!newModeName.trim()) return;
-        setPmSaving(true);
         try {
             if (editingPm) {
                 await paymentModeService.update(editingPm.id, { ...editingPm, name: newModeName.trim() });
@@ -104,58 +128,39 @@ export default function Settings() {
             setEditingPm(null);
             await loadPaymentModes();
         } catch {
-            setPmError(editingPm ? 'Failed to update payment mode.' : 'Failed to add payment mode.');
-        } finally {
-            setPmSaving(false);
+            setSuccessMsg(editingPm ? 'Failed to update payment mode.' : 'Failed to add payment mode.');
         }
     }
 
-    function handleEditMode(mode) {
-        setEditingPm(mode);
-        setNewModeName(mode.name);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function cancelPmEdit() {
-        setEditingPm(null);
-        setNewModeName('');
-    }
 
     async function handleDeleteMode(id) {
         try {
             await paymentModeService.delete(id);
             await loadPaymentModes();
         } catch {
-            setPmError('Failed to delete mode.');
+            console.error('Failed to delete mode.');
         }
     }
 
     async function loadTaxRules() {
-        setTrLoading(true);
-        setTrError(null);
         try {
             const data = await taxRuleService.getAll();
             setTaxRules(Array.isArray(data) ? data : []);
         } catch {
-            setTrError('Failed to load tax rules.');
-        } finally {
-            setTrLoading(false);
+            console.error('Failed to load tax rules.');
         }
     }
 
     async function handleAddTaxRule(e) {
         e.preventDefault();
         if (!newTaxRule.name.trim() || !newTaxRule.rate) return;
-        setTrSaving(true);
         try {
             await taxRuleService.create({ ...newTaxRule, rate: parseFloat(newTaxRule.rate) });
             setNewTaxRule({ name: '', rate: '', taxType: 'GST' });
             await loadTaxRules();
             setSuccessMsg('Tax rule added.');
         } catch {
-            setTrError('Failed to add tax rule.');
-        } finally {
-            setTrSaving(false);
+            setSuccessMsg('Failed to add tax rule.');
         }
     }
 
@@ -164,14 +169,10 @@ export default function Settings() {
             await taxRuleService.delete(id);
             await loadTaxRules();
         } catch {
-            setTrError('Failed to delete tax rule.');
+            console.error('Failed to delete tax rule.');
         }
     }
 
-    const handleLogout = () => {
-        authService.logout();
-        navigate('/login');
-    };
 
     return (
         <MainLayout title="System Configuration">
@@ -184,11 +185,11 @@ export default function Settings() {
                 {/* ── Sidebar Navigation ────────────────────────────────────────── */}
                 <div className="w-full lg:w-64 flex flex-col gap-2">
                     {[
-                        { id: 'master', label: 'Shop Settings', icon: SettingsIcon },
-                        { id: 'company', label: 'Company Profile', icon: Building },
-                        { id: 'branding', label: 'Branding', icon: Palette },
+                        { id: 'master', label: 'Business Settings', icon: SettingsIcon },
+                        { id: 'company', label: 'Business Profile', icon: Building },
+                        { id: 'branding', label: 'Logo & Branding', icon: Palette },
                         { id: 'account', label: 'My Profile', icon: User },
-                        { id: 'security', label: 'Security', icon: ShieldCheck },
+                        { id: 'security', label: 'Security & Access', icon: ShieldCheck },
                     ].map((tab) => (
                         <button
                             key={tab.id}
@@ -211,170 +212,174 @@ export default function Settings() {
                     {successMsg && <Alert variant="success" message={successMsg} className="mb-4" onClose={() => setSuccessMsg(null)} />}
 
                     {activeTab === 'master' && (
-                        <div className="space-y-6">
-                            {/* Payment Modes */}
-                            <Card className="border-none bg-white dark:bg-slate-900 shadow-xl rounded-[2rem] overflow-hidden">
-                                <CardHeader className="p-8 border-b border-slate-50 dark:border-slate-800">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
-                                            <CreditCard size={18} />
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                            {/* Left Column: Core Master Data */}
+                            <div className="lg:col-span-7 space-y-6">
+                                {/* Payment Modes - High Density Layout */}
+                                <Card className="border-none bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] overflow-hidden group">
+                                    <CardHeader className="p-8 border-b border-slate-50 dark:border-slate-800 bg-gradient-to-r from-blue-50/50 to-transparent">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 rotate-3 group-hover:rotate-0 transition-transform">
+                                                    <CreditCard size={22} />
+                                                </div>
+                                                <div>
+                                                    <CardTitle className="text-slate-900 dark:text-white border-none font-black text-lg p-0">Payment Modes</CardTitle>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configure accepted payment methods</p>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <CardTitle className="text-slate-900 dark:text-white border-none font-black text-base p-0">Payment Modes</CardTitle>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configure accepted payment methods</p>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="p-8 space-y-6">
-                                    {pmError && <Alert variant="error" message={pmError} onClose={() => setPmError(null)} />}
-                                    <form onSubmit={handleAddMode} className="flex items-center gap-3">
-                                        <div className="relative flex-1">
+                                    </CardHeader>
+                                    <CardContent className="p-8 space-y-6">
+                                        <form onSubmit={handleAddMode} className="flex items-center gap-3">
                                             <Input
-                                                placeholder="New mode name (e.g. Cash, UPI, Card)"
+                                                placeholder="e.g. UPI, Digital Wallet, Cash"
                                                 value={newModeName}
-                                                autoComplete="off"
                                                 onChange={(e) => setNewModeName(e.target.value)}
-                                                className="w-full"
+                                                className="flex-1 bg-slate-50 border-none h-12 rounded-2xl font-bold"
                                             />
-                                            {editingPm && (
-                                                <button
-                                                    type="button"
-                                                    onClick={cancelPmEdit}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors"
-                                                >
-                                                    <X size={14} />
-                                                </button>
-                                            )}
-                                        </div>
-                                        <Button
-                                            type="submit"
-                                            disabled={pmSaving || !newModeName.trim()}
-                                            className={cn(
-                                                "h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-lg transition-all",
-                                                editingPm
-                                                    ? "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20"
-                                                    : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20"
-                                            )}
-                                        >
-                                            {pmSaving ? <Loader2 size={16} className="animate-spin" /> : (editingPm ? <Save size={16} /> : <Plus size={16} />)}
-                                            {editingPm ? 'Update' : 'Add'}
-                                        </Button>
-                                    </form>
+                                            <Button type="submit" className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest text-[10px]">
+                                                {editingPm ? 'Update' : 'Add'}
+                                            </Button>
+                                        </form>
 
-                                    {pmLoading ? (
-                                        <div className="flex justify-center py-8">
-                                            <Loader2 size={24} className="animate-spin text-blue-500" />
-                                        </div>
-                                    ) : paymentModes.length === 0 ? (
-                                        <p className="text-center text-xs font-black text-slate-300 uppercase tracking-widest py-8">No payment modes defined yet.</p>
-                                    ) : (
-                                        <div className="space-y-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                             {paymentModes.map((mode) => (
-                                                <div key={mode.id} className="flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl group hover:bg-blue-50/50 transition-all">
+                                                <div key={mode.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-transparent hover:border-blue-100 hover:bg-white transition-all group/item">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="h-8 w-8 rounded-lg bg-white dark:bg-slate-700 flex items-center justify-center shadow-sm">
-                                                            <CreditCard size={14} className="text-blue-500" />
+                                                        <div className="h-8 w-8 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center shadow-sm">
+                                                            <Check size={14} className="text-blue-500" />
                                                         </div>
-                                                        <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight">{mode.name}</span>
-                                                        {mode.isActive !== false && (
-                                                            <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full uppercase tracking-widest">Active</span>
-                                                        )}
+                                                        <span className="text-sm font-black text-slate-700 dark:text-white">{mode.name}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleEditMode(mode)}
-                                                            className="h-8 w-8 rounded-lg text-slate-300 hover:text-blue-500 hover:bg-blue-50 flex items-center justify-center"
-                                                        >
-                                                            <Palette size={14} />
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleDeleteMode(mode.id)}
-                                                            className="h-8 w-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center"
-                                                        >
-                                                            <Trash2 size={14} />
-                                                        </button>
+                                                    <div className="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                                        <button onClick={() => handleDeleteMode(mode.id)} className="p-2 text-slate-300 hover:text-rose-500"><Trash2 size={14} /></button>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
-                                    )}
-                                </CardContent>
-                            </Card>
+                                    </CardContent>
+                                </Card>
 
-                            {/* Tax Rules */}
-                            <Card className="border-none bg-white dark:bg-slate-900 shadow-xl rounded-[2rem] overflow-hidden">
-                                <CardHeader className="p-8 border-b border-slate-50 dark:border-slate-800">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-10 w-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg">
-                                            <Percent size={18} />
+                                {/* Tax Rules - Modern Table Layout */}
+                                <Card className="border-none bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] overflow-hidden">
+                                    <CardHeader className="p-8 border-b border-slate-50 dark:border-slate-800 bg-gradient-to-r from-emerald-50/50 to-transparent">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-12 w-12 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 -rotate-3 group-hover:rotate-0 transition-transform">
+                                                <Percent size={22} />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-slate-900 dark:text-white border-none font-black text-lg p-0">Tax Rules (GST/VAT)</CardTitle>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage reusable tax configurations</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <CardTitle className="text-slate-900 dark:text-white border-none font-black text-base p-0">Tax Rules (GST/VAT)</CardTitle>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage reusable tax configurations</p>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="p-8 space-y-6">
-                                    {trError && <Alert variant="error" message={trError} onClose={() => setTrError(null)} />}
-                                    <form onSubmit={handleAddTaxRule} className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                        <Input
-                                            placeholder="Rule Name (e.g. GST 18%)"
-                                            value={newTaxRule.name}
-                                            onChange={(e) => setNewTaxRule({ ...newTaxRule, name: e.target.value })}
-                                        />
-                                        <Input
-                                            type="number"
-                                            placeholder="Rate (%)"
-                                            value={newTaxRule.rate}
-                                            onChange={(e) => setNewTaxRule({ ...newTaxRule, rate: e.target.value })}
-                                        />
-                                        <Button
-                                            type="submit"
-                                            disabled={trSaving || !newTaxRule.name.trim() || !newTaxRule.rate}
-                                            className="h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-lg shadow-emerald-500/20"
-                                        >
-                                            {trSaving ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-                                            Add Rule
-                                        </Button>
-                                    </form>
+                                    </CardHeader>
+                                    <CardContent className="p-8">
+                                        <form onSubmit={handleAddTaxRule} className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-8">
+                                            <div className="md:col-span-5"><Input placeholder="Rule Label" value={newTaxRule.name} onChange={(e) => setNewTaxRule({ ...newTaxRule, name: e.target.value })} className="h-12 bg-slate-50 border-none font-bold" /></div>
+                                            <div className="md:col-span-4"><Input type="number" placeholder="Rate %" value={newTaxRule.rate} onChange={(e) => setNewTaxRule({ ...newTaxRule, rate: e.target.value })} className="h-12 bg-slate-50 border-none font-bold" /></div>
+                                            <div className="md:col-span-3"><Button type="submit" className="h-12 w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black uppercase tracking-widest text-[10px]">Add Rule</Button></div>
+                                        </form>
 
-                                    {trLoading ? (
-                                        <div className="flex justify-center py-8">
-                                            <Loader2 size={24} className="animate-spin text-emerald-500" />
-                                        </div>
-                                    ) : taxRules.length === 0 ? (
-                                        <p className="text-center text-xs font-black text-slate-300 uppercase tracking-widest py-8">No tax rules defined yet.</p>
-                                    ) : (
-                                        <div className="space-y-3">
+                                        <div className="space-y-2">
                                             {taxRules.map((rule) => (
-                                                <div key={rule.id} className="flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl group hover:bg-emerald-50/50 transition-all">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="h-8 w-8 rounded-lg bg-white dark:bg-slate-700 flex items-center justify-center shadow-sm">
-                                                            <Percent size={14} className="text-emerald-500" />
+                                                <div key={rule.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl hover:bg-emerald-50/50 transition-all">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="h-10 w-10 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center font-black text-emerald-600 shadow-sm">{rule.rate}%</div>
+                                                        <div>
+                                                            <p className="text-sm font-black text-slate-700 dark:text-white">{rule.name}</p>
+                                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Standard Rate</p>
                                                         </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight">{rule.name}</span>
-                                                            <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">{rule.rate}% {rule.taxType}</span>
-                                                        </div>
-                                                        {rule.isActive !== false && (
-                                                            <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full uppercase tracking-widest ml-2">Active</span>
-                                                        )}
                                                     </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleDeleteTaxRule(rule.id)}
-                                                        className="h-8 w-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
+                                                    <button onClick={() => handleDeleteTaxRule(rule.id)} className="p-2 text-slate-300 hover:text-rose-500 transition-colors"><Trash2 size={16} /></button>
                                                 </div>
                                             ))}
                                         </div>
-                                    )}
-                                </CardContent>
-                            </Card>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                            {/* Right Column: High-Security Protocols */}
+                            <div className="lg:col-span-5">
+                                <Card className="border-none bg-white dark:bg-slate-900 shadow-2xl rounded-[3rem] overflow-hidden sticky top-6">
+                                    <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                                        <ShieldCheck size={200} className="text-indigo-600" />
+                                    </div>
+                                    <CardHeader className="p-10 border-b border-slate-50 dark:border-slate-800 bg-gradient-to-br from-indigo-50/50 to-transparent">
+                                        <div className="flex items-center gap-5">
+                                            <div className="h-14 w-14 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/30 rotate-6">
+                                                <ShieldCheck size={28} />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-slate-900 dark:text-white border-none font-black text-xl p-0">Attendance Rules</CardTitle>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Enforce security for staff check-ins</p>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="p-10 space-y-8">
+                                        <div className="space-y-4">
+                                            <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:bg-indigo-50/50 transition-all">
+                                                <div className="flex items-center gap-5">
+                                                    <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-700 flex items-center justify-center text-indigo-600 shadow-sm">
+                                                        <Camera size={24} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">AI Face Verification</p>
+                                                        <p className="text-[10px] text-slate-400 font-bold mt-1">Enforce mandatory check-in selfie</p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    disabled={tenantSaving}
+                                                    onClick={() => handleUpdateTenantSetting('isSelfieMandatory', !tenant?.isSelfieMandatory)}
+                                                    className={cn(
+                                                        "h-8 w-14 rounded-full relative transition-all duration-500",
+                                                        tenant?.isSelfieMandatory ? "bg-indigo-600 shadow-lg shadow-indigo-200" : "bg-slate-200"
+                                                    )}
+                                                >
+                                                    <div className={cn(
+                                                        "absolute top-1.5 h-5 w-5 bg-white rounded-full shadow-md transition-all duration-500",
+                                                        tenant?.isSelfieMandatory ? "left-7.5" : "left-1.5"
+                                                    )} />
+                                                </button>
+                                            </div>
+
+                                            <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:bg-indigo-50/50 transition-all">
+                                                <div className="flex items-center gap-5">
+                                                    <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-700 flex items-center justify-center text-emerald-600 shadow-sm">
+                                                        <MapPin size={24} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">GPS Geofencing</p>
+                                                        <p className="text-[10px] text-slate-400 font-bold mt-1">Validate physical store presence</p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    disabled={tenantSaving}
+                                                    onClick={() => handleUpdateTenantSetting('isGpsMandatory', !tenant?.isGpsMandatory)}
+                                                    className={cn(
+                                                        "h-8 w-14 rounded-full relative transition-all duration-500",
+                                                        tenant?.isGpsMandatory ? "bg-emerald-500 shadow-lg shadow-emerald-200" : "bg-slate-200"
+                                                    )}
+                                                >
+                                                    <div className={cn(
+                                                        "absolute top-1.5 h-5 w-5 bg-white rounded-full shadow-md transition-all duration-500",
+                                                        tenant?.isGpsMandatory ? "left-7.5" : "left-1.5"
+                                                    )} />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-6 p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800">
+                                            <div className="flex gap-3">
+                                                <ShieldCheck size={16} className="text-indigo-400 shrink-0" />
+                                                <p className="text-[10px] text-slate-500 font-bold leading-relaxed">
+                                                    Protocols are enforced globally for all QR-based staff attendance. Mobile devices will prompt for hardware permissions.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
                     )}
 
@@ -483,10 +488,10 @@ export default function Settings() {
                                                 try {
                                                     setSuccessMsg('Syncing logo with server...');
                                                     const res = await brandingService.uploadLogo(file);
-                                                    
+
                                                     // IMPORTANT: Get the actual server path from response
                                                     const serverPath = res.logoUrl || res.path || res.url;
-                                                    
+
                                                     // 2. Once uploaded, update state with SERVER URL, not blob
                                                     setLocalBranding(p => ({ ...p, logoUrl: serverPath }));
                                                     setSuccessMsg('Branding asset synced successfully!');
@@ -560,8 +565,8 @@ export default function Settings() {
                                                         localStorage.setItem('user', JSON.stringify(res));
                                                         setSuccessMsg('Profile picture updated successfully.');
                                                         window.location.reload(); // Refresh to update Topbar
-                                                    } catch (err) {
-                                                        setPmError('Failed to upload profile picture.');
+                                                    } catch {
+                                                        setSuccessMsg('Failed to upload profile picture.');
                                                     }
                                                 }
                                             }}
@@ -584,7 +589,7 @@ export default function Settings() {
                                                         localStorage.setItem('user', JSON.stringify(res));
                                                         setSuccessMsg('Profile picture removed.');
                                                         setTimeout(() => window.location.reload(), 1000);
-                                                    } catch (err) {
+                                                    } catch {
                                                         // setAccountError('Failed to remove profile picture.');
                                                     }
                                                 }
@@ -645,7 +650,7 @@ export default function Settings() {
     );
 }
 
-function MasterDataCard({ title, icon: Icon, color }) { // eslint-disable-line no-unused-vars
+function MasterDataCard({ title, icon: Icon, color }) {
     return (
         <Card className="enterprise-card p-6 transition-all hover:shadow-md cursor-pointer group">
             <div className="flex flex-row items-center justify-between pb-2">

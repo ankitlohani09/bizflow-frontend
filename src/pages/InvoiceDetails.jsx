@@ -15,12 +15,12 @@ import {
     Calendar,
     FileText,
     CheckCircle2,
-    User
+    User,
+    X
 } from 'lucide-react';
 import invoiceService from '../services/invoiceService';
 import pdfExportService from '../services/pdfExportService';
 import MainLayout from '../layouts/MainLayout';
-import { cn } from '../utils/cn';
 
 const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
@@ -32,7 +32,6 @@ export default function InvoiceDetails() {
     const [invoice, setInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
     const fetchInvoice = useCallback(async () => {
         setLoading(true);
@@ -55,7 +54,6 @@ export default function InvoiceDetails() {
 
     const handleWhatsAppShare = () => {
         if (!invoice) return;
-        const tenantName = localStorage.getItem('tenantName') || 'BizFlow';
         const customerName = invoice.customerName || invoice.customer?.name || 'Customer';
         const amount = fmt(invoice.grandTotal || invoice.totalAmount || 0);
         const text = `Hello ${customerName}, your Invoice #${invoice.invoiceNumber || invoice.id} for ${amount} is ready. Thank you!`;

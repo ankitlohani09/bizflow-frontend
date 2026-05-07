@@ -12,7 +12,7 @@ import taxRuleService from '../services/taxRuleService';
  * ItemModal – Manual creation of new product definitions
  * Features inline creation for missing categories/units
  */
-export default function ItemModal({ isOpen, onClose, onSuccess }) {
+export default function ItemModal({ isOpen, onClose, onSuccess, initialData = null }) {
     const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -40,8 +40,48 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
         trackInventory: true,
         isActive: true,
         hasVariants: false,
-        description: ''
+        description: '',
+        expiryDate: '',
+        batchNo: ''
     });
+
+    useEffect(() => {
+        if (initialData) {
+            setForm({
+                ...initialData,
+                name: initialData.name || initialData.itemName || '',
+                barcode: initialData.barcode || '',
+                type: initialData.type || 'PRODUCT',
+                categoryId: initialData.categoryId?.toString() || '',
+                unitId: initialData.unitId?.toString() || '',
+                taxRuleId: initialData.taxRuleId?.toString() || '',
+                expiryDate: initialData.expiryDate ? new Date(initialData.expiryDate).toISOString().split('T')[0] : '',
+                costPrice: initialData.costPrice || 0,
+                sellingPrice: initialData.sellingPrice || 0,
+                lowStockThreshold: initialData.lowStockThreshold || 5,
+                batchNo: initialData.batchNo || ''
+            });
+        } else {
+            setForm({
+                name: '',
+                barcode: '',
+                categoryId: '',
+                unitId: '',
+                type: 'PRODUCT',
+                sellingPrice: 0,
+                costPrice: 0,
+                taxRate: 0,
+                taxRuleId: '',
+                lowStockThreshold: 5,
+                trackInventory: true,
+                isActive: true,
+                hasVariants: false,
+                description: '',
+                expiryDate: '',
+                batchNo: ''
+            });
+        }
+    }, [initialData, isOpen]);
 
     const loadDependencies = async () => {
         setLoading(true);
@@ -71,7 +111,7 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
             if (catsRes.status === 'rejected' || unsRes.status === 'rejected') {
                 console.error('Some dependencies failed to load');
             }
-        } catch (err) {
+        } catch {
             setError('Could not load categories or units. Please try again.');
         } finally {
             setLoading(false);
@@ -93,7 +133,7 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
             setForm(f => ({ ...f, categoryId: newId }));
             setShowNewCat(false);
             setNewCatName('');
-        } catch (err) {
+        } catch {
             setError('Failed to create category.');
         }
     };
@@ -107,7 +147,7 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
             setForm(f => ({ ...f, unitId: newId }));
             setShowNewUnit(false);
             setNewUnit({ name: '', symbol: '' });
-        } catch (err) {
+        } catch {
             setError('Failed to create unit.');
         }
     };
@@ -131,18 +171,25 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
                 taxRate: Number(form.taxRate),
                 lowStockThreshold: Number(form.lowStockThreshold)
             };
-            await itemService.create(payload);
+            
+            const idToUpdate = initialData?.itemId || initialData?.id;
+            if (idToUpdate) {
+                await itemService.update(idToUpdate, payload);
+            } else {
+                await itemService.create(payload);
+            }
+            
             onSuccess();
             onClose();
         } catch (err) {
-            setError(err.message || 'Failed to register item.');
+            setError(err.message || 'Failed to process item.');
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Add New Item">
+        <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Item" : "Add New Item"}>
             <form onSubmit={handleSubmit} className="space-y-6">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-12 gap-3">
@@ -167,6 +214,21 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
                                 value={form.barcode}
                                 onChange={(e) => setForm({ ...form, barcode: e.target.value })}
                                 required
+                            />
+                            <Input
+                                label="Batch Number"
+                                placeholder="B-123"
+                                value={form.batchNo}
+                                onChange={(e) => setForm({ ...form, batchNo: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <Input
+                                label="Expiry Date"
+                                type="date"
+                                value={form.expiryDate}
+                                onChange={(e) => setForm({ ...form, expiryDate: e.target.value })}
                             />
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Item Type</label>

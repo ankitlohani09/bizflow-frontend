@@ -128,7 +128,7 @@ export default function GlobalSearch() {
 
             {isOpen && query.length >= 2 && results.length === 0 && !loading && (
                 <div className="absolute top-full left-0 right-0 mt-2 p-8 text-center bg-white border border-slate-200 rounded-2xl shadow-xl dark:bg-slate-900 dark:border-slate-800 z-50">
-                    <p className="text-sm font-medium text-slate-400">No matches found for "{query}"</p>
+                    <p className="text-sm font-medium text-slate-400">No matches found for &quot;{query}&quot;</p>
                 </div>
             )}
         </div>

@@ -14,8 +14,14 @@ import {
     CheckCircle2,
     XCircle,
     Wallet,
-    Receipt
+    Receipt,
+    Camera,
+    MapPin,
+    Fingerprint,
+    ShieldCheck
 } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 import MainLayout from '../layouts/MainLayout';
 import staffService from '../services/staffService';
 import Button from '../components/ui/Button';
@@ -39,6 +45,8 @@ export default function StaffDetails() {
     const [error, setError] = useState(null);
     const [isAdvanceModalOpen, setIsAdvanceModalOpen] = useState(false);
     const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
+    const [hasBiometric, setHasBiometric] = useState(false);
+    const [biometricLoading, setBiometricLoading] = useState(false);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -60,6 +68,62 @@ export default function StaffDetails() {
     }, [id]);
 
     useEffect(() => { fetchData(); }, [fetchData]);
+
+    const checkBiometric = useCallback(async () => {
+        try {
+            const res = await axios.get(`http://${window.location.hostname}:8080/api/v1/public/biometric/check/${id}`);
+            setHasBiometric(res.data.data.hasBiometric);
+        } catch (err) {
+            console.error('Biometric check failed:', err);
+        }
+    }, [id]);
+
+    useEffect(() => { checkBiometric(); }, [checkBiometric]);
+
+    const handleRegisterBiometric = async () => {
+        setBiometricLoading(true);
+        try {
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+            const options = {
+                publicKey: {
+                    challenge: challenge,
+                    rp: { name: "BizFlow Enterprise" },
+                    user: {
+                        id: new TextEncoder().encode(id.toString()),
+                        name: staff.email || staff.name,
+                        displayName: staff.name
+                    },
+                    pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                    authenticatorSelection: {
+                        userVerification: "preferred"
+                    },
+                    timeout: 60000
+                }
+            };
+
+            const credential = await navigator.credentials.create(options);
+
+            // Convert Buffer to Base64 for transport
+            const credentialId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+
+            await axios.post(`http://${window.location.hostname}:8080/api/v1/public/biometric/register`, {
+                staffId: id,
+                credentialId: credentialId,
+                publicKey: "WEBAUTHN_REAL_V1" // Simplified for this demo
+            });
+
+            setHasBiometric(true);
+            toast.success('Biometric Security Activated!');
+        } catch (err) {
+            console.error(err);
+            const msg = err.response?.data?.message || err.message || 'Setup Failed';
+            toast.error(`Biometric Setup Failed: ${msg}. (Ensure HTTPS if on mobile)`);
+        } finally {
+            setBiometricLoading(false);
+        }
+    };
 
     // ── Payroll Logic ────────────────────────────────────────────────────────
     const presentDays = attendance.filter(a => a.status === 'PRESENT').length;
@@ -170,6 +234,42 @@ export default function StaffDetails() {
                         </CardContent>
                     </Card>
 
+                    {/* Biometric Security Card */}
+                    <Card className="enterprise-card border-blue-100 bg-blue-50/30 overflow-hidden relative">
+                        <div className="absolute -right-4 -bottom-4 opacity-5">
+                            <Fingerprint size={100} />
+                        </div>
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className={cn("p-2 rounded-lg", hasBiometric ? "bg-emerald-100 text-emerald-600" : "bg-blue-100 text-blue-600")}>
+                                    {hasBiometric ? <ShieldCheck size={18} /> : <Fingerprint size={18} />}
+                                </div>
+                                <div>
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Biometric Identity</h4>
+                                    <p className="text-xs font-bold text-slate-900 mt-0.5">
+                                        {hasBiometric ? "Device Security Linked" : "No Biometrics Registered"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <Button
+                                className={cn(
+                                    "w-full text-[10px] font-black uppercase tracking-widest py-3 rounded-xl gap-2",
+                                    hasBiometric ? "bg-white border-2 border-slate-200 text-slate-500 hover:bg-slate-50" : "bg-blue-600 text-white hover:bg-blue-500"
+                                )}
+                                onClick={handleRegisterBiometric}
+                                disabled={biometricLoading}
+                            >
+                                {biometricLoading ? "Processing..." : hasBiometric ? "Re-link Device" : "Register Fingerprint"}
+                            </Button>
+                            {!window.isSecureContext && (
+                                <p className="text-[9px] text-rose-500 font-bold mt-3 leading-tight italic">
+                                    ⚠️ Security Error: Real biometrics requires a secure (HTTPS) connection.
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
+
                     {/* Payroll Summary Card */}
                     <Card className="enterprise-card p-6 bg-slate-950 text-white border-none relative overflow-hidden group">
                         <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-blue-500/10 blur-3xl group-hover:bg-blue-500/20 transition-all" />
@@ -242,6 +342,7 @@ export default function StaffDetails() {
                                         <TableHead className="pl-8 py-4 text-[9px] font-black uppercase tracking-wider text-slate-500">Date</TableHead>
                                         <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">In-Time</TableHead>
                                         <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Out-Time</TableHead>
+                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Verification</TableHead>
                                         <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500 pr-8 text-right">Status</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -256,6 +357,21 @@ export default function StaffDetails() {
                                                 <TableCell className="pl-8 font-black text-slate-900">{log.date}</TableCell>
                                                 <TableCell className="font-bold text-slate-500">{log.checkIn || '—'}</TableCell>
                                                 <TableCell className="font-bold text-slate-500">{log.checkOut || '—'}</TableCell>
+                                                <TableCell>
+                                                    <div className="flex gap-2">
+                                                        {log.photoUrl && (
+                                                            <a href={log.photoUrl} target="_blank" rel="noreferrer" className="p-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
+                                                                <Camera size={14} />
+                                                            </a>
+                                                        )}
+                                                        {log.location && (
+                                                            <a href={`https://www.google.com/maps?q=${log.location}`} target="_blank" rel="noreferrer" className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors">
+                                                                <MapPin size={14} />
+                                                            </a>
+                                                        )}
+                                                        {!log.photoUrl && !log.location && <span className="text-[10px] text-slate-400">Manual</span>}
+                                                    </div>
+                                                </TableCell>
                                                 <TableCell className="pr-8 text-right">
                                                     <span className={cn(
                                                         "inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest",

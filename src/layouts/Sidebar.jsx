@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
     LayoutDashboard,
     Users,
@@ -101,12 +101,12 @@ export default function Sidebar({ isOpen, onClose }) {
             <div className="flex h-24 shrink-0 items-center gap-4 px-8">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-xl shadow-primary/20">
                     {branding.logoUrl ? (
-                        <img 
+                        <img
                             src={branding.logoUrl.startsWith('http') || branding.logoUrl.startsWith('blob:') || branding.logoUrl.startsWith('data:')
-                                ? branding.logoUrl 
-                                : `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`} 
-                            alt="Logo" 
-                            className="h-7 w-auto object-contain" 
+                                ? branding.logoUrl
+                                : `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`}
+                            alt="Logo"
+                            className="h-7 w-auto object-contain"
                         />
                     ) : (
                         <Store className="h-6 w-6" />

@@ -15,7 +15,6 @@ import {
     Warehouse,
     Upload
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import inventoryService from '../services/inventoryService';
 import MainLayout from '../layouts/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
@@ -56,7 +55,6 @@ function StockBadge({ qty, threshold = 5 }) {
 }
 
 export default function Inventory() {
-    const navigate = useNavigate();
     const [records, setRecords] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -154,7 +152,7 @@ export default function Inventory() {
                         </Button>
                     </div>
 
-                    <Button onClick={() => setIsItemModalOpen(true)} className="h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/25 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 transition-all hover:scale-[1.02] active:scale-95">
+                    <Button onClick={() => { setSelectedItem(null); setIsItemModalOpen(true); }} className="h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/25 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 transition-all hover:scale-[1.02] active:scale-95">
                         <Plus size={18} /> New Item
                     </Button>
                 </div>
@@ -276,7 +274,7 @@ export default function Inventory() {
                                         </TableCell>
                                         <TableCell>
                                             <span className="text-[10px] font-bold text-slate-500">
-                                                {r.categoryName || '—'}
+                                                {r.categoryName || r.category?.name || r.category || '—'}
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-center">
@@ -335,7 +333,7 @@ export default function Inventory() {
             />
 
             <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onSuccess={fetchData} />
-            <ItemModal isOpen={isItemModalOpen} onClose={() => setIsItemModalOpen(false)} onSuccess={fetchData} />
+            <ItemModal isOpen={isItemModalOpen} onClose={() => setIsItemModalOpen(false)} onSuccess={fetchData} initialData={selectedItem} />
         </MainLayout>
     );
 }

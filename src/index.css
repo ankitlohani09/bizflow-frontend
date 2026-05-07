@@ -44,6 +44,14 @@
     color: #334155; /* slate-700 */
   }
 
+  .no-scroll {
+    overflow: hidden !important;
+    height: 100vh !important;
+    touch-action: none;
+    -webkit-overflow-scrolling: none;
+    overscroll-behavior: none;
+  }
+
   html.dark body {
     background-color: #020617; /* slate-950 */
     color: #cbd5e1; /* slate-300 */

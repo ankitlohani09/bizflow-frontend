@@ -8,8 +8,10 @@ import {
     Lightbulb,
     ArrowUpRight,
     MessageSquare,
-    Loader2
+    Loader2,
+    ArrowLeft
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import aiService from '../services/aiService';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,6 +19,7 @@ import { cn } from '../utils/cn';
 
 export default function AiInsights() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [query, setQuery] = useState('');
     const [chatHistory, setChatHistory] = useState([
         { type: 'ai', text: 'Hello! I am BizFlow AI. How can I help you with your business data today?' }
@@ -52,7 +55,7 @@ export default function AiInsights() {
         try {
             const response = await aiService.query(query);
             setChatHistory(prev => [...prev, { type: 'ai', text: response.answer || response.response || 'I processed your request, but I am unable to provide a specific answer right now.' }]);
-        } catch (error) {
+        } catch {
             setChatHistory(prev => [...prev, { type: 'ai', text: 'Sorry, I encountered an error while processing your request. Please try again later.' }]);
         } finally {
             setLoading(false);
@@ -64,7 +67,13 @@ export default function AiInsights() {
             {/* Left Column: AI Chat & Quick Actions */}
             <div className="xl:col-span-2 flex flex-col gap-8">
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                    >
+                        <ArrowLeft size={20} />
+                    </button>
                     <div>
                         <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                             <Sparkles className="text-primary animate-pulse" size={32} />
@@ -208,7 +217,7 @@ export default function AiInsights() {
                                         <span className="text-xs font-bold uppercase tracking-wider">AI Insight</span>
                                     </div>
                                     <p className="text-sm text-white/70 leading-relaxed">
-                                        "Seasonal analysis shows increased demand for cold beverages expected next week as temperatures rise."
+                                        &quot;Seasonal analysis shows increased demand for cold beverages expected next week as temperatures rise.&quot;
                                     </p>
                                 </div>
                             ) : trends.map((trend, idx) => (

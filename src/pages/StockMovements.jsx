@@ -148,7 +148,7 @@ export default function StockMovements() {
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <p className="text-xs font-bold text-slate-600 dark:text-slate-400 italic">
-                                                "{move.reason || 'Stock Changed'}"
+                                                &quot;{move.reason || 'Stock Changed'}&quot;
                                             </p>
                                             <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black italic">
                                                 Done by: {move.createdBy || 'SYSTEM'}
@@ -250,7 +250,7 @@ export default function StockMovements() {
                         <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100/50 dark:border-indigo-900/30">
                             <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-1">Notes</p>
                             <p className="text-sm font-medium text-slate-700 dark:text-slate-300 italic">
-                                "{selectedMovement.reason || 'No notes added for this change.'}"
+                                &quot;{selectedMovement.reason || 'No notes added for this change.'}&quot;
                             </p>
                         </div>
 

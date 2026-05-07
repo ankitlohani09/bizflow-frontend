@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Terminal,
     User,
-    Calendar,
     Activity,
     BrainCircuit,
     Search,
     Filter,
     Download,
     Eye,
-    Clock
+    Clock,
+    ArrowLeft
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import logService from '../services/logService';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../utils/cn';
@@ -35,12 +36,13 @@ const formatDate = (dateStr, formatType) => {
 
 export default function Logs() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('ACTIVITY');
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const fetchLogs = async () => {
+    const fetchLogs = useCallback(async () => {
         setLoading(true);
         try {
             const data = activeTab === 'ACTIVITY'
@@ -52,11 +54,11 @@ export default function Logs() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [activeTab]);
 
     useEffect(() => {
         fetchLogs();
-    }, [activeTab]);
+    }, [fetchLogs]);
 
     const filteredLogs = logs.filter(log =>
         (log.action || log.query || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -67,12 +69,20 @@ export default function Logs() {
         <div className="p-8 space-y-8 min-h-screen bg-slate-50/50 dark:bg-slate-950/50">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-                        <Terminal className="text-primary" size={32} />
-                        {t('System Logs')}
-                    </h1>
-                    <p className="text-slate-500 font-medium mt-1">Audit user activities and AI interactions.</p>
+                <div className="flex flex-col md:flex-row md:items-center gap-6 flex-1">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="h-12 w-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center shrink-0"
+                    >
+                        <ArrowLeft size={20} />
+                    </button>
+                    <div>
+                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                            <Terminal className="text-primary" size={32} />
+                            {t('System Logs')}
+                        </h1>
+                        <p className="text-slate-500 font-medium mt-1">Audit user activities and AI interactions.</p>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -199,7 +209,7 @@ export default function Logs() {
                                                 </div>
                                             ) : (
                                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-400 line-clamp-1 italic">
-                                                    "{log.prompt || log.query}"
+                                                    &quot;{log.prompt || log.query}&quot;
                                                 </p>
                                             )}
                                         </td>

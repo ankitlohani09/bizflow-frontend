@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ThemeProvider } from './context/ThemeContext';
 import { Loader2 } from 'lucide-react';
@@ -31,6 +31,7 @@ const Logs = lazy(() => import('./pages/Logs'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Tenants = lazy(() => import('./pages/Tenants'));
+const PublicCheckIn = lazy(() => import('./pages/PublicCheckIn'));
 
 function PageLoader() {
   return (
@@ -61,6 +62,7 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/check-in/:tenantCode" element={<PublicCheckIn />} />
 
               {/* General access routes */}
               <Route element={<ProtectedRoute />}>

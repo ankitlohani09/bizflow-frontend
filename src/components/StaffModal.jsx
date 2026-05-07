@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, Save, X, User, Briefcase, Phone, Mail, DollarSign, Calendar } from 'lucide-react';
+import { Loader2, Save, X, User, Briefcase, Phone, Mail, DollarSign, Calendar, Shield } from 'lucide-react';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
 import Input from './ui/Input';
@@ -29,6 +29,7 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
         email: '',
         phone: '',
         salary: '',
+        pin: '',
         joinDate: new Date().toISOString().split('T')[0],
         isActive: true,
     });
@@ -42,6 +43,7 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
                     email: staff.email || '',
                     phone: staff.phone || '',
                     salary: staff.salary || '',
+                    pin: staff.pin || '',
                     joinDate: (staff.joinDate || '').split('T')[0],
                     isActive: staff.isActive !== false,
                 });
@@ -52,6 +54,7 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
                     email: '',
                     phone: '',
                     salary: '',
+                    pin: '',
                     joinDate: new Date().toISOString().split('T')[0],
                     isActive: true,
                 });
@@ -155,6 +158,15 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
                         icon={<Calendar size={14} />}
                         value={form.joinDate}
                         onChange={(e) => setForm({ ...form, joinDate: e.target.value })}
+                    />
+                    <Input
+                        label="Attendance PIN (4-Digits)"
+                        type="password"
+                        maxLength={4}
+                        placeholder="••••"
+                        icon={<Shield size={14} />}
+                        value={form.pin}
+                        onChange={(e) => setForm({ ...form, pin: e.target.value })}
                     />
                     <div className="flex flex-col justify-end">
                         <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition-colors">

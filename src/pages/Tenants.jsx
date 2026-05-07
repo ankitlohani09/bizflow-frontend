@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { 
     Plus, 
     Search, 
@@ -36,13 +36,6 @@ const BUSINESS_TYPES = [
 ];
 
 export default function Tenants() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    
-    // Security: Only Super Admin (Tenant 1, ADMIN role)
-    if (user.tenantId !== 1 || !(user.roles || []).includes('ADMIN')) {
-        return <Navigate to="/dashboard" replace />;
-    }
-
     const [tenants, setTenants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -64,7 +57,7 @@ export default function Tenants() {
         try {
             const data = await tenantService.getAll();
             setTenants(data);
-        } catch (error) {
+        } catch {
             toast.error('Failed to load tenants');
         } finally {
             setLoading(false);
@@ -74,6 +67,13 @@ export default function Tenants() {
     useEffect(() => {
         fetchTenants();
     }, [fetchTenants]);
+
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    // Security: Only Super Admin (Tenant 1, ADMIN role)
+    if (user.tenantId !== 1 || !(user.roles || []).includes('ADMIN')) {
+        return <Navigate to="/dashboard" replace />;
+    }
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;

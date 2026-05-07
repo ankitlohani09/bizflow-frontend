@@ -71,24 +71,21 @@ export default function Dashboard() {
     const [analytics, setAnalytics] = useState(null);
     const [recentInvoices, setRecentInvoices] = useState([]);
     const [insights, setInsights] = useState([]);
-    const [predictions, setPredictions] = useState([]);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const [sum, enh, invs, ai, pred] = await Promise.all([
+            const [sum, enh, invs, ai] = await Promise.all([
                 reportService.getFinancialSummary(),
                 reportService.getEnhancedAnalytics(),
                 invoiceService.getAll(),
-                reportService.getSmartInsights(),
-                reportService.getPredictiveInventory()
+                reportService.getSmartInsights()
             ]);
             setSummary(sum);
             setAnalytics(enh);
             setRecentInvoices(invs.slice(0, 5));
             setInsights(ai);
-            setPredictions(pred.slice(0, 4));
         } catch {
             setError('Failed to load store summary.');
         } finally {
@@ -146,7 +143,6 @@ export default function Dashboard() {
                             icon={TrendingUp}
                             colorClass="icon-box-blue"
                             subtitle={`${recentInvoices.length} invoices registered`}
-                            delay={0.1}
                         />
                         <MetricCard
                             title="Total Expenses"
@@ -154,7 +150,6 @@ export default function Dashboard() {
                             icon={TrendingDown}
                             colorClass="icon-box-rose"
                             subtitle={`${summary?.expenseCount || 0} expense records`}
-                            delay={0.2}
                         />
                         <MetricCard
                             title="Net Profit"
@@ -162,7 +157,6 @@ export default function Dashboard() {
                             icon={ArrowUpRight}
                             colorClass="icon-box-emerald"
                             subtitle="On track for Q2"
-                            delay={0.3}
                         />
                         <MetricCard
                             title="Low Stock"
@@ -170,7 +164,6 @@ export default function Dashboard() {
                             icon={AlertCircle}
                             colorClass="icon-box-amber"
                             subtitle={`of ${analytics?.topItems?.length || 0} items`}
-                            delay={0.4}
                         />
                     </div>
 
@@ -239,8 +232,8 @@ export default function Dashboard() {
                                 <CardDescription>Sales performance over time</CardDescription>
                             </CardHeader>
                             <CardContent className="p-8">
-                                <div style={{ width: '100%', height: 400 }}>
-                                    <ResponsiveContainer>
+                                <div className="h-[400px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart data={analytics?.monthlyData}>
                                             <defs>
                                                 <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
@@ -333,7 +326,7 @@ export default function Dashboard() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {recentInvoices.map((invoice, idx) => (
+                                    {recentInvoices.map((invoice) => (
                                         <TableRow key={invoice.id} className="dark:hover:bg-slate-800/30 border-slate-50 dark:border-slate-800/50 group h-16">
                                             <TableCell className="font-black text-slate-900 dark:text-slate-200 pl-8">
                                                 {invoice.invoiceNumber || (`#INV-${invoice.id}`)}
@@ -353,7 +346,7 @@ export default function Dashboard() {
     );
 }
 
-function MetricCard({ title, value, subtitle, icon: Icon, colorClass, delay = 0 }) {
+function MetricCard({ title, value, subtitle, icon: Icon, colorClass }) {
     return (
         <motion.div variants={item}>
             <Card className="p-8 group hover:border-indigo-500/20 transition-all duration-500 bg-white dark:bg-slate-900 shadow-xl border-none">

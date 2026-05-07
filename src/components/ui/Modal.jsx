@@ -35,11 +35,13 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
     // ── Lock body scroll while modal is open ─────────────────────────────────
     useEffect(() => {
         if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
+            document.documentElement.classList.add('no-scroll');
+            document.body.classList.add('no-scroll');
+            return () => {
+                document.documentElement.classList.remove('no-scroll');
+                document.body.classList.remove('no-scroll');
+            };
         }
-        return () => { document.body.style.overflow = ''; };
     }, [isOpen]);
 
     // Don't render anything when closed
@@ -61,7 +63,9 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
         <div
             ref={overlayRef}
             onClick={handleBackdropClick}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
             aria-modal="true"
             role="dialog"
             aria-labelledby="modal-title"
@@ -91,7 +95,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
                 </div>
 
                 {/* Body */}
-                <div className="px-6 py-5">
+                <div className="px-6 py-5 max-h-[80vh] overflow-y-auto custom-scrollbar">
                     {children}
                 </div>
             </div>

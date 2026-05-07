@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, User, Menu, Maximize, Minimize, Command, ChevronDown, ShieldCheck, LogOut, Settings } from 'lucide-react';
+import { Sun, Moon, User, Menu, Maximize, Minimize, ChevronDown, ShieldCheck, LogOut, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GlobalSearch from '../components/GlobalSearch';
 import NotificationCenter from '../components/NotificationCenter';

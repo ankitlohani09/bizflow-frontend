@@ -34,7 +34,7 @@ export default function ForgotPassword() {
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900 mb-2">Check your email</h2>
                     <p className="text-slate-500 mb-8 text-sm leading-relaxed">
-                        We've sent a password reset link to <br/>
+                        We&apos;ve sent a password reset link to <br/>
                         <span className="font-semibold text-slate-900">{email}</span>
                     </p>
                     <Link 
@@ -62,7 +62,7 @@ export default function ForgotPassword() {
                         <Mail className="h-6 w-6" />
                     </div>
                     <h1 className="text-2xl font-bold text-slate-900">Forgot password?</h1>
-                    <p className="mt-1 text-sm text-slate-500">No worries, we'll send you reset instructions.</p>
+                    <p className="mt-1 text-sm text-slate-500">No worries, we&apos;ll send you reset instructions.</p>
                 </div>
 
                 {error && (

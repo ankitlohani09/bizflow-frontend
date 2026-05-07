@@ -30,6 +30,8 @@ import StaffModal from '../components/StaffModal';
 import { exportToCSV, flattenData } from '../utils/exportUtils';
 import { cn } from '../utils/cn';
 import Pagination from '../components/ui/Pagination';
+import { QRCodeCanvas } from 'qrcode.react';
+import { QrCode, X, Download } from 'lucide-react';
 
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -92,6 +94,11 @@ export default function Staff() {
 
     // Modal state
     const [modal, setModal] = useState({ isOpen: false, data: null });
+    const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const [serverIp, setServerIp] = useState(window.location.hostname);
+    const qrUrl = `http://${serverIp}:5173/check-in/${user.tenantCode}`;
 
     const fetchStaff = useCallback(async () => {
         setLoading(true);
@@ -157,6 +164,13 @@ export default function Staff() {
                 <div className="flex gap-2">
                     <Button variant="ghost" onClick={fetchStaff} disabled={loading}>
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
+                    </Button>
+                    <Button 
+                        variant="outline" 
+                        className="gap-2 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 font-bold px-6 rounded-xl shadow-lg shadow-amber-500/10"
+                        onClick={() => setIsQRModalOpen(true)}
+                    >
+                        <QrCode className="h-4 w-4" /> Attendance QR
                     </Button>
                     <Button variant="outline" className="gap-2 border-slate-200" onClick={handleExportCSV}>
                         <FileDown className="h-4 w-4" /> Export Roster
@@ -257,17 +271,19 @@ export default function Staff() {
                                             key={staffMember.id} 
                                             className={cn(
                                                 !staffMember.isActive && 'opacity-60 bg-slate-50/50', 
-                                                'group border-slate-50 cursor-pointer hover:bg-slate-50/50'
+                                                'group border-slate-50'
                                             )}
-                                            onClick={() => navigate(`/staff/${staffMember.id}`)}
                                         >
                                             <TableCell className="pl-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-400 text-lg shadow-sm">
+                                                <div 
+                                                    className="flex items-center gap-4 group cursor-pointer"
+                                                    onClick={() => navigate(`/staff/${staffMember.id}`)}
+                                                >
+                                                    <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xl group-hover:bg-blue-50 group-hover:text-blue-500 transition-all shadow-sm">
                                                         {staffMember.name?.charAt(0)}
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="font-bold text-slate-900 uppercase tracking-tighter leading-none">{staffMember.name}</span>
+                                                        <span className="font-bold text-slate-900 uppercase tracking-tighter leading-none group-hover:text-blue-600 transition-colors">{staffMember.name}</span>
                                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1.5 font-mono">{staffMember.employeeId || `ID_${staffMember.id.toString().padStart(4, '0')}`}</span>
                                                     </div>
                                                 </div>
@@ -324,6 +340,72 @@ export default function Staff() {
                 onSuccess={fetchStaff}
                 staff={modal.data}
             />
+
+            {/* Attendance QR Modal */}
+            {isQRModalOpen && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-100">
+                        <div className="bg-amber-500 p-8 text-white flex justify-between items-center">
+                            <div>
+                                <h2 className="text-xl font-black uppercase tracking-tighter">Business QR</h2>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-amber-100">Attendance Scan Point</p>
+                            </div>
+                            <button onClick={() => setIsQRModalOpen(false)} className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div className="p-8 flex flex-col items-center gap-6">
+                            <div className="p-6 bg-white rounded-3xl shadow-xl shadow-slate-200 border-2 border-slate-50">
+                                <QRCodeCanvas 
+                                    value={qrUrl} 
+                                    size={200} 
+                                    level="H" 
+                                    includeMargin={false}
+                                    imageSettings={{
+                                        src: "/logo.png",
+                                        x: undefined,
+                                        y: undefined,
+                                        height: 40,
+                                        width: 40,
+                                        excavate: true,
+                                    }}
+                                />
+                            </div>
+                            
+                            <div className="text-center space-y-4 w-full">
+                                <div className="space-y-1">
+                                    <p className="text-sm font-bold text-slate-900 uppercase tracking-tighter">Instructions</p>
+                                    <p className="text-[10px] font-bold text-slate-400 leading-relaxed px-4">
+                                        Display this QR at your shop entrance. Staff can scan using any smartphone to log their attendance securely.
+                                    </p>
+                                </div>
+                                
+                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Network Server IP (for Mobile)</label>
+                                    <input 
+                                        type="text" 
+                                        value={serverIp}
+                                        onChange={(e) => setServerIp(e.target.value)}
+                                        placeholder="e.g. 192.168.1.15"
+                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                                    />
+                                    <p className="text-[8px] text-amber-600 font-bold mt-2 uppercase tracking-wider">Use IP Address to work on mobile</p>
+                                </div>
+                            </div>
+
+                            <div className="w-full flex gap-2">
+                                <Button 
+                                    className="flex-1 gap-2 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest"
+                                    onClick={() => window.print()}
+                                >
+                                    <Download size={16} /> Print QR
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </MainLayout>
     );
 }

@@ -90,7 +90,6 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
 
 export default function InvoiceForm() {
     const navigate = useNavigate();
-    const barcodeRef = useRef(null);
     const itemSearchRef = useRef(null);
 
     const [customers, setCustomers] = useState([]);

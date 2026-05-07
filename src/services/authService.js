@@ -38,6 +38,7 @@ const authService = {
         email: result.email,
         roles: result.roles || [], // Backend returns array
         tenantId: result.tenantId,
+        tenantCode: result.tenantCode,
         profilePictureUrl: result.profilePictureUrl
       };
       localStorage.setItem('user', JSON.stringify(userProfile));
