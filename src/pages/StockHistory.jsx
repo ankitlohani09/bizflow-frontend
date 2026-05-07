@@ -76,8 +76,8 @@ export default function StockHistory() {
             </div>
 
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-slate-900">Stock Movement Logs</h1>
-                <p className="text-sm text-slate-500">Audit trail of all inventory additions and removals.</p>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Stock History</h1>
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Record of all items added or removed from shop.</p>
             </div>
 
             {error && <Alert variant="error" message={error} className="mb-6" onClose={() => setError(null)} />}

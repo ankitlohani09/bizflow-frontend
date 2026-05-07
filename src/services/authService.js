@@ -37,7 +37,9 @@ const authService = {
         name: result.name,
         email: result.email,
         roles: result.roles || [], // Backend returns array
-        tenantId: result.tenantId
+        tenantId: result.tenantId,
+        tenantCode: result.tenantCode,
+        profilePictureUrl: result.profilePictureUrl
       };
       localStorage.setItem('user', JSON.stringify(userProfile));
     }
@@ -68,6 +70,23 @@ const authService = {
   getToken() {
     return localStorage.getItem('token');
   },
+
+  /**
+   * Request a password reset email.
+   * @param {string} email
+   */
+  async forgotPassword(email) {
+    return await api.post(`/auth/forgot-password?email=${encodeURIComponent(email)}`);
+  },
+
+  /**
+   * Reset password using a token.
+   * @param {string} token
+   * @param {string} newPassword
+   */
+  async resetPassword(token, newPassword) {
+    return await api.post('/auth/reset-password', { token, newPassword });
+  }
 };
 
 export default authService;

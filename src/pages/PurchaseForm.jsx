@@ -306,8 +306,10 @@ export default function PurchaseForm() {
 
                                 <div className="space-y-6 mb-12">
                                     <div className="flex justify-between items-center text-slate-400">
-                                        <span className="text-xs font-bold uppercase tracking-widest">Resource Load</span>
-                                        <span className="text-lg font-black text-white">{form.items.length} Units</span>
+                                        <span className="text-xs font-bold uppercase tracking-widest">Total Items</span>
+                                        <span className="text-lg font-black text-white">
+                                            {form.items.length} {form.items.length === 1 ? 'Item' : 'Items'}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between items-center text-slate-400">
                                         <span className="text-xs font-bold uppercase tracking-widest">Net Payable</span>
@@ -316,7 +318,7 @@ export default function PurchaseForm() {
                                 </div>
 
                                 <div className="pt-10 border-t border-slate-800 mb-12">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 text-center">Total Receivable</p>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 text-center">Total Payable</p>
                                     <p className="text-5xl font-black text-white text-center tracking-tighter tabular-nums drop-shadow-2xl">{fmt(totals.grandTotal)}</p>
                                 </div>
 
@@ -334,13 +336,13 @@ export default function PurchaseForm() {
                                 </Button>
 
                                 <div className="mt-8">
-                                    <div className="p-6 rounded-2xl bg-slate-800/50 border border-slate-800">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Remarks</label>
+                                    <div className="p-6 rounded-[1.5rem] bg-slate-800/30 border border-slate-800/50 backdrop-blur-sm">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Remarks / Notes</label>
                                         <textarea
                                             value={form.remarks}
                                             onChange={(e) => setForm({ ...form, remarks: e.target.value })}
                                             className="w-full bg-transparent border-none text-slate-300 text-sm font-medium resize-none focus:ring-0 p-0 h-20 placeholder:text-slate-700"
-                                            placeholder="Add notes here..."
+                                            placeholder="Add any internal notes here..."
                                         />
                                     </div>
                                 </div>

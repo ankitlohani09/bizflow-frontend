@@ -23,7 +23,10 @@ const resources = {
       "Add Customer": "Add Customer",
       "Quick Scan": "Quick Scan (SKU/ID)...",
       "Total Amount": "Total Amount",
-      "Apply Visual System": "Apply Visual System"
+      "Apply Visual System": "Apply Visual System",
+      "Kitchen Orders": "Kitchen Orders",
+      "AI Insights": "AI Insights",
+      "System Logs": "System Logs"
     }
   },
   hi: {
@@ -46,7 +49,10 @@ const resources = {
       "Add Customer": "ग्राहक जोड़ें",
       "Quick Scan": "त्वरित स्कैन (SKU/ID)...",
       "Total Amount": "कुल राशि",
-      "Apply Visual System": "सिस्टम अपडेट करें"
+      "Apply Visual System": "सिस्टम अपडेट करें",
+      "Kitchen Orders": "रसोई के आदेश",
+      "AI Insights": "एआई अंतर्दृष्टि",
+      "System Logs": "सिस्टम लॉग"
     }
   },
   hg: {
@@ -69,7 +75,10 @@ const resources = {
       "Add Customer": "Customer add karein",
       "Quick Scan": "Quick Scan karein...",
       "Total Amount": "Total Paisa",
-      "Apply Visual System": "Sab update karein"
+      "Apply Visual System": "Sab update karein",
+      "Kitchen Orders": "Kitchen Orders",
+      "AI Insights": "Smart AI Report",
+      "System Logs": "System Logs"
     }
   }
 };

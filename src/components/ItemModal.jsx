@@ -12,7 +12,7 @@ import taxRuleService from '../services/taxRuleService';
  * ItemModal – Manual creation of new product definitions
  * Features inline creation for missing categories/units
  */
-export default function ItemModal({ isOpen, onClose, onSuccess }) {
+export default function ItemModal({ isOpen, onClose, onSuccess, initialData = null }) {
     const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -40,29 +40,79 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
         trackInventory: true,
         isActive: true,
         hasVariants: false,
-        description: ''
+        description: '',
+        expiryDate: '',
+        batchNo: ''
     });
+
+    useEffect(() => {
+        if (initialData) {
+            setForm({
+                ...initialData,
+                name: initialData.name || initialData.itemName || '',
+                barcode: initialData.barcode || '',
+                type: initialData.type || 'PRODUCT',
+                categoryId: initialData.categoryId?.toString() || '',
+                unitId: initialData.unitId?.toString() || '',
+                taxRuleId: initialData.taxRuleId?.toString() || '',
+                expiryDate: initialData.expiryDate ? new Date(initialData.expiryDate).toISOString().split('T')[0] : '',
+                costPrice: initialData.costPrice || 0,
+                sellingPrice: initialData.sellingPrice || 0,
+                lowStockThreshold: initialData.lowStockThreshold || 5,
+                batchNo: initialData.batchNo || ''
+            });
+        } else {
+            setForm({
+                name: '',
+                barcode: '',
+                categoryId: '',
+                unitId: '',
+                type: 'PRODUCT',
+                sellingPrice: 0,
+                costPrice: 0,
+                taxRate: 0,
+                taxRuleId: '',
+                lowStockThreshold: 5,
+                trackInventory: true,
+                isActive: true,
+                hasVariants: false,
+                description: '',
+                expiryDate: '',
+                batchNo: ''
+            });
+        }
+    }, [initialData, isOpen]);
 
     const loadDependencies = async () => {
         setLoading(true);
+        setError(null);
         try {
-            const [cats, uns, trs] = await Promise.all([
+            const [catsRes, unsRes, trsRes] = await Promise.allSettled([
                 categoryService.getAll(),
                 unitService.getAll(),
                 taxRuleService.getAll()
             ]);
-            setCategories(Array.isArray(cats) ? cats : []);
-            setUnits(Array.isArray(uns) ? uns : []);
-            setTaxRules(Array.isArray(trs) ? trs : []);
 
-            // Set defaults if not already set
+            const cats = catsRes.status === 'fulfilled' ? (Array.isArray(catsRes.value) ? catsRes.value : []) : [];
+            const uns = unsRes.status === 'fulfilled' ? (Array.isArray(unsRes.value) ? unsRes.value : []) : [];
+            const trs = trsRes.status === 'fulfilled' ? (Array.isArray(trsRes.value) ? trsRes.value : []) : [];
+
+            setCategories(cats);
+            setUnits(uns);
+            setTaxRules(trs);
+
+            // Set defaults safely
             setForm(f => ({
                 ...f,
                 categoryId: f.categoryId || (cats.length > 0 ? cats[0].id : ''),
                 unitId: f.unitId || (uns.length > 0 ? uns[0].id : '')
             }));
-        } catch (err) {
-            setError('Failed to load form dependencies.');
+
+            if (catsRes.status === 'rejected' || unsRes.status === 'rejected') {
+                console.error('Some dependencies failed to load');
+            }
+        } catch {
+            setError('Could not load categories or units. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -83,7 +133,7 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
             setForm(f => ({ ...f, categoryId: newId }));
             setShowNewCat(false);
             setNewCatName('');
-        } catch (err) {
+        } catch {
             setError('Failed to create category.');
         }
     };
@@ -97,7 +147,7 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
             setForm(f => ({ ...f, unitId: newId }));
             setShowNewUnit(false);
             setNewUnit({ name: '', symbol: '' });
-        } catch (err) {
+        } catch {
             setError('Failed to create unit.');
         }
     };
@@ -121,30 +171,37 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
                 taxRate: Number(form.taxRate),
                 lowStockThreshold: Number(form.lowStockThreshold)
             };
-            await itemService.create(payload);
+            
+            const idToUpdate = initialData?.itemId || initialData?.id;
+            if (idToUpdate) {
+                await itemService.update(idToUpdate, payload);
+            } else {
+                await itemService.create(payload);
+            }
+            
             onSuccess();
             onClose();
         } catch (err) {
-            setError(err.message || 'Failed to register item.');
+            setError(err.message || 'Failed to process item.');
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Register New Item">
+        <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Item" : "Add New Item"}>
             <form onSubmit={handleSubmit} className="space-y-6">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-12 gap-3">
                         <Loader2 className="animate-spin text-blue-500" size={32} />
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Synchronizing Catalog...</p>
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Loading List...</p>
                     </div>
                 ) : (
                     <>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="col-span-2">
                                 <Input
-                                    label="Product Name"
+                                    label="Item Name"
                                     placeholder="E.g. Wireless Mouse"
                                     value={form.name}
                                     onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -152,11 +209,26 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
                                 />
                             </div>
                             <Input
-                                label="Barcode / SKU"
+                                label="Code / Barcode"
                                 placeholder="FC-001"
                                 value={form.barcode}
                                 onChange={(e) => setForm({ ...form, barcode: e.target.value })}
                                 required
+                            />
+                            <Input
+                                label="Batch Number"
+                                placeholder="B-123"
+                                value={form.batchNo}
+                                onChange={(e) => setForm({ ...form, batchNo: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <Input
+                                label="Expiry Date"
+                                type="date"
+                                value={form.expiryDate}
+                                onChange={(e) => setForm({ ...form, expiryDate: e.target.value })}
                             />
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Item Type</label>
@@ -247,8 +319,8 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
                                     value={form.taxRuleId}
                                     onChange={(e) => {
                                         const rule = taxRules.find(r => r.id.toString() === e.target.value);
-                                        setForm({ 
-                                            ...form, 
+                                        setForm({
+                                            ...form,
                                             taxRuleId: e.target.value,
                                             taxRate: rule ? rule.rate : 0
                                         });
@@ -280,7 +352,7 @@ export default function ItemModal({ isOpen, onClose, onSuccess }) {
                     <Button type="button" variant="ghost" className="flex-1 font-bold" onClick={onClose}>Cancel</Button>
                     <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white gap-2 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20" disabled={submitting || loading}>
                         {submitting ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
-                        Save Product
+                        Save Item
                     </Button>
                 </div>
             </form>

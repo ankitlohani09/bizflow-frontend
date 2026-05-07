@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Store, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import authService from '../services/authService';
 
@@ -93,9 +93,17 @@ export default function Login() {
 
                     {/* Password */}
                     <div className="space-y-1.5">
-                        <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-                            Password
-                        </label>
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+                                Password
+                            </label>
+                            <Link 
+                                to="/forgot-password" 
+                                className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                            >
+                                Forgot password?
+                            </Link>
+                        </div>
                         <div className="relative">
                             <input
                                 id="password"

@@ -14,14 +14,22 @@ import {
     CheckCircle2,
     XCircle,
     Wallet,
-    Receipt
+    Receipt,
+    Camera,
+    MapPin,
+    Fingerprint,
+    ShieldCheck
 } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 import MainLayout from '../layouts/MainLayout';
 import staffService from '../services/staffService';
 import Button from '../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
 import { cn } from '../utils/cn';
+import StaffAdvanceModal from '../components/StaffAdvanceModal';
+import AttendanceModal from '../components/AttendanceModal';
 
 const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
@@ -35,6 +43,10 @@ export default function StaffDetails() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
+    const [isAdvanceModalOpen, setIsAdvanceModalOpen] = useState(false);
+    const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
+    const [hasBiometric, setHasBiometric] = useState(false);
+    const [biometricLoading, setBiometricLoading] = useState(false);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -56,6 +68,62 @@ export default function StaffDetails() {
     }, [id]);
 
     useEffect(() => { fetchData(); }, [fetchData]);
+
+    const checkBiometric = useCallback(async () => {
+        try {
+            const res = await axios.get(`http://${window.location.hostname}:8080/api/v1/public/biometric/check/${id}`);
+            setHasBiometric(res.data.data.hasBiometric);
+        } catch (err) {
+            console.error('Biometric check failed:', err);
+        }
+    }, [id]);
+
+    useEffect(() => { checkBiometric(); }, [checkBiometric]);
+
+    const handleRegisterBiometric = async () => {
+        setBiometricLoading(true);
+        try {
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+            const options = {
+                publicKey: {
+                    challenge: challenge,
+                    rp: { name: "BizFlow Enterprise" },
+                    user: {
+                        id: new TextEncoder().encode(id.toString()),
+                        name: staff.email || staff.name,
+                        displayName: staff.name
+                    },
+                    pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                    authenticatorSelection: {
+                        userVerification: "preferred"
+                    },
+                    timeout: 60000
+                }
+            };
+
+            const credential = await navigator.credentials.create(options);
+
+            // Convert Buffer to Base64 for transport
+            const credentialId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+
+            await axios.post(`http://${window.location.hostname}:8080/api/v1/public/biometric/register`, {
+                staffId: id,
+                credentialId: credentialId,
+                publicKey: "WEBAUTHN_REAL_V1" // Simplified for this demo
+            });
+
+            setHasBiometric(true);
+            toast.success('Biometric Security Activated!');
+        } catch (err) {
+            console.error(err);
+            const msg = err.response?.data?.message || err.message || 'Setup Failed';
+            toast.error(`Biometric Setup Failed: ${msg}. (Ensure HTTPS if on mobile)`);
+        } finally {
+            setBiometricLoading(false);
+        }
+    };
 
     // ── Payroll Logic ────────────────────────────────────────────────────────
     const presentDays = attendance.filter(a => a.status === 'PRESENT').length;
@@ -102,8 +170,8 @@ export default function StaffDetails() {
     return (
         <MainLayout title={`Staff Profile — ${staff?.name}`}>
             <div className="mb-8">
-                <Button 
-                    variant="ghost" 
+                <Button
+                    variant="ghost"
                     className="gap-2 text-slate-500 font-bold hover:bg-slate-100 rounded-xl"
                     onClick={() => navigate('/staff')}
                 >
@@ -166,10 +234,46 @@ export default function StaffDetails() {
                         </CardContent>
                     </Card>
 
+                    {/* Biometric Security Card */}
+                    <Card className="enterprise-card border-blue-100 bg-blue-50/30 overflow-hidden relative">
+                        <div className="absolute -right-4 -bottom-4 opacity-5">
+                            <Fingerprint size={100} />
+                        </div>
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className={cn("p-2 rounded-lg", hasBiometric ? "bg-emerald-100 text-emerald-600" : "bg-blue-100 text-blue-600")}>
+                                    {hasBiometric ? <ShieldCheck size={18} /> : <Fingerprint size={18} />}
+                                </div>
+                                <div>
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Biometric Identity</h4>
+                                    <p className="text-xs font-bold text-slate-900 mt-0.5">
+                                        {hasBiometric ? "Device Security Linked" : "No Biometrics Registered"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <Button
+                                className={cn(
+                                    "w-full text-[10px] font-black uppercase tracking-widest py-3 rounded-xl gap-2",
+                                    hasBiometric ? "bg-white border-2 border-slate-200 text-slate-500 hover:bg-slate-50" : "bg-blue-600 text-white hover:bg-blue-500"
+                                )}
+                                onClick={handleRegisterBiometric}
+                                disabled={biometricLoading}
+                            >
+                                {biometricLoading ? "Processing..." : hasBiometric ? "Re-link Device" : "Register Fingerprint"}
+                            </Button>
+                            {!window.isSecureContext && (
+                                <p className="text-[9px] text-rose-500 font-bold mt-3 leading-tight italic">
+                                    ⚠️ Security Error: Real biometrics requires a secure (HTTPS) connection.
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
+
                     {/* Payroll Summary Card */}
                     <Card className="enterprise-card p-6 bg-slate-950 text-white border-none relative overflow-hidden group">
                         <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-blue-500/10 blur-3xl group-hover:bg-blue-500/20 transition-all" />
-                        
+
                         <div className="flex items-center gap-4 mb-8">
                             <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
                                 <Wallet className="text-blue-400" size={20} />
@@ -200,7 +304,7 @@ export default function StaffDetails() {
                                 </div>
                             </div>
 
-                            <Button 
+                            <Button
                                 className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] py-6 rounded-2xl shadow-xl shadow-blue-500/20 gap-2"
                                 onClick={handleProcessPayroll}
                                 disabled={submitting || netPayout <= 0}
@@ -223,6 +327,12 @@ export default function StaffDetails() {
                                     </CardTitle>
                                     <CardDescription className="text-slate-400 text-xs mt-1 font-bold lowercase">Chronological log of check-ins and check-outs.</CardDescription>
                                 </div>
+                                <Button
+                                    className="gap-2 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg shadow-blue-500/20"
+                                    onClick={() => setIsAttendanceModalOpen(true)}
+                                >
+                                    Mark Attendance
+                                </Button>
                             </div>
                         </CardHeader>
                         <CardContent className="p-0 overflow-x-auto">
@@ -232,6 +342,7 @@ export default function StaffDetails() {
                                         <TableHead className="pl-8 py-4 text-[9px] font-black uppercase tracking-wider text-slate-500">Date</TableHead>
                                         <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">In-Time</TableHead>
                                         <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Out-Time</TableHead>
+                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Verification</TableHead>
                                         <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500 pr-8 text-right">Status</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -244,8 +355,23 @@ export default function StaffDetails() {
                                         attendance.map((log, i) => (
                                             <TableRow key={i} className="border-slate-50">
                                                 <TableCell className="pl-8 font-black text-slate-900">{log.date}</TableCell>
-                                                <TableCell className="font-bold text-slate-500">{log.checkIn}</TableCell>
+                                                <TableCell className="font-bold text-slate-500">{log.checkIn || '—'}</TableCell>
                                                 <TableCell className="font-bold text-slate-500">{log.checkOut || '—'}</TableCell>
+                                                <TableCell>
+                                                    <div className="flex gap-2">
+                                                        {log.photoUrl && (
+                                                            <a href={log.photoUrl} target="_blank" rel="noreferrer" className="p-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
+                                                                <Camera size={14} />
+                                                            </a>
+                                                        )}
+                                                        {log.location && (
+                                                            <a href={`https://www.google.com/maps?q=${log.location}`} target="_blank" rel="noreferrer" className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors">
+                                                                <MapPin size={14} />
+                                                            </a>
+                                                        )}
+                                                        {!log.photoUrl && !log.location && <span className="text-[10px] text-slate-400">Manual</span>}
+                                                    </div>
+                                                </TableCell>
                                                 <TableCell className="pr-8 text-right">
                                                     <span className={cn(
                                                         "inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest",
@@ -273,6 +399,12 @@ export default function StaffDetails() {
                                     </CardTitle>
                                     <CardDescription className="text-slate-400 text-xs mt-1 font-bold lowercase">Detailed tracking of financial advances and adjustments.</CardDescription>
                                 </div>
+                                <Button
+                                    className="gap-2 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl"
+                                    onClick={() => setIsAdvanceModalOpen(true)}
+                                >
+                                    Give Advance
+                                </Button>
                             </div>
                         </CardHeader>
                         <CardContent className="p-0 overflow-x-auto">
@@ -294,8 +426,8 @@ export default function StaffDetails() {
                                         advances.map((adv, i) => (
                                             <TableRow key={i} className="border-slate-50">
                                                 <TableCell className="pl-8 font-black text-slate-900 text-[10px] tracking-widest">#ADV-{adv.id}</TableCell>
-                                                <TableCell className="font-bold text-slate-500">{adv.date}</TableCell>
-                                                <TableCell className="font-bold text-slate-500 truncate max-w-[200px]">{adv.reason}</TableCell>
+                                                <TableCell className="font-bold text-slate-500">{adv.advanceDate}</TableCell>
+                                                <TableCell className="font-bold text-slate-500 truncate max-w-[200px]">{adv.notes}</TableCell>
                                                 <TableCell className="pr-8 text-right font-black text-rose-600">{fmt(adv.amount)}</TableCell>
                                             </TableRow>
                                         ))
@@ -306,6 +438,21 @@ export default function StaffDetails() {
                     </Card>
                 </div>
             </div>
+
+            <StaffAdvanceModal
+                isOpen={isAdvanceModalOpen}
+                onClose={() => setIsAdvanceModalOpen(false)}
+                onSuccess={fetchData}
+                staffId={id}
+            />
+
+            <AttendanceModal
+                isOpen={isAttendanceModalOpen}
+                onClose={() => setIsAttendanceModalOpen(false)}
+                onSuccess={fetchData}
+                staffId={id}
+                staffName={staff?.name}
+            />
         </MainLayout>
     );
 }

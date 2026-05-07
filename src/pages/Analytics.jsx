@@ -38,7 +38,7 @@ const fmt = (val) =>
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function MetricCard({ title, value, subtitle, trend, icon: Icon, colorClass }) { // eslint-disable-line no-unused-vars
+function MetricCard({ title, value, subtitle, trend, icon: Icon, colorClass }) {
     const isPositive = trend >= 0;
     return (
         <Card className="enterprise-card h-full p-8 transition-all hover:shadow-md">
@@ -98,7 +98,7 @@ export default function Analytics() {
         <MainLayout title="Financial Intelligence">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Analytics</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Reports</h1>
                     <p className="text-sm text-slate-500 font-medium">Visualizing your business growth and financial health.</p>
                 </div>
                 <Button variant="outline" className="gap-2 rounded-xl shadow-sm bg-white border-slate-200" onClick={loadAnalytics} disabled={loading}>
