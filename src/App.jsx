@@ -31,6 +31,7 @@ const Logs = lazy(() => import('./pages/Logs'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Tenants = lazy(() => import('./pages/Tenants'));
+const TenantDetails = lazy(() => import('./pages/TenantDetails'));
 const PublicCheckIn = lazy(() => import('./pages/PublicCheckIn'));
 
 function PageLoader() {
@@ -64,13 +65,23 @@ export default function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/check-in/:tenantCode" element={<PublicCheckIn />} />
 
-              {/* General access routes */}
-              <Route element={<ProtectedRoute />}>
+              {/* Shared Access (Including ADMIN for Dashboard) */}
+              <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'OWNER', 'MANAGER']} />}>
                 <Route path="/dashboard" element={<Dashboard />} />
+              </Route>
+
+              {/* Operational & Billing Access (All Staff) */}
+              <Route element={<ProtectedRoute allowedRoles={['OWNER', 'MANAGER', 'USER']} />}>
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/invoices" element={<Invoices />} />
                 <Route path="/invoices/new" element={<InvoiceForm />} />
                 <Route path="/invoices/:id" element={<InvoiceDetails />} />
+                <Route path="/returns" element={<Returns />} />
+                <Route path="/kitchen-orders" element={<KitchenOrders />} />
+              </Route>
+
+              {/* Managerial & Inventory Access (Excluding Billing Staff) */}
+              <Route element={<ProtectedRoute allowedRoles={['OWNER', 'MANAGER']} />}>
                 <Route path="/inventory" element={<Inventory />} />
                 <Route path="/stock-movements" element={<StockMovements />} />
                 <Route path="/inventory/history" element={<StockHistory />} />
@@ -79,18 +90,21 @@ export default function App() {
                 <Route path="/purchases" element={<Purchases />} />
                 <Route path="/purchases/new" element={<PurchaseForm />} />
                 <Route path="/analytics" element={<Analytics />} />
-                <Route path="/returns" element={<Returns />} />
-                <Route path="/kitchen-orders" element={<KitchenOrders />} />
               </Route>
 
-              {/* Admin and Owner Only */}
-              <Route element={<ProtectedRoute allowedRoles={['OWNER', 'ADMIN']} />}>
+              {/* Owner Only Modules */}
+              <Route element={<ProtectedRoute allowedRoles={['OWNER']} />}>
                 <Route path="/staff" element={<Staff />} />
                 <Route path="/staff/:id" element={<StaffDetails />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/ai-insights" element={<AiInsights />} />
                 <Route path="/logs" element={<Logs />} />
+              </Route>
+
+              {/* Platform Management Only */}
+              <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                 <Route path="/tenants" element={<Tenants />} />
+                <Route path="/tenants/:id" element={<TenantDetails />} />
               </Route>
 
               {/* Default: redirect root to /dashboard (ProtectedRoute handles auth check) */}

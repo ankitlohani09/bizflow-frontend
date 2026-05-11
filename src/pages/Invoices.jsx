@@ -144,7 +144,7 @@ export default function Invoices() {
             {error && <Alert variant="error" message={error} className="mb-6 shadow-lg" onClose={() => setError(null)} />}
 
             <Card className="enterprise-card overflow-hidden">
-                <CardHeader className="border-b border-slate-100 bg-slate-50/50 p-8">
+                <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 p-8">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
                             <CardTitle className="text-slate-900 border-none font-bold">Invoices & Records</CardTitle>
@@ -168,7 +168,7 @@ export default function Invoices() {
                                 />
                             </div>
 
-                             <div className="flex items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50 p-1">
+                             <div className="flex items-center gap-1.5 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-1">
                                 {['ALL', 'PAID', 'PENDING'].map((status) => (
                                     <button
                                         key={status}
@@ -195,7 +195,7 @@ export default function Invoices() {
                     <div className="min-w-[800px]">
                          <Table>
                             <TableHeader>
-                                <TableRow className="bg-slate-50 border-b border-slate-100">
+                                <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
                                     <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500 pl-8 py-4" onClick={() => handleSort('id')}>Invoice info</TableHead>
                                     <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('customerName')}>Customer</TableHead>
                                     <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('invoiceDate')}>Timeline</TableHead>
@@ -207,14 +207,14 @@ export default function Invoices() {
                             <TableBody>
                                  {paginatedInvoices.map((invoice) => (
                                     <TableRow key={invoice.id} className="group border-slate-50">
-                                        <TableCell className="font-bold text-slate-900 pl-8 py-6 leading-none">
+                                         <TableCell className="font-bold text-slate-900 dark:text-white pl-8 py-6 leading-none">
                                             {invoice.invoiceNumber || `#INV-${invoice.formattedId || invoice.id || 'N/A'}`}
                                         </TableCell>
-                                        <TableCell className="text-slate-600 font-bold uppercase tracking-tighter text-xs">{invoice.customerName || invoice.customer?.name || 'Walk-in'}</TableCell>
+                                         <TableCell className="text-slate-600 dark:text-slate-300 font-bold uppercase tracking-tighter text-xs">{invoice.customerName || invoice.customer?.name || 'Walk-in'}</TableCell>
                                         <TableCell className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">
                                             {new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
                                         </TableCell>
-                                        <TableCell className="font-black text-slate-900 text-lg tabular-nums">{fmt(invoice.totalAmount || invoice.grandTotal || 0)}</TableCell>
+                                         <TableCell className="font-black text-slate-900 dark:text-white text-lg tabular-nums">{fmt(invoice.totalAmount || invoice.grandTotal || 0)}</TableCell>
                                         <TableCell>
                                             <StatusBadge status={invoice.paymentStatus ?? invoice.status} />
                                         </TableCell>

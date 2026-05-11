@@ -19,6 +19,14 @@ const tenantService = {
 
   async delete(id) {
     return await api.delete(`/tenants/${id}`);
+  },
+
+  async getStats(id) {
+    return await api.get(`/tenants/${id}/stats`);
+  },
+
+  async getGlobalStats() {
+    return await api.get('/tenants/global-stats');
   }
 };
 

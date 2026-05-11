@@ -38,7 +38,7 @@ export default function Login() {
         setError('');
 
         try {
-            await authService.login(form.email, form.password);
+            const user = await authService.login(form.email, form.password);
             navigate('/dashboard', { replace: true });
         } catch (err) {
             // err.message is already human-readable (set in api.js interceptor)
@@ -97,8 +97,8 @@ export default function Login() {
                             <label htmlFor="password" className="block text-sm font-medium text-slate-700">
                                 Password
                             </label>
-                            <Link 
-                                to="/forgot-password" 
+                            <Link
+                                to="/forgot-password"
                                 className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
                             >
                                 Forgot password?

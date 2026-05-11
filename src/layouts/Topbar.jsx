@@ -18,7 +18,16 @@ export default function Topbar({ onToggleSidebar }) {
     const [isFullscreen, setIsFullscreen] = React.useState(false);
     const [showProfileMenu, setShowProfileMenu] = React.useState(false);
     const menuRef = React.useRef(null);
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const [user, setUser] = React.useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
+
+    // Listen for user updates without page reload
+    React.useEffect(() => {
+        const handleUserUpdate = () => {
+            setUser(JSON.parse(localStorage.getItem('user') || '{}'));
+        };
+        window.addEventListener('user-updated', handleUserUpdate);
+        return () => window.removeEventListener('user-updated', handleUserUpdate);
+    }, []);
 
     // Click outside handler
     React.useEffect(() => {

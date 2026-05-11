@@ -135,7 +135,7 @@ export default function Expenses() {
                     </div>
                 </Card>
                 <div className="space-y-6">
-                    <Card className="shadow-xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl p-6">
+                    <Card className="shadow-xl shadow-slate-200/50 dark:shadow-none dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl p-6">
                         <div className="flex items-center gap-4">
                             <div className="h-12 w-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600">
                                 <TrendingUp size={24} />
@@ -148,7 +148,7 @@ export default function Expenses() {
                             </div>
                         </div>
                     </Card>
-                    <Card className="shadow-xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl p-6">
+                    <Card className="shadow-xl shadow-slate-200/50 dark:shadow-none dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl p-6">
                         <div className="flex items-center gap-4">
                             <div className="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600">
                                 <Receipt size={24} />
@@ -167,7 +167,7 @@ export default function Expenses() {
             {error && <Alert variant="error" message={error} className="mb-6" onClose={() => setError(null)} />}
 
             {/* ── Directory Table ─────────────────────────────────────────────── */}
-            <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden">
+            <Card className="shadow-2xl shadow-slate-200/50 dark:shadow-none dark:shadow-none border-none ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden">
                 <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 p-8">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>

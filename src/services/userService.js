@@ -18,6 +18,10 @@ const userService = {
 
     getProfile: async (userId) => {
         return api.get(`/users/${userId}`);
+    },
+
+    updateProfile: async (userId, data) => {
+        return api.put(`/users/${userId}`, data);
     }
 };
 

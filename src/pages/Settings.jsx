@@ -52,6 +52,7 @@ export default function Settings() {
         }
     }, [location]);
     const [successMsg, setSuccessMsg] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
     const [localBranding, setLocalBranding] = useState(branding);
 
     // ── Tax Rules state ──────────────────────────────────────────────
@@ -67,7 +68,19 @@ export default function Settings() {
     const [tenant, setTenant] = useState(null);
     const [tenantSaving, setTenantSaving] = useState(false);
 
+    // ── Profile State ──────────────────────────────────────────────────
+    const [displayName, setDisplayName] = useState(JSON.parse(localStorage.getItem('user') || '{}').name || '');
+    const [phoneNumber, setPhoneNumber] = useState(JSON.parse(localStorage.getItem('user') || '{}').phone || '');
+    const [profilePictureUrl, setProfilePictureUrl] = useState(JSON.parse(localStorage.getItem('user') || '{}').profilePictureUrl || '');
+    
+    // ── Security State ─────────────────────────────────────────────────
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
     useEffect(() => {
+        setSuccessMsg(null);
+        setErrorMsg(null);
         if (activeTab === 'master') {
             loadPaymentModes();
             loadTaxRules();
@@ -187,6 +200,7 @@ export default function Settings() {
                     {[
                         { id: 'master', label: 'Business Settings', icon: SettingsIcon },
                         { id: 'company', label: 'Business Profile', icon: Building },
+                        { id: 'subscription', label: 'Subscription & Plan', icon: CreditCard },
                         { id: 'branding', label: 'Logo & Branding', icon: Palette },
                         { id: 'account', label: 'My Profile', icon: User },
                         { id: 'security', label: 'Security & Access', icon: ShieldCheck },
@@ -197,8 +211,8 @@ export default function Settings() {
                             className={cn(
                                 "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all w-full text-left",
                                 activeTab === tab.id
-                                    ? "bg-slate-900 text-white shadow-md shadow-slate-200"
-                                    : "text-slate-500 hover:bg-white hover:text-slate-900"
+                                    ? "bg-slate-900 dark:bg-slate-800 text-white shadow-md shadow-slate-200 dark:shadow-none"
+                                    : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                             )}
                         >
                             <tab.icon size={18} />
@@ -210,6 +224,7 @@ export default function Settings() {
                 {/* ── Content Area ──────────────────────────────────────────────── */}
                 <div className="flex-1 space-y-6">
                     {successMsg && <Alert variant="success" message={successMsg} className="mb-4" onClose={() => setSuccessMsg(null)} />}
+                    {errorMsg && <Alert variant="error" message={errorMsg} className="mb-4" onClose={() => setErrorMsg(null)} />}
 
                     {activeTab === 'master' && (
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -385,7 +400,7 @@ export default function Settings() {
 
                     {activeTab === 'company' && (
                         <Card className="enterprise-card overflow-hidden">
-                            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                            <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                                 <CardTitle className="text-slate-900 border-none font-bold">Company Profile</CardTitle>
                                 <CardDescription className="text-slate-500 font-medium">This information will appear on your invoices and reports.</CardDescription>
                             </CardHeader>
@@ -413,7 +428,7 @@ export default function Settings() {
 
                     {activeTab === 'branding' && (
                         <Card className="enterprise-card overflow-hidden">
-                            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                            <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <CardTitle className="text-slate-900 border-none font-bold">Visual Identity</CardTitle>
@@ -506,7 +521,7 @@ export default function Settings() {
 
                                 <div className="pt-6 border-t border-slate-100 flex justify-end">
                                     <Button
-                                        className="bg-slate-900 hover:bg-black text-white px-10 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl shadow-xl shadow-slate-200"
+                                        className="bg-slate-900 dark:bg-slate-800 hover:bg-black dark:hover:bg-slate-700 text-white px-10 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl shadow-xl shadow-slate-200 dark:shadow-none"
                                         onClick={async () => {
                                             // Final safety check: if it's a blob, don't save it
                                             if (localBranding.logoUrl && localBranding.logoUrl.startsWith('blob:')) {
@@ -526,7 +541,7 @@ export default function Settings() {
 
                     {activeTab === 'account' && (
                         <Card className="enterprise-card overflow-hidden">
-                            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                            <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                                 <CardTitle className="text-slate-900 border-none font-bold">Account Settings</CardTitle>
                                 <CardDescription className="text-slate-500 font-medium">Manage your personal information and profile visibility.</CardDescription>
                             </CardHeader>
@@ -535,9 +550,9 @@ export default function Settings() {
                                 <div className="flex flex-col md:flex-row items-center gap-8">
                                     <div className="relative group">
                                         <div className="h-32 w-32 rounded-[2.5rem] bg-indigo-50 border-4 border-white shadow-2xl shadow-indigo-500/10 flex items-center justify-center overflow-hidden">
-                                            {JSON.parse(localStorage.getItem('user') || '{}').profilePictureUrl ? (
+                                            {profilePictureUrl ? (
                                                 <img
-                                                    src={(import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1') + JSON.parse(localStorage.getItem('user') || '{}').profilePictureUrl}
+                                                    src={(import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1') + profilePictureUrl}
                                                     className="h-full w-full object-cover"
                                                     alt="Profile"
                                                 />
@@ -559,14 +574,23 @@ export default function Settings() {
                                             onChange={async (e) => {
                                                 const file = e.target.files[0];
                                                 if (file) {
+                                                    // Check file size (1MB limit)
+                                                    if (file.size > 1024 * 1024) {
+                                                        setSuccessMsg(null);
+                                                        setErrorMsg(`File is too large (${(file.size / (1024 * 1024)).toFixed(2)}MB). Maximum size allowed is 1MB.`);
+                                                        return;
+                                                    }
                                                     try {
                                                         const user = JSON.parse(localStorage.getItem('user') || '{}');
                                                         const res = await userService.updateProfilePicture(user.id, file);
                                                         localStorage.setItem('user', JSON.stringify(res));
+                                                        setProfilePictureUrl(res.profilePictureUrl);
                                                         setSuccessMsg('Profile picture updated successfully.');
-                                                        window.location.reload(); // Refresh to update Topbar
-                                                    } catch {
-                                                        setSuccessMsg('Failed to upload profile picture.');
+                                                        setErrorMsg(null);
+                                                        window.dispatchEvent(new Event('user-updated'));
+                                                    } catch (err) {
+                                                        setSuccessMsg(null);
+                                                        setErrorMsg(err.message || 'Failed to upload profile picture.');
                                                     }
                                                 }
                                             }}
@@ -575,7 +599,7 @@ export default function Settings() {
                                     <div className="space-y-2 text-center md:text-left">
                                         <h3 className="text-lg font-black text-slate-900">Your Avatar</h3>
                                         <p className="text-xs font-medium text-slate-500 max-w-xs leading-relaxed">
-                                            Click on the image to upload a new profile picture. Recommended size is 256x256px.
+                                            Click on the image to upload a new profile picture. Recommended size is 256x256px. Max size: 1MB.
                                         </p>
                                         <Button
                                             variant="ghost"
@@ -587,10 +611,13 @@ export default function Settings() {
                                                     try {
                                                         const res = await userService.deleteProfilePicture(user.id);
                                                         localStorage.setItem('user', JSON.stringify(res));
+                                                        setProfilePictureUrl('');
                                                         setSuccessMsg('Profile picture removed.');
-                                                        setTimeout(() => window.location.reload(), 1000);
-                                                    } catch {
-                                                        // setAccountError('Failed to remove profile picture.');
+                                                        setErrorMsg(null);
+                                                        window.dispatchEvent(new Event('user-updated'));
+                                                    } catch (err) {
+                                                        setSuccessMsg(null);
+                                                        setErrorMsg(err.message || 'Failed to remove profile picture.');
                                                     }
                                                 }
                                             }}
@@ -601,13 +628,29 @@ export default function Settings() {
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <Input label="Display Name" defaultValue={JSON.parse(localStorage.getItem('user') || '{}').name} />
+                                    <Input label="Display Name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
                                     <Input label="Email Address" defaultValue={JSON.parse(localStorage.getItem('user') || '{}').email} disabled />
-                                    <Input label="Phone Number" defaultValue={JSON.parse(localStorage.getItem('user') || '{}').phone || 'Not provided'} />
+                                    <Input label="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="Enter phone number" />
                                 </div>
 
                                 <div className="pt-6 border-t border-slate-100 flex justify-end">
-                                    <Button className="bg-slate-900 text-white px-8 font-bold rounded-xl h-12 shadow-xl shadow-slate-200">
+                                    <Button 
+                                        className="bg-slate-900 dark:bg-slate-800 text-white px-8 font-bold rounded-xl h-12 shadow-xl shadow-slate-200 dark:shadow-none"
+                                        onClick={async () => {
+                                            const user = JSON.parse(localStorage.getItem('user') || '{}');
+                                            try {
+                                                await userService.updateProfile(user.id, { name: displayName, phone: phoneNumber, email: user.email });
+                                                // Update local storage
+                                                localStorage.setItem('user', JSON.stringify({ ...user, name: displayName, phone: phoneNumber }));
+                                                setSuccessMsg('Account data saved successfully.');
+                                                setErrorMsg(null);
+                                                window.dispatchEvent(new Event('user-updated'));
+                                            } catch (err) {
+                                                setSuccessMsg(null);
+                                                setErrorMsg(err.message || 'Failed to save account data.');
+                                            }
+                                        }}
+                                    >
                                         Save Account Data
                                     </Button>
                                 </div>
@@ -615,28 +658,132 @@ export default function Settings() {
                         </Card>
                     )}
 
+                    {activeTab === 'subscription' && (
+                        <Card className="border-none bg-white dark:bg-slate-900 shadow-2xl rounded-[3rem] overflow-hidden">
+                            <CardHeader className="p-10 border-b border-slate-50 dark:border-slate-800 bg-gradient-to-br from-amber-50/50 to-transparent">
+                                <div className="flex items-center gap-5">
+                                    <div className="h-14 w-14 rounded-[1.25rem] bg-amber-500 flex items-center justify-center text-white shadow-xl shadow-amber-500/30">
+                                        <CreditCard size={28} />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-slate-900 dark:text-white border-none font-black text-xl p-0">Current Subscription</CardTitle>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Manage your service plan and usage limits</p>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-10 space-y-10">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Active Plan</p>
+                                        <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase">{tenant?.subscriptionPlan || 'TRIAL'}</h4>
+                                        <span className="inline-flex mt-3 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 text-[9px] font-black uppercase">Active Now</span>
+                                    </div>
+                                    <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Valid Until</p>
+                                        <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase">
+                                            {tenant?.expiryDate ? new Date(tenant.expiryDate).toLocaleDateString() : 'N/A'}
+                                        </h4>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase mt-2">Auto-renewal: Disabled</p>
+                                    </div>
+                                    <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">User Quota</p>
+                                        <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase">{tenant?.maxUsers || 5} Staff</h4>
+                                        <div className="w-full h-1.5 bg-slate-200 rounded-full mt-4 overflow-hidden">
+                                            <div className="h-full bg-amber-500 w-[60%]" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="p-8 rounded-[2rem] bg-slate-900 text-white relative overflow-hidden group">
+                                    <div className="relative z-10">
+                                        <h3 className="text-xl font-black uppercase tracking-tight">Upgrade your plan</h3>
+                                        <p className="text-slate-400 text-sm mt-2 max-w-md font-medium">Unlock advanced AI insights, unlimited staff accounts, and custom invoice templates with our Enterprise plan.</p>
+                                        <Button className="mt-8 bg-white text-slate-900 hover:bg-slate-100 px-8 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl">
+                                            View Pricing Models
+                                        </Button>
+                                    </div>
+                                    <Sparkles className="absolute -right-8 -bottom-8 text-white/5 group-hover:scale-110 transition-transform duration-700" size={300} />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
                     {activeTab === 'security' && (
                         <Card className="enterprise-card overflow-hidden">
-                            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                            <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                                 <CardTitle className="text-slate-900 border-none font-bold">Security & Privacy</CardTitle>
                                 <CardDescription className="text-slate-500 font-medium">Update your password and manage security settings.</CardDescription>
                             </CardHeader>
                             <CardContent className="p-8 space-y-8">
-                                {/* Local Honeypot to catch autofill within this card */}
-                                <div style={{ display: 'none' }} aria-hidden="true">
-                                    <input type="text" name="fake-username" tabIndex="-1" />
-                                    <input type="password" name="fake-password" tabIndex="-1" />
-                                </div>
-
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
                                     <div className="md:col-span-2">
-                                        <Input label="Current Password" type="password" placeholder="••••••••" autoComplete="current-password" />
+                                        <Input 
+                                            label="Current Password" 
+                                            type="password" 
+                                            placeholder="••••••••" 
+                                            autoComplete="current-password"
+                                            value={currentPassword}
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                        />
                                     </div>
-                                    <Input label="New Password" type="password" placeholder="••••••••" autoComplete="new-password" />
-                                    <Input label="Confirm New Password" type="password" placeholder="••••••••" autoComplete="new-password" />
-
+                                    <Input 
+                                        label="New Password" 
+                                        type="password" 
+                                        placeholder="••••••••" 
+                                        autoComplete="new-password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                    />
+                                    <Input 
+                                        label="Confirm New Password" 
+                                        type="password" 
+                                        placeholder="••••••••" 
+                                        autoComplete="new-password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                    />
+ 
                                     <div className="md:col-span-2 pt-4">
-                                        <Button className="bg-primary text-white px-10 font-bold rounded-xl h-12 shadow-xl shadow-primary/10 w-full md:w-auto">
+                                        <Button 
+                                            className="bg-primary text-white px-10 font-bold rounded-xl h-12 shadow-xl shadow-primary/10 w-full md:w-auto"
+                                            onClick={async () => {
+                                                if (!currentPassword || !newPassword || !confirmPassword) {
+                                                    setSuccessMsg(null);
+                                                    setErrorMsg('All fields are required.');
+                                                    return;
+                                                }
+                                                if (newPassword !== confirmPassword) {
+                                                    setSuccessMsg(null);
+                                                    setErrorMsg('New password and confirm password do not match.');
+                                                    return;
+                                                }
+                                                if (newPassword.length < 6) {
+                                                    setSuccessMsg(null);
+                                                    setErrorMsg('Password must be at least 6 characters long.');
+                                                    return;
+                                                }
+                                                
+                                                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                                                try {
+                                                    // Use updateProfile to update password
+                                                    await userService.updateProfile(user.id, { 
+                                                        name: user.name, 
+                                                        phone: user.phone, 
+                                                        email: user.email,
+                                                        password: newPassword,
+                                                        currentPassword: currentPassword
+                                                    });
+                                                    setSuccessMsg('Password changed successfully.');
+                                                    setErrorMsg(null);
+                                                    setCurrentPassword('');
+                                                    setNewPassword('');
+                                                    setConfirmPassword('');
+                                                } catch (err) {
+                                                    setSuccessMsg(null);
+                                                    setErrorMsg(err.message || 'Failed to change password.');
+                                                }
+                                            }}
+                                        >
                                             Change Password
                                         </Button>
                                     </div>

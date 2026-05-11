@@ -319,7 +319,7 @@ export default function StaffDetails() {
                 <div className="lg:col-span-2 space-y-8">
                     {/* Attendance History */}
                     <Card className="enterprise-card overflow-hidden">
-                        <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                        <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <CardTitle className="text-slate-900 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
@@ -391,7 +391,7 @@ export default function StaffDetails() {
 
                     {/* Advance History */}
                     <Card className="enterprise-card overflow-hidden">
-                        <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                        <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <CardTitle className="text-slate-900 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
