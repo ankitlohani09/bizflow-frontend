@@ -99,13 +99,13 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
                 ) : (
                     <>
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
                                 <Package size={14} className="text-slate-400" /> Select Item
                             </label>
                             <select
                                 value={form.itemId}
                                 onChange={(e) => setForm({ ...form, itemId: e.target.value })}
-                                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                                 required
                                 disabled={!!initialItem}
                             >
@@ -120,13 +120,13 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
                                     <ArrowRightLeft size={14} className="text-slate-400" /> Type
                                 </label>
                                 <select
                                     value={form.movementType}
                                     onChange={(e) => setForm({ ...form, movementType: e.target.value })}
-                                    className="w-full rounded-lg border border-slate-200 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                    className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                                 >
                                     <option value="PURCHASE">Stock In (Purchase/Return)</option>
                                     <option value="SALE">Stock Out (Sale/Loss)</option>
@@ -167,14 +167,14 @@ export default function StockMovementModal({ isOpen, onClose, onSuccess, initial
                         )}
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
                                 Reason / Reference
                             </label>
                             <textarea
                                 value={form.reason}
                                 onChange={(e) => setForm({ ...form, reason: e.target.value })}
                                 placeholder="E.g. Damaged goods, Correction, Supplier return..."
-                                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                                 rows={2}
                             />
                         </div>

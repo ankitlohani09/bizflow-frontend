@@ -21,6 +21,7 @@ import {
 import invoiceService from '../services/invoiceService';
 import pdfExportService from '../services/pdfExportService';
 import MainLayout from '../layouts/MainLayout';
+import ReturnModal from '../components/ReturnModal';
 
 const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
@@ -32,6 +33,7 @@ export default function InvoiceDetails() {
     const [invoice, setInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
     const fetchInvoice = useCallback(async () => {
         setLoading(true);
@@ -108,21 +110,24 @@ export default function InvoiceDetails() {
                         <button onClick={handleWhatsAppShare} className="h-10 px-4 flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-lg text-xs font-bold text-emerald-600 hover:bg-emerald-100 transition-all">
                             <MessageCircle size={16} /> WhatsApp
                         </button>
+                        <button onClick={() => setIsReturnModalOpen(true)} className="h-10 px-4 flex items-center gap-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-900/50 rounded-lg text-xs font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-all">
+                            <RotateCcw size={16} /> Return
+                        </button>
                     </div>
                 </div>
 
                 {/* Receipt Card */}
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden">
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden dark:bg-slate-900 dark:border-slate-800 dark:shadow-none">
                     
                     {/* Branded Section */}
-                    <div className="p-10 flex flex-col md:flex-row justify-between items-start gap-10 border-b border-slate-100 bg-slate-50/50">
+                    <div className="p-10 flex flex-col md:flex-row justify-between items-start gap-10 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800">
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
                                 <div className="h-12 w-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
                                     <Receipt size={24} />
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none uppercase">
+                                    <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none uppercase">
                                         {localStorage.getItem('tenantName') || 'BIZFLOW'}
                                     </h1>
                                     <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-[0.2em] mt-1">Official Invoice</p>
@@ -135,7 +140,7 @@ export default function InvoiceDetails() {
                             </div>
                             <div className="space-y-1">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Invoice Number</p>
-                                <p className="text-xl font-black text-slate-900 font-mono">#{invoice.invoiceNumber || invoice.id}</p>
+                                <p className="text-xl font-black text-slate-900 dark:text-white font-mono">#{invoice.invoiceNumber || invoice.id}</p>
                             </div>
                         </div>
                     </div>
@@ -148,7 +153,7 @@ export default function InvoiceDetails() {
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                                         <User size={12} /> Billed To
                                     </p>
-                                    <h3 className="text-lg font-black text-slate-900 uppercase">
+                                    <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase">
                                         {invoice.customerName || invoice.customer?.name || 'Walk-in Customer'}
                                     </h3>
                                     <div className="mt-3 space-y-2">
@@ -170,7 +175,7 @@ export default function InvoiceDetails() {
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                                         <Calendar size={12} /> Issue Date
                                     </p>
-                                    <p className="text-sm font-black text-slate-800">
+                                    <p className="text-sm font-black text-slate-800 dark:text-white">
                                         {new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString('en-IN', { 
                                             day: '2-digit', month: 'long', year: 'numeric' 
                                         })}
@@ -180,7 +185,7 @@ export default function InvoiceDetails() {
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                                         <FileText size={12} /> Transaction
                                     </p>
-                                    <p className="text-sm font-black text-slate-800">SALE / RETAIL</p>
+                                    <p className="text-sm font-black text-slate-800 dark:text-white">SALE / RETAIL</p>
                                 </div>
                             </div>
                         </div>
@@ -189,7 +194,7 @@ export default function InvoiceDetails() {
                         <div className="mb-12">
                             <table className="w-full text-left">
                                 <thead>
-                                    <tr className="border-b-2 border-slate-900 text-[10px] font-bold uppercase tracking-widest text-slate-900">
+                                    <tr className="border-b-2 border-slate-900 dark:border-slate-700 text-[10px] font-bold uppercase tracking-widest text-slate-900 dark:text-slate-400">
                                         <th className="pb-4">Item Detail</th>
                                         <th className="pb-4 text-center">Qty</th>
                                         <th className="pb-4 text-right">Unit Price</th>
@@ -200,12 +205,12 @@ export default function InvoiceDetails() {
                                     {invoice.items?.map((item, i) => (
                                         <tr key={i} className="group">
                                             <td className="py-6">
-                                                <p className="font-bold text-slate-800">{item.itemName || 'Product'}</p>
+                                                <p className="font-bold text-slate-800 dark:text-white">{item.itemName || 'Product'}</p>
                                                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">SKU: {item.sku || 'N/A'}</p>
                                             </td>
-                                            <td className="py-6 text-center font-bold text-slate-600">{item.quantity}</td>
-                                            <td className="py-6 text-right font-semibold text-slate-600">{fmt(item.unitPrice)}</td>
-                                            <td className="py-6 text-right font-black text-slate-900">{fmt(item.lineTotal || (item.quantity * item.unitPrice))}</td>
+                                            <td className="py-6 text-center font-bold text-slate-600 dark:text-slate-300">{item.quantity}</td>
+                                            <td className="py-6 text-right font-semibold text-slate-600 dark:text-slate-300">{fmt(item.unitPrice)}</td>
+                                            <td className="py-6 text-right font-black text-slate-900 dark:text-white">{fmt(item.lineTotal || (item.quantity * item.unitPrice))}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -213,16 +218,16 @@ export default function InvoiceDetails() {
                         </div>
 
                         {/* Totals Section */}
-                        <div className="flex flex-col md:flex-row justify-between items-end gap-10 pt-10 border-t border-slate-100">
+                        <div className="flex flex-col md:flex-row justify-between items-end gap-10 pt-10 border-t border-slate-100 dark:border-slate-700">
                             <div className="max-w-[400px]">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Internal Note</p>
-                                <p className="text-xs font-medium text-slate-500 leading-relaxed italic">
+                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed italic">
                                     {invoice.notes || "No special instructions provided for this transaction."}
                                 </p>
                             </div>
                             <div className="w-full md:w-80 space-y-4">
-                                <div className="space-y-2 border-b border-slate-100 pb-4">
-                                    <div className="flex justify-between text-sm font-semibold text-slate-500">
+                                <div className="space-y-2 border-b border-slate-100 dark:border-slate-700 pb-4">
+                                    <div className="flex justify-between text-sm font-semibold text-slate-500 dark:text-slate-400">
                                         <span>Subtotal</span>
                                         <span>{fmt(invoice.subtotal)}</span>
                                     </div>
@@ -239,7 +244,7 @@ export default function InvoiceDetails() {
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount Payable</span>
-                                    <span className="text-4xl font-black text-slate-900 tracking-tighter">{fmt(invoice.grandTotal)}</span>
+                                    <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{fmt(invoice.grandTotal)}</span>
                                 </div>
                                 <div className="p-4 rounded-2xl bg-indigo-600 text-white shadow-xl shadow-indigo-600/20">
                                     <div className="flex justify-between items-center">
@@ -252,7 +257,7 @@ export default function InvoiceDetails() {
                     </div>
 
                     {/* Footer */}
-                    <div className="p-10 bg-slate-50/50 border-t border-slate-100 text-center space-y-3 no-print">
+                    <div className="p-10 bg-slate-50/50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 text-center space-y-3 no-print">
                         <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Authorized Digital Document</p>
                         <p className="text-[10px] font-medium text-slate-400 max-w-sm mx-auto leading-relaxed">
                             This receipt is electronically generated by BizFlow POS. No signature required. 
@@ -261,6 +266,14 @@ export default function InvoiceDetails() {
                     </div>
                 </div>
             </div>
+            <ReturnModal 
+                isOpen={isReturnModalOpen} 
+                onClose={() => setIsReturnModalOpen(false)} 
+                onSuccess={() => {
+                    navigate('/returns');
+                }} 
+                invoice={invoice} 
+            />
         </MainLayout>
     );
 }

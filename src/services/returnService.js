@@ -21,6 +21,21 @@ const returnService = {
    */
   getReturnHistory() {
     return api.get('/returns');
+  },
+
+  /**
+   * Fetch a specific return by ID
+   */
+  getById(id) {
+    return api.get(`/returns/${id}`);
+  },
+
+  approve(id, overrideRefund) {
+    return api.post(`/returns/${id}/approve`, null, { params: { overrideRefund } });
+  },
+
+  reject(id, reason) {
+    return api.post(`/returns/${id}/reject`, null, { params: { reason } });
   }
 };
 

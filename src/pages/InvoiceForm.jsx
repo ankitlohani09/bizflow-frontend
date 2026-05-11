@@ -47,9 +47,9 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-                <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-slate-700 uppercase tracking-widest">Quick Register Customer</h3>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-slate-700 dark:text-white uppercase tracking-widest">Quick Register Customer</h3>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
                 </div>
                 <form onSubmit={handleSave} className="p-6 space-y-4">
@@ -59,7 +59,7 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name *</label>
                         <div className="relative">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
-                            <input autoFocus value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold" placeholder="Customer Name" />
+                            <input autoFocus value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold dark:bg-slate-800 dark:border-slate-700 dark:text-white" placeholder="Customer Name" />
                         </div>
                     </div>
 
@@ -67,7 +67,7 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Mobile Number *</label>
                         <div className="relative">
                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
-                            <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold" placeholder="10-digit Mobile" />
+                            <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold dark:bg-slate-800 dark:border-slate-700 dark:text-white" placeholder="10-digit Mobile" />
                         </div>
                     </div>
 
@@ -75,7 +75,7 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Shipping Address</label>
                         <div className="relative">
                             <MapPin className="absolute left-3 top-3 text-slate-300" size={14} />
-                            <textarea rows={2} value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className="w-full pl-9 pr-4 pt-2 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold resize-none" placeholder="Enter full address" />
+                            <textarea rows={2} value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className="w-full pl-9 pr-4 pt-2 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold resize-none dark:bg-slate-800 dark:border-slate-700 dark:text-white" placeholder="Enter full address" />
                         </div>
                     </div>
 
@@ -305,13 +305,13 @@ export default function InvoiceForm() {
                 onSuccess={(c) => { setCustomers(p => [c, ...p]); selectCustomer(c); }} 
             />
             
-            <div className="h-[calc(100vh-64px)] bg-slate-50/50 overflow-hidden">
+            <div className="h-[calc(100vh-64px)] bg-slate-50/50 dark:bg-slate-950/50 overflow-hidden">
                 <div className="max-w-[1700px] mx-auto h-full px-4 pt-4 flex flex-col">
 
                     {/* ── Compact Header ── */}
                     <div className="flex items-center justify-between mb-4 px-2">
                         <div className="flex items-center gap-4">
-                            <h1 className="text-lg font-bold text-slate-800 tracking-tight">POS Terminal</h1>
+                            <h1 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight">POS Terminal</h1>
                             <div className="flex items-center gap-2 px-2 py-0.5 bg-indigo-50 border border-indigo-100 rounded text-[10px] font-bold text-indigo-600 uppercase tracking-widest">
                                 <Database size={10} /> Active Inventory
                             </div>
@@ -327,7 +327,7 @@ export default function InvoiceForm() {
                         
                         {/* ── LEFT COLUMN ── */}
                         <div className="flex-[8] flex flex-col gap-4 min-w-0">
-                            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+                            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 dark:bg-slate-900 dark:border-slate-800">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div id="item-search-box" className="relative">
                                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
@@ -338,15 +338,15 @@ export default function InvoiceForm() {
                                             value={itemSearch}
                                             onChange={(e) => { setItemSearch(e.target.value); setShowItemDropdown(true); }}
                                             onFocus={() => setShowItemDropdown(true)}
-                                            className="w-full h-10 pl-10 pr-4 rounded border border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none text-sm font-semibold transition-all shadow-inner"
+                                            className="w-full h-10 pl-10 pr-4 rounded border border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none text-sm font-semibold transition-all shadow-inner dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:focus:bg-slate-900"
                                         />
                                         {showItemDropdown && (
-                                            <div className="absolute top-full mt-1 left-0 right-0 bg-white rounded-lg shadow-xl border border-slate-200 z-50 overflow-hidden">
+                                            <div className="absolute top-full mt-1 left-0 right-0 bg-white rounded-lg shadow-xl border border-slate-200 z-50 overflow-hidden dark:bg-slate-800 dark:border-slate-700">
                                                 {filteredInventory.map(p => (
-                                                    <button key={p.itemId} type="button" onClick={() => addItemToCart(p)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 border-b last:border-0 group">
+                                                    <button key={p.itemId} type="button" onClick={() => addItemToCart(p)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 border-b border-slate-50 dark:border-slate-700 last:border-0 group">
                                                         <div className="text-left">
-                                                            <p className="text-sm font-bold text-slate-900">{p.itemName}</p>
-                                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{p.sku}</p>
+                                                            <p className="text-sm font-bold text-slate-900 dark:text-white">{p.itemName}</p>
+                                                            <p className="text-[10px] text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest">{p.sku}</p>
                                                         </div>
                                                         <div className="flex items-center gap-4">
                                                             <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Stock: {p.availableQty}</span>
@@ -359,20 +359,20 @@ export default function InvoiceForm() {
                                     </div>
                                     <div className="relative">
                                         <Barcode className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-                                        <input type="text" placeholder="Barcode Entry..." value={barcode} onChange={(e) => setBarcode(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleBarcodeScan(e)} className="w-full h-10 pl-10 pr-4 rounded border border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none text-sm transition-all shadow-inner" />
+                                        <input type="text" placeholder="Barcode Entry..." value={barcode} onChange={(e) => setBarcode(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleBarcodeScan(e)} className="w-full h-10 pl-10 pr-4 rounded border border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none text-sm transition-all shadow-inner dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:focus:bg-slate-900" />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex-1 bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col min-h-0">
-                                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                            <div className="flex-1 bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col min-h-0 dark:bg-slate-900 dark:border-slate-800">
+                                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50 dark:border-slate-800">
                                     <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-tight">
                                         <ShoppingCart size={16} className="text-slate-400" /> Billing Items
                                     </div>
                                 </div>
                                 <div className="flex-1 overflow-auto custom-scrollbar">
                                     <table className="w-full text-left text-xs border-collapse">
-                                        <thead className="sticky top-0 bg-white shadow-sm z-10 text-slate-400 font-bold uppercase text-[9px] tracking-widest border-b border-slate-100">
+                                        <thead className="sticky top-0 bg-white shadow-sm z-10 text-slate-400 font-bold uppercase text-[9px] tracking-widest border-b border-slate-100 dark:bg-slate-900 dark:border-slate-800">
                                             <tr>
                                                 <th className="px-4 py-3">Item Detail</th>
                                                 <th className="px-4 py-3 text-center">Stock</th>
@@ -382,32 +382,32 @@ export default function InvoiceForm() {
                                                 <th className="px-4 py-3 text-center"></th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-50">
+                                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                                             {form.items.map((item, index) => (
-                                                <tr key={index} className="hover:bg-slate-50/50 transition-colors">
+                                                <tr key={index} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                                                     <td className="px-4 py-3">
-                                                        <p className="font-bold text-slate-800 leading-tight truncate max-w-[200px]">{item.itemName}</p>
+                                                        <p className="font-bold text-slate-800 dark:text-slate-200 leading-tight truncate max-w-[200px]">{item.itemName}</p>
                                                         <p className="text-[9px] text-slate-400 font-bold uppercase">{item.sku}</p>
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
-                                                        <span className={cn("px-2 py-0.5 rounded text-[9px] font-bold", item.stock < 10 ? 'bg-rose-50 text-rose-500' : 'bg-slate-50 text-slate-500')}>
+                                                        <span className={cn("px-2 py-0.5 rounded text-[9px] font-bold", item.stock < 10 ? 'bg-rose-50 text-rose-500 dark:bg-rose-950/20 dark:text-rose-400' : 'bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400')}>
                                                             {item.stock}
                                                         </span>
                                                     </td>
-                                                    <td className="px-4 py-3 font-semibold text-slate-600 tabular-nums">{fmt(item.unitPrice)}</td>
-                                                    <td className="px-4 py-3 font-bold text-slate-900 tabular-nums">{fmt(item.subtotal)}</td>
+                                                    <td className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300 tabular-nums">{fmt(item.unitPrice)}</td>
+                                                    <td className="px-4 py-3 font-bold text-slate-900 dark:text-white tabular-nums">{fmt(item.subtotal)}</td>
                                                     <td className="px-4 py-3">
                                                         <div className="flex items-center justify-center gap-2">
-                                                            <button type="button" onClick={() => updateItemField(index, 'quantity', Math.max(1, Number(item.quantity) - 1))} className="h-6 w-6 border border-slate-200 rounded flex items-center justify-center text-slate-400 hover:text-indigo-600"><Minus size={12} /></button>
+                                                            <button type="button" onClick={() => updateItemField(index, 'quantity', Math.max(1, Number(item.quantity) - 1))} className="h-6 w-6 border border-slate-200 dark:border-slate-700 rounded flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-indigo-600"><Minus size={12} /></button>
                                                             <input type="number" value={item.quantity} onChange={(e) => updateItemField(index, 'quantity', e.target.value)} className="w-8 text-center font-bold text-xs bg-transparent outline-none" />
-                                                            <button type="button" onClick={() => updateItemField(index, 'quantity', Number(item.quantity) + 1)} className="h-6 w-6 border border-slate-200 rounded flex items-center justify-center text-slate-400 hover:text-indigo-600"><Plus size={12} /></button>
+                                                            <button type="button" onClick={() => updateItemField(index, 'quantity', Number(item.quantity) + 1)} className="h-6 w-6 border border-slate-200 dark:border-slate-700 rounded flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-indigo-600"><Plus size={12} /></button>
                                                         </div>
                                                     </td>
                                                     <td className="px-4 py-3 text-center"><button type="button" onClick={() => removeItem(index)} className="text-slate-200 hover:text-rose-500"><Trash2 size={16} /></button></td>
                                                 </tr>
                                             ))}
                                             {form.items.length === 0 && (
-                                                <tr><td colSpan="6" className="px-4 py-20 text-center text-slate-300 font-bold uppercase text-[9px] tracking-widest">Cart is empty</td></tr>
+                                                <tr><td colSpan="6" className="px-4 py-20 text-center text-slate-300 dark:text-slate-600 font-bold uppercase text-[9px] tracking-widest">Cart is empty</td></tr>
                                             )}
                                         </tbody>
                                     </table>
@@ -417,43 +417,43 @@ export default function InvoiceForm() {
 
                         {/* ── RIGHT COLUMN ── */}
                         <div className="flex-[4] flex flex-col gap-4 min-w-[350px]">
-                            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 space-y-4">
+                            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 space-y-4 dark:bg-slate-900 dark:border-slate-800">
                                 <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-tight"><Users size={16} className="text-indigo-600" /> Customer</div>
+                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-white uppercase tracking-tight"><Users size={16} className="text-indigo-600" /> Customer</div>
                                     <button type="button" onClick={() => setIsQuickAddOpen(true)} className="flex items-center gap-1 text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded hover:bg-indigo-600 hover:text-white transition-all"><Plus size={12} /> QUICK ADD</button>
                                 </div>
                                 <div id="customer-search-box" className="space-y-2 relative">
                                     <div className="relative">
                                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
-                                        <input type="text" placeholder={form.customerName} value={customerSearch} onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); }} onFocus={() => setShowCustomerDropdown(true)} className="w-full h-9 pl-9 pr-3 rounded border border-slate-200 bg-slate-50 outline-none text-xs font-bold text-slate-700 focus:bg-white" />
+                                        <input type="text" placeholder={form.customerName} value={customerSearch} onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); }} onFocus={() => setShowCustomerDropdown(true)} className="w-full h-9 pl-9 pr-3 rounded border border-slate-200 bg-slate-50 outline-none text-xs font-bold text-slate-700 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:focus:bg-slate-900" />
                                         {showCustomerDropdown && (
-                                            <div className="absolute top-full mt-1 left-0 w-full bg-white rounded-lg shadow-xl border border-slate-200 z-[100] overflow-hidden">
-                                                <button type="button" onClick={() => selectCustomer('walk-in')} className="w-full text-left px-3 py-2.5 hover:bg-slate-50 border-b border-slate-50 flex items-center gap-2"><Users size={12} className="text-indigo-600" /><span className="text-xs font-bold">Walk-in Customer</span></button>
+                                            <div className="absolute top-full mt-1 left-0 w-full bg-white rounded-lg shadow-xl border border-slate-200 z-[100] overflow-hidden dark:bg-slate-800 dark:border-slate-700">
+                                                <button type="button" onClick={() => selectCustomer('walk-in')} className="w-full text-left px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700/50 border-b border-slate-50 dark:border-slate-700 flex items-center gap-2"><Users size={12} className="text-indigo-600" /><span className="text-xs font-bold dark:text-white">Walk-in Customer</span></button>
                                                 {filteredCustomers.map(c => (
-                                                    <button key={c.id} type="button" onClick={() => selectCustomer(c)} className="w-full text-left px-3 py-2 hover:bg-slate-50 border-b border-slate-50 last:border-0"><p className="text-xs font-bold">{c.name}</p><p className="text-[9px] text-slate-400">{c.phone}</p></button>
+                                                    <button key={c.id} type="button" onClick={() => selectCustomer(c)} className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 border-b border-slate-50 dark:border-slate-700 last:border-0"><p className="text-xs font-bold dark:text-white">{c.name}</p><p className="text-[9px] text-slate-400 dark:text-slate-400">{c.phone}</p></button>
                                                 ))}
                                             </div>
                                         )}
                                     </div>
                                     {form.customerPhone && (
-                                        <div className="p-3 bg-slate-50 rounded border border-slate-100 space-y-1.5">
-                                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600"><Phone size={10} className="text-indigo-500" /> {form.customerPhone}</div>
+                                        <div className="p-3 bg-slate-50 rounded border border-slate-100 space-y-1.5 dark:bg-slate-800 dark:border-slate-700">
+                                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600 dark:text-slate-300"><Phone size={10} className="text-indigo-500" /> {form.customerPhone}</div>
                                             {form.customerAddress && <div className="flex items-start gap-2 text-[10px] font-bold text-slate-500"><MapPin size={10} className="text-indigo-500 mt-0.5 shrink-0" /> <span className="leading-relaxed">{form.customerAddress}</span></div>}
                                         </div>
                                     )}
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Date</label>
-                                    <input type="date" value={form.invoiceDate} onChange={(e) => setForm(p => ({ ...p, invoiceDate: e.target.value }))} className="w-full h-9 px-3 rounded border border-slate-200 bg-slate-50 outline-none text-xs font-bold text-slate-700" />
+                                    <input type="date" value={form.invoiceDate} onChange={(e) => setForm(p => ({ ...p, invoiceDate: e.target.value }))} className="w-full h-9 px-3 rounded border border-slate-200 bg-slate-50 outline-none text-xs font-bold text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
                                 </div>
                             </div>
 
-                            <div className="flex-1 bg-white rounded-lg shadow-sm border border-slate-200 p-4 flex flex-col gap-4 min-h-0 overflow-visible">
-                                <div className="space-y-2.5 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                    <div className="flex justify-between text-slate-500 font-bold text-[10px] uppercase"><span>Subtotal</span><span className="text-slate-800 tabular-nums">{fmt(totals.subtotal)}</span></div>
+                            <div className="flex-1 bg-white rounded-lg shadow-sm border border-slate-200 p-4 flex flex-col gap-4 min-h-0 overflow-visible dark:bg-slate-900 dark:border-slate-800">
+                                <div className="space-y-2.5 bg-slate-50 p-3 rounded-lg border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                                    <div className="flex justify-between text-slate-500 font-bold text-[10px] uppercase"><span>Subtotal</span><span className="text-slate-800 dark:text-slate-200 tabular-nums">{fmt(totals.subtotal)}</span></div>
                                     <div className="flex justify-between text-slate-500 font-bold text-[10px] uppercase"><span>Tax (GST)</span><span className="text-indigo-600 tabular-nums">+{fmt(totals.taxAmount)}</span></div>
-                                    <div className="pt-2 border-t border-slate-200 flex justify-between items-center"><span className="text-[10px] font-bold text-slate-400 uppercase">Discount</span><div className="flex items-center bg-white border border-slate-200 rounded px-2 py-0.5"><span className="text-[9px] text-slate-300 mr-1">₹</span><input type="number" value={form.discountAmount} onChange={(e) => setForm(p => ({ ...p, discountAmount: e.target.value }))} className="w-16 text-right font-bold text-xs outline-none" /></div></div>
-                                    <div className="pt-2 flex justify-between items-center border-t border-slate-200"><span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Amount Payable</span><span className="text-2xl font-black text-slate-900 tabular-nums">{fmt(totals.grandTotal)}</span></div>
+                                    <div className="pt-2 border-t border-slate-200 flex justify-between items-center"><span className="text-[10px] font-bold text-slate-400 uppercase">Discount</span><div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-0.5"><span className="text-[9px] text-slate-300 mr-1">₹</span><input type="number" value={form.discountAmount} onChange={(e) => setForm(p => ({ ...p, discountAmount: e.target.value }))} className="w-16 text-right font-bold text-xs outline-none" /></div></div>
+                                    <div className="pt-2 flex justify-between items-center border-t border-slate-200 dark:border-slate-700"><span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Amount Payable</span><span className="text-2xl font-black text-slate-900 dark:text-slate-100 tabular-nums">{fmt(totals.grandTotal)}</span></div>
                                 </div>
 
                                 <div className="flex-1 min-h-0 overflow-auto custom-scrollbar space-y-2">
@@ -461,13 +461,13 @@ export default function InvoiceForm() {
                                     {form.splitPayments.length === 0 ? (
                                         <div className="grid grid-cols-2 gap-2">
                                             {paymentModes.map(mode => (
-                                                <button key={mode.id} type="button" onClick={() => setForm(p => ({ ...p, selectedPaymentModeId: mode.id }))} className={cn("px-3 py-3 rounded border text-[10px] font-bold uppercase transition-all", form.selectedPaymentModeId === mode.id ? "bg-indigo-600 border-indigo-600 text-white shadow-md" : "bg-white border-slate-200 text-slate-500 hover:border-indigo-100")}>{mode.name}</button>
+                                                <button key={mode.id} type="button" onClick={() => setForm(p => ({ ...p, selectedPaymentModeId: mode.id }))} className={cn("px-3 py-3 rounded border text-[10px] font-bold uppercase transition-all", form.selectedPaymentModeId === mode.id ? "bg-indigo-600 border-indigo-600 text-white shadow-md" : "bg-white border-slate-200 text-slate-500 hover:border-indigo-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:border-slate-600")}>{mode.name}</button>
                                             ))}
                                         </div>
                                     ) : (
                                         <div className="space-y-2">
                                             {form.splitPayments.map((sp, idx) => (
-                                                <div key={sp.paymentModeId} className="flex items-center justify-between bg-slate-50 px-3 py-1.5 rounded border border-slate-100 text-[10px] font-bold"><span className="text-slate-400 uppercase">{sp.name}</span><input type="number" value={sp.amount} onChange={(e) => setForm(p => ({ ...p, splitPayments: p.splitPayments.map((s, i) => i === idx ? { ...s, amount: Number(e.target.value) } : s) }))} className="w-20 text-right bg-transparent outline-none" /></div>
+                                                <div key={sp.paymentModeId} className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded border border-slate-100 dark:border-slate-700 text-[10px] font-bold"><span className="text-slate-400 uppercase">{sp.name}</span><input type="number" value={sp.amount} onChange={(e) => setForm(p => ({ ...p, splitPayments: p.splitPayments.map((s, i) => i === idx ? { ...s, amount: Number(e.target.value) } : s) }))} className="w-20 text-right bg-transparent outline-none dark:text-white" /></div>
                                             ))}
                                         </div>
                                     )}

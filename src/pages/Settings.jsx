@@ -18,7 +18,8 @@ import {
     X,
     Percent,
     MapPin,
-    Camera
+    Camera,
+    ChefHat
 } from 'lucide-react';
 import tenantService from '../services/tenantService';
 import MainLayout from '../layouts/MainLayout';
@@ -41,7 +42,9 @@ import userService from '../services/userService';
 export default function Settings() {
     const location = useLocation();
     const { branding, updateBranding } = useTheme();
-    const [activeTab, setActiveTab] = useState('master');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const isManagerOrOwner = user.roles?.includes('MANAGER') || user.roles?.includes('OWNER');
+    const [activeTab, setActiveTab] = useState(isManagerOrOwner ? 'master' : 'account');
 
     // Handle tab switching from navigation state
     useEffect(() => {
@@ -204,7 +207,12 @@ export default function Settings() {
                         { id: 'branding', label: 'Logo & Branding', icon: Palette },
                         { id: 'account', label: 'My Profile', icon: User },
                         { id: 'security', label: 'Security & Access', icon: ShieldCheck },
-                    ].map((tab) => (
+                    ].filter(tab => {
+                        if (!isManagerOrOwner) {
+                            return ['account', 'security'].includes(tab.id);
+                        }
+                        return true;
+                    }).map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
@@ -251,7 +259,7 @@ export default function Settings() {
                                                 placeholder="e.g. UPI, Digital Wallet, Cash"
                                                 value={newModeName}
                                                 onChange={(e) => setNewModeName(e.target.value)}
-                                                className="flex-1 bg-slate-50 border-none h-12 rounded-2xl font-bold"
+                                                className="flex-1 bg-slate-50 dark:bg-slate-800 border-none h-12 rounded-2xl font-bold dark:text-white"
                                             />
                                             <Button type="submit" className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest text-[10px]">
                                                 {editingPm ? 'Update' : 'Add'}
@@ -291,8 +299,8 @@ export default function Settings() {
                                     </CardHeader>
                                     <CardContent className="p-8">
                                         <form onSubmit={handleAddTaxRule} className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-8">
-                                            <div className="md:col-span-5"><Input placeholder="Rule Label" value={newTaxRule.name} onChange={(e) => setNewTaxRule({ ...newTaxRule, name: e.target.value })} className="h-12 bg-slate-50 border-none font-bold" /></div>
-                                            <div className="md:col-span-4"><Input type="number" placeholder="Rate %" value={newTaxRule.rate} onChange={(e) => setNewTaxRule({ ...newTaxRule, rate: e.target.value })} className="h-12 bg-slate-50 border-none font-bold" /></div>
+                                            <div className="md:col-span-5"><Input placeholder="Rule Label" value={newTaxRule.name} onChange={(e) => setNewTaxRule({ ...newTaxRule, name: e.target.value })} className="h-12 bg-slate-50 dark:bg-slate-800 border-none font-bold dark:text-white" /></div>
+                                            <div className="md:col-span-4"><Input type="number" placeholder="Rate %" value={newTaxRule.rate} onChange={(e) => setNewTaxRule({ ...newTaxRule, rate: e.target.value })} className="h-12 bg-slate-50 dark:bg-slate-800 border-none font-bold dark:text-white" /></div>
                                             <div className="md:col-span-3"><Button type="submit" className="h-12 w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black uppercase tracking-widest text-[10px]">Add Rule</Button></div>
                                         </form>
 
@@ -309,6 +317,47 @@ export default function Settings() {
                                                     <button onClick={() => handleDeleteTaxRule(rule.id)} className="p-2 text-slate-300 hover:text-rose-500 transition-colors"><Trash2 size={16} /></button>
                                                 </div>
                                             ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* App Modules - Feature Toggles */}
+                                <Card className="border-none bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] overflow-hidden group mt-6">
+                                    <CardHeader className="p-8 border-b border-slate-50 dark:border-slate-800 bg-gradient-to-r from-amber-50/50 to-transparent">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-12 w-12 rounded-2xl bg-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/20 rotate-3 group-hover:rotate-0 transition-transform">
+                                                <ChefHat size={22} />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-slate-900 dark:text-white border-none font-black text-lg p-0">App Modules</CardTitle>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Enable or disable features</p>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="p-8 space-y-6">
+                                        <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:bg-amber-50/50 transition-all">
+                                            <div className="flex items-center gap-5">
+                                                <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-700 flex items-center justify-center text-amber-600 shadow-sm">
+                                                    <ChefHat size={24} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Kitchen Module</p>
+                                                    <p className="text-[10px] text-slate-400 font-bold mt-1">Enable Kitchen Orders for Restaurant mode</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                disabled={tenantSaving}
+                                                onClick={() => handleUpdateTenantSetting('isKitchenEnabled', !tenant?.isKitchenEnabled)}
+                                                className={cn(
+                                                    "h-8 w-14 rounded-full relative transition-all duration-500",
+                                                    tenant?.isKitchenEnabled ? "bg-indigo-600 shadow-lg shadow-indigo-200" : "bg-slate-200"
+                                                )}
+                                            >
+                                                <div className={cn(
+                                                    "absolute top-1.5 h-5 w-5 bg-white rounded-full shadow-md transition-all duration-500",
+                                                    tenant?.isKitchenEnabled ? "left-7.5" : "left-1.5"
+                                                )} />
+                                            </button>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -414,7 +463,7 @@ export default function Settings() {
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-slate-700 uppercase">Registered Address</label>
                                     <textarea
-                                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all"
+                                        className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all dark:text-white"
                                         rows={3}
                                         defaultValue="123, Tech Plaza, BKC, Mumbai, Maharashtra 400051"
                                     />
@@ -465,7 +514,7 @@ export default function Settings() {
                                 </div>
 
                                 <div
-                                    className="p-8 rounded-3xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-white transition-all overflow-hidden relative"
+                                    className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition-all overflow-hidden relative"
                                     onClick={() => document.getElementById('logo-upload').click()}
                                 >
                                     {localBranding.logoUrl ? (
@@ -481,10 +530,10 @@ export default function Settings() {
                                         </div>
                                     ) : (
                                         <>
-                                            <div className="h-16 w-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-slate-300 group-hover:text-blue-500 transition-colors">
+                                            <div className="h-16 w-16 rounded-2xl bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center text-slate-300 group-hover:text-blue-500 transition-colors">
                                                 <ImageIcon size={32} />
                                             </div>
-                                            <p className="mt-4 text-xs font-black text-slate-900 uppercase tracking-tighter">Upload Company Logo</p>
+                                            <p className="mt-4 text-xs font-black text-slate-900 dark:text-white uppercase tracking-tighter">Upload Company Logo</p>
                                             <p className="text-[10px] text-slate-400 font-bold mt-1">PNG or SVG, max 500kb</p>
                                         </>
                                     )}
@@ -549,7 +598,7 @@ export default function Settings() {
                                 {/* Profile Picture Section */}
                                 <div className="flex flex-col md:flex-row items-center gap-8">
                                     <div className="relative group">
-                                        <div className="h-32 w-32 rounded-[2.5rem] bg-indigo-50 border-4 border-white shadow-2xl shadow-indigo-500/10 flex items-center justify-center overflow-hidden">
+                                        <div className="h-32 w-32 rounded-[2.5rem] bg-indigo-50 dark:bg-indigo-950/20 border-4 border-white dark:border-slate-800 shadow-2xl shadow-indigo-500/10 flex items-center justify-center overflow-hidden">
                                             {profilePictureUrl ? (
                                                 <img
                                                     src={(import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1') + profilePictureUrl}
@@ -597,7 +646,7 @@ export default function Settings() {
                                         />
                                     </div>
                                     <div className="space-y-2 text-center md:text-left">
-                                        <h3 className="text-lg font-black text-slate-900">Your Avatar</h3>
+                                        <h3 className="text-lg font-black text-slate-900 dark:text-white">Your Avatar</h3>
                                         <p className="text-xs font-medium text-slate-500 max-w-xs leading-relaxed">
                                             Click on the image to upload a new profile picture. Recommended size is 256x256px. Max size: 1MB.
                                         </p>

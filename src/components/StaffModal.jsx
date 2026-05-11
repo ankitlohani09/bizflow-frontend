@@ -18,7 +18,7 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
 
     const [form, setForm] = useState({
         name: '',
-        role: 'USER',
+        role: 'CASHIER',
         email: '',
         phone: '',
         salary: '',
@@ -46,7 +46,7 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
             } catch (err) {
                 console.error('Failed to fetch roles:', err);
                 // Fallback to basic roles if API fails (Excluding OWNER)
-                setRoles(['MANAGER', 'USER']);
+                setRoles(['MANAGER', 'CASHIER']);
             } finally {
                 setLoadingRoles(false);
             }
@@ -62,7 +62,7 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
             if (staff) {
                 setForm({
                     name: staff.name || '',
-                    role: staff.role || 'USER',
+                    role: staff.role || 'CASHIER',
                     email: staff.email || '',
                     phone: staff.phone || '',
                     salary: staff.salary || '',
@@ -130,13 +130,13 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
                             <Briefcase size={14} className="text-slate-400" /> Professional Role
                         </label>
                         <select
                             value={form.role}
                             onChange={(e) => setForm({ ...form, role: e.target.value })}
-                            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:text-white"
                             required
                             disabled={loadingRoles}
                         >
@@ -197,7 +197,7 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
                         onChange={(e) => setForm({ ...form, pin: e.target.value })}
                     />
                     <div className="flex flex-col justify-end">
-                        <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition-colors">
+                        <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                             <input
                                 type="checkbox"
                                 className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
@@ -205,7 +205,7 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
                                 onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
                             />
                             <div className="flex flex-col">
-                                <span className="text-sm font-bold text-slate-700">Active Employment</span>
+                                <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Active Employment</span>
                                 <span className="text-[10px] text-slate-400 leading-tight">Disable to mark as former employee</span>
                             </div>
                         </label>
