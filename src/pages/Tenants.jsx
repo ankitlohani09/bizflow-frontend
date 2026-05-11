@@ -24,7 +24,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '.
 import tenantService from '../services/tenantService';
 import { cn } from '../utils/cn';
 import { toast } from 'react-hot-toast';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const BUSINESS_TYPES = [
     'Retail',
@@ -36,6 +36,7 @@ const BUSINESS_TYPES = [
 ];
 
 export default function Tenants() {
+    const navigate = useNavigate();
     const [tenants, setTenants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -49,7 +50,10 @@ export default function Tenants() {
         phone: '',
         address: '',
         businessType: 'Retail',
-        isActive: true
+        isActive: true,
+        subscriptionPlan: 'TRIAL',
+        expiryDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
+        maxUsers: 5
     });
 
     const fetchTenants = useCallback(async () => {
@@ -98,7 +102,10 @@ export default function Tenants() {
                 phone: '',
                 address: '',
                 businessType: 'Retail',
-                isActive: true
+                isActive: true,
+                subscriptionPlan: 'TRIAL',
+                expiryDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
+                maxUsers: 5
             });
             fetchTenants();
         } catch (error) {
@@ -185,8 +192,8 @@ export default function Tenants() {
                         <TableHeader>
                             <TableRow className="bg-slate-50/50 dark:bg-slate-800/20 hover:bg-transparent border-none">
                                 <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-8 h-14">Business Name</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 h-14">Type</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 h-14">Contact</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 h-14">Plan & Quota</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 h-14 text-center">Expiry</TableHead>
                                 <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 h-14 text-center">Status</TableHead>
                                 <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pr-8 h-14 text-right">Actions</TableHead>
                             </TableRow>
@@ -209,31 +216,45 @@ export default function Tenants() {
                                 </TableRow>
                             ) : (
                                 filteredTenants.map((tenant) => (
-                                    <TableRow key={tenant.id} className="dark:hover:bg-slate-800/30 border-slate-50 dark:border-slate-800/50 group h-20">
+                                    <TableRow 
+                                        key={tenant.id} 
+                                        onClick={() => navigate(`/tenants/${tenant.id}`)}
+                                        className="dark:hover:bg-slate-800/30 border-slate-50 dark:border-slate-800/50 group h-24 cursor-pointer"
+                                    >
                                         <TableCell className="pl-8">
                                             <div className="flex items-center gap-4">
                                                 <div className="h-10 w-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black">
                                                     {tenant.code}
                                                 </div>
                                                 <div>
-                                                    <p className="font-black text-slate-900 dark:text-white tracking-tight">{tenant.name}</p>
-                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{tenant.email}</p>
+                                                    <p className="font-black text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 transition-colors">{tenant.name}</p>
+                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{tenant.businessType}</p>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">
-                                                <Briefcase size={10} /> {tenant.businessType}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
                                             <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-bold">
-                                                    <Phone size={12} /> {tenant.phone || 'N/A'}
-                                                </div>
-                                                <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-bold">
-                                                    <MapPin size={12} className="shrink-0" /> <span className="truncate max-w-[150px]">{tenant.address || 'N/A'}</span>
-                                                </div>
+                                                <span className={cn(
+                                                    "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                                                    tenant.subscriptionPlan === 'ENTERPRISE' ? "bg-amber-500/10 text-amber-600 border border-amber-500/20" :
+                                                    tenant.subscriptionPlan === 'PRO' ? "bg-indigo-500/10 text-indigo-600 border border-indigo-500/20" :
+                                                    "bg-slate-500/10 text-slate-600 border border-slate-500/20"
+                                                )}>
+                                                    {tenant.subscriptionPlan || 'TRIAL'}
+                                                </span>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest ml-1">
+                                                    Max {tenant.maxUsers || 5} Users
+                                                </p>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            <div className="flex flex-col items-center">
+                                                <p className="text-xs font-black text-slate-700 dark:text-slate-300">
+                                                    {tenant.expiryDate ? new Date(tenant.expiryDate).toLocaleDateString() : 'N/A'}
+                                                </p>
+                                                {tenant.expiryDate && new Date(tenant.expiryDate) < new Date() && (
+                                                    <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">Expired</span>
+                                                )}
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center">
@@ -247,8 +268,14 @@ export default function Tenants() {
                                             </span>
                                         </TableCell>
                                         <TableCell className="pr-8 text-right">
-                                            <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
-                                                <MoreHorizontal className="h-5 w-5 text-slate-400" />
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(`/tenants/${tenant.id}`);
+                                                }}
+                                                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-500 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 ml-auto"
+                                            >
+                                                View <ArrowUpRight size={14} />
                                             </button>
                                         </TableCell>
                                     </TableRow>
@@ -328,12 +355,37 @@ export default function Tenants() {
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Subscription Plan</label>
+                                            <select 
+                                                name="subscriptionPlan"
+                                                value={formData.subscriptionPlan}
+                                                onChange={handleInputChange}
+                                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 font-bold text-slate-900 dark:text-white appearance-none cursor-pointer"
+                                            >
+                                                <option value="TRIAL">TRIAL (Free)</option>
+                                                <option value="PRO">PRO (Growth)</option>
+                                                <option value="ENTERPRISE">ENTERPRISE (Elite)</option>
+                                            </select>
+                                        </div>
                                         <InputField 
-                                            label="Phone Number"
-                                            name="phone"
-                                            value={formData.phone}
+                                            label="Max Users Allowed"
+                                            name="maxUsers"
+                                            type="number"
+                                            value={formData.maxUsers}
                                             onChange={handleInputChange}
-                                            placeholder="+91 9876543210"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <InputField 
+                                            label="Subscription Expiry"
+                                            name="expiryDate"
+                                            type="date"
+                                            value={formData.expiryDate}
+                                            onChange={handleInputChange}
+                                            required
                                         />
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Business Type</label>
@@ -350,13 +402,22 @@ export default function Tenants() {
                                         </div>
                                     </div>
 
-                                    <InputField 
-                                        label="Business Address"
-                                        name="address"
-                                        value={formData.address}
-                                        onChange={handleInputChange}
-                                        placeholder="Full business address..."
-                                    />
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <InputField 
+                                            label="Phone Number"
+                                            name="phone"
+                                            value={formData.phone}
+                                            onChange={handleInputChange}
+                                            placeholder="+91 9876543210"
+                                        />
+                                        <InputField 
+                                            label="Business Address"
+                                            name="address"
+                                            value={formData.address}
+                                            onChange={handleInputChange}
+                                            placeholder="Full business address..."
+                                        />
+                                    </div>
 
                                     <div className="pt-4 flex gap-4">
                                         <Button 

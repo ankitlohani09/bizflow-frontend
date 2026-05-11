@@ -5,16 +5,7 @@ import Button from './ui/Button';
 import Input from './ui/Input';
 import Alert from './ui/Alert';
 import staffService from '../services/staffService';
-
-const ROLES = [
-    'ADMIN',
-    'MANAGER',
-    'SALES',
-    'WAREHOUSE',
-    'ACCOUNTANT',
-    'HR',
-    'OTHER'
-];
+import roleService from '../services/roleService';
 
 /**
  * StaffModal – handles hiring new staff or updating existing records.
@@ -22,10 +13,12 @@ const ROLES = [
 export default function StaffModal({ isOpen, onClose, onSuccess, staff = null }) {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
+    const [roles, setRoles] = useState([]);
+    const [loadingRoles, setLoadingRoles] = useState(false);
 
     const [form, setForm] = useState({
         name: '',
-        role: 'SALES',
+        role: 'USER',
         email: '',
         phone: '',
         salary: '',
@@ -34,12 +27,42 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
         isActive: true,
     });
 
+    // Fetch dynamic roles
+    useEffect(() => {
+        const fetchRoles = async () => {
+            setLoadingRoles(true);
+            try {
+                const response = await roleService.getAll();
+                const roleList = response.data
+                    .map(r => r.name)
+                    .filter(name => name !== 'OWNER'); // Exclude OWNER from hiring dropdown
+                setRoles(roleList);
+
+                // Set default role if not editing
+                if (!staff && roleList.length > 0) {
+                    const defaultRole = roleList.includes('SALES') ? 'SALES' : roleList[0];
+                    setForm(prev => ({ ...prev, role: defaultRole }));
+                }
+            } catch (err) {
+                console.error('Failed to fetch roles:', err);
+                // Fallback to basic roles if API fails (Excluding OWNER)
+                setRoles(['MANAGER', 'USER']);
+            } finally {
+                setLoadingRoles(false);
+            }
+        };
+
+        if (isOpen) {
+            fetchRoles();
+        }
+    }, [isOpen, staff]);
+
     useEffect(() => {
         if (isOpen) {
             if (staff) {
                 setForm({
                     name: staff.name || '',
-                    role: staff.role || 'SALES',
+                    role: staff.role || 'USER',
                     email: staff.email || '',
                     phone: staff.phone || '',
                     salary: staff.salary || '',
@@ -113,12 +136,17 @@ export default function StaffModal({ isOpen, onClose, onSuccess, staff = null })
                         <select
                             value={form.role}
                             onChange={(e) => setForm({ ...form, role: e.target.value })}
-                            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                             required
+                            disabled={loadingRoles}
                         >
-                            {ROLES.map(role => (
-                                <option key={role} value={role}>{role}</option>
-                            ))}
+                            {loadingRoles ? (
+                                <option>Loading roles...</option>
+                            ) : (
+                                roles.map(role => (
+                                    <option key={role} value={role}>{role}</option>
+                                ))
+                            )}
                         </select>
                     </div>
 

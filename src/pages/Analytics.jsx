@@ -148,7 +148,7 @@ export default function Analytics() {
                     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                         {/* ── Monthly Sales Chart ──────────────────────────────────── */}
                         <Card className="enterprise-card overflow-hidden">
-                            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                            <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                                 <CardTitle className="text-slate-900 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
                                     <BarChart3 size={20} className="text-blue-500" /> Monthly Revenue Trend
                                 </CardTitle>
@@ -188,7 +188,7 @@ export default function Analytics() {
 
                         {/* ── Expense vs Profit Chart ──────────────────────────────── */}
                         <Card className="enterprise-card overflow-hidden">
-                            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                            <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                                 <CardTitle className="text-slate-900 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
                                     <PieChart size={20} className="text-emerald-500" /> Financial Health
                                 </CardTitle>

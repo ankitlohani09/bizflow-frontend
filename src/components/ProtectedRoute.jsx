@@ -21,7 +21,8 @@ export default function ProtectedRoute({ allowedRoles = [] }) {
         const hasAccess = user.roles?.some(role => allowedRoles.includes(role));
         if (!hasAccess) {
             console.warn(`Access denied for roles: ${user.roles?.join(', ')}. Required: ${allowedRoles.join(', ')}`);
-            return <Navigate to="/dashboard" replace />;
+            const isAdmin = user.roles?.includes('ADMIN');
+            return <Navigate to={isAdmin ? "/tenants" : "/invoices"} replace />;
         }
     }
 

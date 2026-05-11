@@ -128,10 +128,46 @@ export default function Sidebar({ isOpen, onClose }) {
                 </p>
                 <div className="space-y-1">
                     {menuItems.filter(item => {
-                        if (item.superOnly) {
-                            const user = JSON.parse(localStorage.getItem('user') || '{}');
-                            return user.tenantId === 1 && (user.roles || []).includes('ADMIN');
+                        const user = JSON.parse(localStorage.getItem('user') || '{}');
+                        const roles = user.roles || [];
+                        const isAdmin = roles.includes('ADMIN');
+                        const isOwner = roles.includes('OWNER');
+                        const isManager = roles.includes('MANAGER');
+                        const isUser = roles.includes('USER');
+
+                        // 1. If user is ADMIN, only show 'Tenants' and 'Dashboard'
+                        if (isAdmin) {
+                            return item.path === '/tenants' || item.path === '/dashboard';
                         }
+
+                        // 2. If user is NOT ADMIN, hide 'Tenants'
+                        if (item.path === '/tenants') return false;
+
+                        // --- Role-Based Content Restriction ---
+
+                        // OWNER Only: Full Administrative Modules
+                        const ownerOnlyPaths = ['/staff', '/logs', '/settings', '/ai-insights'];
+                        if (ownerOnlyPaths.includes(item.path)) {
+                            return isOwner;
+                        }
+
+                        // MANAGER & OWNER: Inventory and Business Growth
+                        const managerPaths = ['/inventory', '/stock-movements', '/suppliers', '/purchases', '/expenses', '/analytics'];
+                        if (managerPaths.includes(item.path)) {
+                            return isOwner || isManager;
+                        }
+
+                        // USER (Billing), MANAGER, OWNER: Operational Items (Excluding Dashboard)
+                        const operationalPaths = ['/customers', '/invoices', '/returns', '/kitchen-orders'];
+                        if (operationalPaths.includes(item.path)) {
+                            return isOwner || isManager || isUser;
+                        }
+
+                        // Dashboard restricted to OWNER and MANAGER
+                        if (item.path === '/dashboard') {
+                            return isOwner || isManager;
+                        }
+
                         return true;
                     }).map((item) => (
                         <SidebarItem key={item.path} item={item} />

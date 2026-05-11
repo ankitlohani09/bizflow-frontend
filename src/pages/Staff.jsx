@@ -222,7 +222,7 @@ export default function Staff() {
 
             {/* ── Directory Table ─────────────────────────────────────────────── */}
             <Card className="enterprise-card overflow-hidden">
-                <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
                             <CardTitle className="text-slate-900 border-none font-bold">Personnel Directory</CardTitle>
