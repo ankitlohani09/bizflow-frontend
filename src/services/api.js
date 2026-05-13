@@ -3,7 +3,6 @@ import axios from 'axios';
 /**
  * Centralized Axios instance for BizFlow API
  *
- * Base URL: http://localhost:8080
  * API prefix (/api/v1) is declared here so services only write the path (e.g. /invoices)
  *
  * What this file does automatically:
@@ -12,7 +11,7 @@ import axios from 'axios';
  *  3. On 401 clears the stored token (session expired)
  */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1', // use env var with fallback
+  baseURL: import.meta.env.VITE_API_URL, // use env var with fallback
   headers: {
     'Content-Type': 'application/json',
   },
@@ -61,7 +60,7 @@ api.interceptors.response.use(
       error.response?.data?.error || // Some Spring Boot errors use 'error' field
       error.message ||
       'An unexpected server error occurred';
-    
+
     // Create an error object that carries the full response for debugging
     const enrichedError = new Error(message);
     enrichedError.response = error.response;

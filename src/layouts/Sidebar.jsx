@@ -136,7 +136,7 @@ export default function Sidebar({ isOpen, onClose }) {
                         <img
                             src={branding.logoUrl.startsWith('http') || branding.logoUrl.startsWith('blob:') || branding.logoUrl.startsWith('data:')
                                 ? branding.logoUrl
-                                : `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`}
+                                : `${import.meta.env.VITE_API_URL}${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`}
                             alt="Logo"
                             className="h-7 w-auto object-contain"
                         />

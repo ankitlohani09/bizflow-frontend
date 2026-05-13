@@ -76,7 +76,7 @@ export default function Settings() {
     const [displayName, setDisplayName] = useState(JSON.parse(localStorage.getItem('user') || '{}').name || '');
     const [phoneNumber, setPhoneNumber] = useState(JSON.parse(localStorage.getItem('user') || '{}').phone || '');
     const [profilePictureUrl, setProfilePictureUrl] = useState(JSON.parse(localStorage.getItem('user') || '{}').profilePictureUrl || '');
-    
+
     // ── Security State ─────────────────────────────────────────────────
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -553,7 +553,7 @@ export default function Settings() {
                                             <img
                                                 src={localBranding.logoUrl.startsWith('blob:') || localBranding.logoUrl.startsWith('data:') || localBranding.logoUrl.startsWith('http')
                                                     ? localBranding.logoUrl
-                                                    : `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}${localBranding.logoUrl.startsWith('/') ? '' : '/'}${localBranding.logoUrl}`}
+                                                    : `${import.meta.env.VITE_API_URL}${localBranding.logoUrl.startsWith('/') ? '' : '/'}${localBranding.logoUrl}`}
                                                 alt="Logo Preview"
                                                 className="h-full object-contain"
                                             />
@@ -632,7 +632,7 @@ export default function Settings() {
                                         <div className="h-32 w-32 rounded-[2.5rem] bg-indigo-50 dark:bg-indigo-950/20 border-4 border-white dark:border-slate-800 shadow-2xl shadow-indigo-500/10 flex items-center justify-center overflow-hidden">
                                             {profilePictureUrl ? (
                                                 <img
-                                                    src={(import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1') + profilePictureUrl}
+                                                    src={(import.meta.env.VITE_API_URL) + profilePictureUrl}
                                                     className="h-full w-full object-cover"
                                                     alt="Profile"
                                                 />
@@ -714,7 +714,7 @@ export default function Settings() {
                                 </div>
 
                                 <div className="pt-6 border-t border-slate-100 flex justify-end">
-                                    <Button 
+                                    <Button
                                         className="bg-slate-900 dark:bg-slate-800 text-white px-8 font-bold rounded-xl h-12 shadow-xl shadow-slate-200 dark:shadow-none"
                                         onClick={async () => {
                                             const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -797,34 +797,34 @@ export default function Settings() {
                             <CardContent className="p-8 space-y-8">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
                                     <div className="md:col-span-2">
-                                        <Input 
-                                            label="Current Password" 
-                                            type="password" 
-                                            placeholder="••••••••" 
+                                        <Input
+                                            label="Current Password"
+                                            type="password"
+                                            placeholder="••••••••"
                                             autoComplete="current-password"
                                             value={currentPassword}
                                             onChange={(e) => setCurrentPassword(e.target.value)}
                                         />
                                     </div>
-                                    <Input 
-                                        label="New Password" 
-                                        type="password" 
-                                        placeholder="••••••••" 
+                                    <Input
+                                        label="New Password"
+                                        type="password"
+                                        placeholder="••••••••"
                                         autoComplete="new-password"
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
                                     />
-                                    <Input 
-                                        label="Confirm New Password" 
-                                        type="password" 
-                                        placeholder="••••••••" 
+                                    <Input
+                                        label="Confirm New Password"
+                                        type="password"
+                                        placeholder="••••••••"
                                         autoComplete="new-password"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                     />
- 
+
                                     <div className="md:col-span-2 pt-4">
-                                        <Button 
+                                        <Button
                                             className="bg-primary text-white px-10 font-bold rounded-xl h-12 shadow-xl shadow-primary/10 w-full md:w-auto"
                                             onClick={async () => {
                                                 if (!currentPassword || !newPassword || !confirmPassword) {
@@ -842,13 +842,13 @@ export default function Settings() {
                                                     setErrorMsg('Password must be at least 6 characters long.');
                                                     return;
                                                 }
-                                                
+
                                                 const user = JSON.parse(localStorage.getItem('user') || '{}');
                                                 try {
                                                     // Use updateProfile to update password
-                                                    await userService.updateProfile(user.id, { 
-                                                        name: user.name, 
-                                                        phone: user.phone, 
+                                                    await userService.updateProfile(user.id, {
+                                                        name: user.name,
+                                                        phone: user.phone,
                                                         email: user.email,
                                                         password: newPassword,
                                                         currentPassword: currentPassword

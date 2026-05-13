@@ -137,7 +137,7 @@ export default function Topbar({ onToggleSidebar }) {
                         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20 font-black text-sm ring-4 ring-indigo-500/10 transition-transform group-hover:scale-105 overflow-hidden">
                             {user.profilePictureUrl ? (
                                 <img
-                                    src={(import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1') + user.profilePictureUrl}
+                                    src={(import.meta.env.VITE_API_URL) + user.profilePictureUrl}
                                     className="h-full w-full object-cover"
                                     alt="Avatar"
                                 />
