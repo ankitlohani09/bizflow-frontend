@@ -39,12 +39,12 @@ import { QrCode, X, Download } from 'lucide-react';
 function RoleBadge({ role }) {
     const r = (role || '').toUpperCase();
     const styles = {
-        ADMIN:      'bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/50',
-        MANAGER:    'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50',
-        SALES:      'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50',
-        WAREHOUSE:  'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50',
+        ADMIN: 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/50',
+        MANAGER: 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50',
+        SALES: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50',
+        WAREHOUSE: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50',
         ACCOUNTANT: 'bg-violet-50 text-violet-700 border-violet-100 dark:bg-violet-950/20 dark:text-violet-400 dark:border-violet-900/50',
-        HR:         'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50',
+        HR: 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50',
     };
     return (
         <span className={cn(
@@ -165,18 +165,18 @@ export default function Staff() {
                     <Button variant="ghost" onClick={fetchStaff} disabled={loading}>
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
-                    <Button 
-                        variant="outline" 
+                    <Button
+                        variant="outline"
                         className="gap-2 border-amber-200 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 hover:bg-amber-100 font-bold px-6 rounded-xl shadow-lg shadow-amber-500/10"
                         onClick={() => setIsQRModalOpen(true)}
                     >
                         <QrCode className="h-4 w-4" /> Attendance QR
                     </Button>
                     <Button variant="outline" className="gap-2 border-slate-200" onClick={handleExportCSV}>
-                        <FileDown className="h-4 w-4" /> Export Roster
+                        <FileDown className="h-4 w-4" /> Export CSV
                     </Button>
                     <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-6 rounded-xl" onClick={() => setModal({ isOpen: true, data: null })}>
-                        <Plus className="h-4 w-4" /> Add Personnel
+                        <Plus className="h-4 w-4" /> Hire New Staff
                     </Button>
                 </div>
             </div>
@@ -259,23 +259,23 @@ export default function Staff() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
-                                        <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('name')}>Identity</TableHead>
-                                        <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('role')}>Classification</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Contact Link</TableHead>
+                                        <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('name')}>Name</TableHead>
+                                        <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('role')}>Role</TableHead>
+                                        <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Contact</TableHead>
                                         <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {paginatedStaff.map((staffMember) => (
-                                        <TableRow 
-                                            key={staffMember.id} 
+                                        <TableRow
+                                            key={staffMember.id}
                                             className={cn(
-                                                !staffMember.isActive && 'opacity-60 bg-slate-50/50 dark:bg-slate-800/20', 
+                                                !staffMember.isActive && 'opacity-60 bg-slate-50/50 dark:bg-slate-800/20',
                                                 'group border-slate-50 dark:border-slate-800'
                                             )}
                                         >
                                             <TableCell className="pl-8 py-6">
-                                                <div 
+                                                <div
                                                     className="flex items-center gap-4 group cursor-pointer"
                                                     onClick={() => navigate(`/staff/${staffMember.id}`)}
                                                 >
@@ -323,7 +323,7 @@ export default function Staff() {
                         </div>
                     )}
                 </CardContent>
-                
+
                 {!loading && filteredStaff.length > 0 && (
                     <Pagination
                         currentPage={currentPage}
@@ -354,13 +354,13 @@ export default function Staff() {
                                 <X size={20} />
                             </button>
                         </div>
-                        
+
                         <div className="p-8 flex flex-col items-center gap-6">
                             <div className="p-6 bg-white rounded-3xl shadow-xl shadow-slate-200 border-2 border-slate-50">
-                                <QRCodeCanvas 
-                                    value={qrUrl} 
-                                    size={200} 
-                                    level="H" 
+                                <QRCodeCanvas
+                                    value={qrUrl}
+                                    size={200}
+                                    level="H"
                                     includeMargin={false}
                                     imageSettings={{
                                         src: "/logo.png",
@@ -372,7 +372,7 @@ export default function Staff() {
                                     }}
                                 />
                             </div>
-                            
+
                             <div className="text-center space-y-4 w-full">
                                 <div className="space-y-1">
                                     <p className="text-sm font-bold text-slate-900 uppercase tracking-tighter">Instructions</p>
@@ -380,11 +380,11 @@ export default function Staff() {
                                         Display this QR at your shop entrance. Staff can scan using any smartphone to log their attendance securely.
                                     </p>
                                 </div>
-                                
+
                                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
                                     <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Network Server IP (for Mobile)</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={serverIp}
                                         onChange={(e) => setServerIp(e.target.value)}
                                         placeholder="e.g. 192.168.1.15"
@@ -395,7 +395,7 @@ export default function Staff() {
                             </div>
 
                             <div className="w-full flex gap-2">
-                                <Button 
+                                <Button
                                     className="flex-1 gap-2 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest"
                                     onClick={() => window.print()}
                                 >

@@ -40,7 +40,7 @@ const menuItems = [
     { label: 'Expenses', icon: Wallet, path: '/expenses' },
     { label: 'Staff', icon: UserCog, path: '/staff' },
     { label: 'Kitchen Orders', icon: ChefHat, path: '/kitchen-orders', featureFlag: 'isKitchenEnabled' },
-    { label: 'AI Insights', icon: Sparkles, path: '/ai-insights' },
+    { label: 'AI Insights', icon: Sparkles, path: '/ai-insights', featureFlag: 'isAiEnabled' },
     { label: 'System Logs', icon: Terminal, path: '/logs' },
     { label: 'Tenants', icon: Building2, path: '/tenants', superOnly: true },
     { label: 'Settings', icon: Settings, path: '/settings' },
@@ -86,25 +86,40 @@ export default function Sidebar({ isOpen, onClose }) {
     const { branding } = useTheme();
     const { t } = useTranslation();
     const [isKitchenEnabled, setIsKitchenEnabled] = React.useState(false);
+    const [isAiEnabled, setIsAiEnabled] = React.useState(localStorage.getItem('ai_enabled') !== 'false');
 
     React.useEffect(() => {
-        const fetchTenantSettings = async () => {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            if (user.tenantId) {
-                try {
-                    const data = await tenantService.getById(user.tenantId);
-                    setIsKitchenEnabled(data.isKitchenEnabled);
-                } catch (err) {
-                    console.error('Failed to fetch tenant settings in Sidebar', err);
-                }
-            }
+        const handleSettingChange = () => {
+            setIsAiEnabled(localStorage.getItem('ai_enabled') !== 'false');
         };
+        window.addEventListener('ai-setting-changed', handleSettingChange);
+        return () => window.removeEventListener('ai-setting-changed', handleSettingChange);
+    }, []);
+
+    const fetchTenantSettings = async () => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.tenantId) {
+            try {
+                const data = await tenantService.getById(user.tenantId);
+                setIsKitchenEnabled(data.isKitchenEnabled);
+            } catch (err) {
+                console.error('Failed to fetch tenant settings in Sidebar', err);
+            }
+        }
+    };
+
+    React.useEffect(() => {
         fetchTenantSettings();
+    }, []);
+
+    React.useEffect(() => {
+        window.addEventListener('tenant-updated', fetchTenantSettings);
+        return () => window.removeEventListener('tenant-updated', fetchTenantSettings);
     }, []);
 
     return (
         <aside className={cn(
-            "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white border-r border-slate-100 transition-transform duration-500 ease-out dark:bg-slate-950 dark:border-slate-900 lg:relative lg:translate-x-0",
+            "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white border-r border-slate-100 transition-transform duration-500 ease-out dark:bg-slate-950 dark:border-slate-900 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0",
             isOpen ? "translate-x-0" : "-translate-x-full"
         )}>
             {/* Mobile Close Button */}
@@ -139,7 +154,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 </div>
             </div>
 
-            <nav className="flex-1 space-y-1.5 px-6 py-6 overflow-y-auto custom-scrollbar">
+            <nav className="flex-1 space-y-1.5 px-6 py-6 overflow-y-auto custom-scrollbar scroll-smooth">
                 <p className="px-4 mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
                     {t('Menu')}
                 </p>
@@ -147,6 +162,10 @@ export default function Sidebar({ isOpen, onClose }) {
                     {menuItems.filter(item => {
                         // Feature Flag Check
                         if (item.featureFlag === 'isKitchenEnabled' && !isKitchenEnabled) {
+                            return false;
+                        }
+
+                        if (item.featureFlag === 'isAiEnabled' && !isAiEnabled) {
                             return false;
                         }
 

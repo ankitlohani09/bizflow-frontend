@@ -54,6 +54,10 @@ const expenseService = {
   getCategories() {
     return api.get('/expense-categories');
   },
+
+  createCategory(categoryDto) {
+    return api.post('/expense-categories', categoryDto);
+  },
 };
 
 export default expenseService;

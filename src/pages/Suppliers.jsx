@@ -80,7 +80,7 @@ export default function Suppliers() {
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
                     <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-6 rounded-xl" onClick={() => setModal({ isOpen: true, data: null })}>
-                        <Plus className="h-4 w-4" /> Add Vendor
+                        <Plus className="h-4 w-4" /> Add Supplier
                     </Button>
                 </div>
             </div>
@@ -182,7 +182,7 @@ export default function Suppliers() {
                         </Table>
                     )}
                 </CardContent>
-                
+
                 {!loading && filteredSuppliers.length > 0 && (
                     <Pagination
                         currentPage={currentPage}

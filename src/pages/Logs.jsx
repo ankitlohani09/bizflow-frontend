@@ -16,6 +16,8 @@ import { useNavigate } from 'react-router-dom';
 import logService from '../services/logService';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../utils/cn';
+import Pagination from '../components/ui/Pagination';
+
 // Using native Intl.DateTimeFormat instead of date-fns to avoid dependency issues in dev server
 const formatDate = (dateStr, formatType) => {
     if (!dateStr) return 'N/A';
@@ -24,15 +26,33 @@ const formatDate = (dateStr, formatType) => {
         return new Intl.DateTimeFormat('en-GB', {
             day: '2-digit',
             month: 'short',
+            year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false
+            hour12: true
         }).format(date);
     }
     if (formatType === 'yyyy') {
         return date.getFullYear();
     }
     return date.toLocaleString();
+};
+
+const formatAction = (action) => {
+    const mapping = {
+        'UPDATE_TENANT': 'Update Settings',
+        'LOGIN': 'Login',
+        'UPDATE_PASSWORD': 'Change Password'
+    };
+    return mapping[action] || action;
+};
+
+const formatEntity = (entity) => {
+    const mapping = {
+        'TENANT': 'Business',
+        'USER': 'User'
+    };
+    return mapping[entity] || entity;
 };
 
 export default function Logs() {
@@ -44,6 +64,10 @@ export default function Logs() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedLog, setSelectedLog] = useState(null);
     const [filterAction, setFilterAction] = useState('');
+
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const fetchLogs = useCallback(async () => {
         setLoading(true);
@@ -63,6 +87,11 @@ export default function Logs() {
         fetchLogs();
     }, [fetchLogs]);
 
+    // Reset pagination on filter change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeTab, searchQuery, filterAction]);
+
     const filteredLogs = logs.filter(log => {
         const matchesSearch = (log.action || log.query || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
                               (log.userName || log.entityType || '').toLowerCase().includes(searchQuery.toLowerCase());
@@ -70,12 +99,18 @@ export default function Logs() {
         return matchesSearch && matchesFilter;
     });
 
+    // Paginated results
+    const paginatedLogs = filteredLogs.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
     const handleExport = () => {
         const headers = ["Timestamp", "User", "Action & Entity", "Details"];
         const rows = filteredLogs.map(log => [
             log.createdAt || log.timestamp,
             log.userName || (log.userId ? `User #${log.userId}` : 'System'),
-            activeTab === 'ACTIVITY' ? `${log.action} on ${log.entityType}` : log.prompt,
+            activeTab === 'ACTIVITY' ? `${formatAction(log.action)} on ${formatEntity(log.entityType)}` : log.prompt,
             log.description || log.response || 'N/A'
         ]);
         
@@ -198,7 +233,7 @@ export default function Logs() {
                                         </td>
                                     </tr>
                                 ))
-                            ) : filteredLogs.length === 0 ? (
+                            ) : paginatedLogs.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} className="px-8 py-20 text-center">
                                         <div className="flex flex-col items-center">
@@ -208,7 +243,7 @@ export default function Logs() {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredLogs.map((log) => (
+                                paginatedLogs.map((log) => (
                                     <tr key={log.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-3">
@@ -218,9 +253,6 @@ export default function Logs() {
                                                 <div>
                                                     <p className="text-sm font-bold text-slate-900 dark:text-white">
                                                         {(log.createdAt || log.timestamp) ? formatDate(log.createdAt || log.timestamp, 'dd MMM, HH:mm') : 'N/A'}
-                                                    </p>
-                                                    <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
-                                                        {(log.createdAt || log.timestamp) ? formatDate(log.createdAt || log.timestamp, 'yyyy') : ''}
                                                     </p>
                                                 </div>
                                             </div>
@@ -234,7 +266,7 @@ export default function Logs() {
                                                     {log.userName || (log.userId ? `User #${log.userId}` : 'System')}
                                                     {log.userRole && (
                                                         <span className="text-[10px] font-black uppercase tracking-wider text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded-md">
-                                                            {log.userRole}
+                                                              {log.userRole}
                                                         </span>
                                                     )}
                                                 </span>
@@ -244,7 +276,7 @@ export default function Logs() {
                                             {activeTab === 'ACTIVITY' ? (
                                                 <div className="space-y-1">
                                                     <p className="text-sm font-bold text-slate-900 dark:text-white">
-                                                        {log.action} <span className="text-slate-400 font-medium">on</span> {log.entityType}
+                                                        {formatAction(log.action)} <span className="text-slate-400 font-medium">on</span> {formatEntity(log.entityType)}
                                                     </p>
                                                     <p className="text-xs font-medium text-slate-500">ID: {log.entityId || 'N/A'}</p>
                                                 </div>
@@ -268,16 +300,16 @@ export default function Logs() {
                         </tbody>
                     </table>
                 </div>
+                
                 {/* Footer / Pagination */}
-                <div className="p-6 bg-slate-50/30 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                        Showing {filteredLogs.length} results
-                    </p>
-                    <div className="flex gap-2">
-                        <button className="px-4 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-500 disabled:opacity-50" disabled>Previous</button>
-                        <button className="px-4 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-500 disabled:opacity-50" disabled>Next</button>
-                    </div>
-                </div>
+                {!loading && filteredLogs.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={filteredLogs.length}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
             </div>
 
             {selectedLog && (
@@ -306,11 +338,11 @@ export default function Logs() {
                             </div>
                             <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
                                 <span className="text-xs font-black uppercase text-slate-400">Action</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{selectedLog.action}</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{formatAction(selectedLog.action)}</span>
                             </div>
                             <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
                                 <span className="text-xs font-black uppercase text-slate-400">Entity</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{selectedLog.entityType}</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{formatEntity(selectedLog.entityType)}</span>
                             </div>
                             <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
                                 <span className="text-xs font-black uppercase text-slate-400">Entity ID</span>

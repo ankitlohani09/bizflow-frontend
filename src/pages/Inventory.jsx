@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Package,
     Plus,
@@ -13,7 +14,8 @@ import {
     FileDown,
     Layers,
     Warehouse,
-    Upload
+    Upload,
+    Eye
 } from 'lucide-react';
 import inventoryService from '../services/inventoryService';
 import MainLayout from '../layouts/MainLayout';
@@ -55,6 +57,7 @@ function StockBadge({ qty, threshold = 5 }) {
 }
 
 export default function Inventory() {
+    const navigate = useNavigate();
     const [records, setRecords] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -298,6 +301,9 @@ export default function Inventory() {
                                         </TableCell>
                                         <TableCell className="pr-10 text-right">
                                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                                                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-indigo-600 hover:text-white shadow-sm" onClick={() => navigate(`/inventory/${r.id}`)}>
+                                                    <Eye size={16} />
+                                                </Button>
                                                 <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-blue-600 hover:text-white shadow-sm" onClick={() => { setSelectedItem(r); setIsModalOpen(true); }}>
                                                     <ArrowRightLeft size={16} />
                                                 </Button>

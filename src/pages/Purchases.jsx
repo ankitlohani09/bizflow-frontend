@@ -98,7 +98,7 @@ export default function Purchases() {
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
                     <Button variant="outline" className="gap-2 border-slate-200 font-bold" onClick={() => navigate('/suppliers')}>
-                        <Building2 className="h-4 w-4" /> Vendors
+                        <Building2 className="h-4 w-4" /> Suppliers
                     </Button>
                     <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-6 rounded-xl" onClick={() => navigate('/purchases/new')}>
                         <Plus className="h-4 w-4" /> New Purchase
@@ -195,7 +195,7 @@ export default function Purchases() {
                         </Table>
                     )}
                 </CardContent>
-                
+
                 {!loading && filteredPurchases.length > 0 && (
                     <Pagination
                         currentPage={currentPage}

@@ -242,7 +242,7 @@ export default function AdminDashboard() {
                                             <tr key={tenant.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all">
                                                 <td className="pl-10 py-6">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="h-10 w-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 font-black text-xs uppercase">
+                                                        <div className="h-10 min-w-[2.5rem] w-auto px-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 font-black text-[10px] uppercase">
                                                             {tenant.code}
                                                         </div>
                                                         <span className="text-sm font-black text-slate-700 dark:text-slate-200 uppercase truncate max-w-[150px]">{tenant.name}</span>
@@ -312,7 +312,7 @@ function DistributionBar({ label, count, total, color }) {
                 <span>{label}</span>
                 <span className="text-slate-500 dark:text-slate-400">{count}</span>
             </div>
-            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${percentage}%` }}

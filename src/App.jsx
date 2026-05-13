@@ -14,6 +14,7 @@ const Invoices = lazy(() => import('./pages/Invoices'));
 const InvoiceDetails = lazy(() => import('./pages/InvoiceDetails'));
 const InvoiceForm = lazy(() => import('./pages/InvoiceForm'));
 const Inventory = lazy(() => import('./pages/Inventory'));
+const InventoryDetails = lazy(() => import('./pages/InventoryDetails'));
 const StockMovements = lazy(() => import('./pages/StockMovements'));
 const StockHistory = lazy(() => import('./pages/StockHistory'));
 const Expenses = lazy(() => import('./pages/Expenses'));
@@ -86,6 +87,7 @@ export default function App() {
               {/* Managerial & Inventory Access (Excluding Billing Staff) */}
               <Route element={<ProtectedRoute allowedRoles={['OWNER', 'MANAGER']} />}>
                 <Route path="/inventory" element={<Inventory />} />
+                <Route path="/inventory/:id" element={<InventoryDetails />} />
                 <Route path="/stock-movements" element={<StockMovements />} />
                 <Route path="/inventory/history" element={<StockHistory />} />
                 <Route path="/expenses" element={<Expenses />} />

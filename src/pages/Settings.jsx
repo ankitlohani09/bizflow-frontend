@@ -57,6 +57,7 @@ export default function Settings() {
     const [successMsg, setSuccessMsg] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
     const [localBranding, setLocalBranding] = useState(branding);
+    const [isAiEnabled, setIsAiEnabled] = useState(localStorage.getItem('ai_enabled') !== 'false');
 
     // ── Tax Rules state ──────────────────────────────────────────────
     const [taxRules, setTaxRules] = useState([]);
@@ -112,6 +113,7 @@ export default function Settings() {
                 ownerName: JSON.parse(localStorage.getItem('user') || '{}').name
             });
             setTenant(data);
+            window.dispatchEvent(new Event('tenant-updated'));
             setSuccessMsg('Attendance security updated.');
         } catch {
             setSuccessMsg('Failed to update attendance settings.');
@@ -356,6 +358,35 @@ export default function Settings() {
                                                 <div className={cn(
                                                     "absolute top-1.5 h-5 w-5 bg-white rounded-full shadow-md transition-all duration-500",
                                                     tenant?.isKitchenEnabled ? "left-7.5" : "left-1.5"
+                                                )} />
+                                            </button>
+                                        </div>
+
+                                        <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:bg-amber-50/50 transition-all">
+                                            <div className="flex items-center gap-5">
+                                                <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-700 flex items-center justify-center text-amber-600 shadow-sm">
+                                                    <Sparkles size={24} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">AI Insights</p>
+                                                    <p className="text-[10px] text-slate-400 font-bold mt-1">Enable AI-powered business chat and predictions</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const newValue = !isAiEnabled;
+                                                    setIsAiEnabled(newValue);
+                                                    localStorage.setItem('ai_enabled', String(newValue));
+                                                    window.dispatchEvent(new Event('ai-setting-changed'));
+                                                }}
+                                                className={cn(
+                                                    "h-8 w-14 rounded-full relative transition-all duration-500",
+                                                    isAiEnabled ? "bg-indigo-600 shadow-lg shadow-indigo-200" : "bg-slate-200"
+                                                )}
+                                            >
+                                                <div className={cn(
+                                                    "absolute top-1.5 h-5 w-5 bg-white rounded-full shadow-md transition-all duration-500",
+                                                    isAiEnabled ? "left-7.5" : "left-1.5"
                                                 )} />
                                             </button>
                                         </div>
