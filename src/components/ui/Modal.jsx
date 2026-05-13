@@ -73,21 +73,21 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
             {/* Dialog panel */}
             <div
                 className={cn(
-                    'relative w-full rounded-xl bg-white shadow-2xl',
+                    'relative w-full rounded-xl bg-white dark:bg-slate-900 shadow-2xl',
                     sizeClasses[size] ?? sizeClasses.md
                 )}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-6 py-4">
                     <h2
                         id="modal-title"
-                        className="text-base font-semibold text-slate-900"
+                        className="text-base font-semibold text-slate-900 dark:text-white"
                     >
                         {title}
                     </h2>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-white"
                         aria-label="Close dialog"
                     >
                         <X className="h-4 w-4" />

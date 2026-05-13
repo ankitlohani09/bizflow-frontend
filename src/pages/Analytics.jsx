@@ -50,8 +50,8 @@ function MetricCard({ title, value, subtitle, trend, icon: Icon, colorClass }) {
                     <div className={cn(
                         "flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border",
                         isPositive 
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
-                            : "bg-rose-50 text-rose-700 border-rose-100"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50" 
+                            : "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50"
                     )}>
                         {isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                         {Math.abs(trend)}%
@@ -60,7 +60,7 @@ function MetricCard({ title, value, subtitle, trend, icon: Icon, colorClass }) {
             </div>
             <div className="mt-8 text-left">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">{title}</p>
-                <h3 className="text-4xl font-black text-slate-900 tracking-tighter tabular-nums">{value}</h3>
+                <h3 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter tabular-nums">{value}</h3>
                 <p className="mt-2 text-xs font-bold text-slate-500">{subtitle}</p>
             </div>
         </Card>
@@ -101,7 +101,7 @@ export default function Analytics() {
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Reports</h1>
                     <p className="text-sm text-slate-500 font-medium">Visualizing your business growth and financial health.</p>
                 </div>
-                <Button variant="outline" className="gap-2 rounded-xl shadow-sm bg-white border-slate-200" onClick={loadAnalytics} disabled={loading}>
+                <Button variant="outline" className="gap-2 rounded-xl shadow-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 dark:text-white" onClick={loadAnalytics} disabled={loading}>
                     <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     Update Data
                 </Button>
@@ -149,7 +149,7 @@ export default function Analytics() {
                         {/* ── Monthly Sales Chart ──────────────────────────────────── */}
                         <Card className="enterprise-card overflow-hidden">
                             <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
-                                <CardTitle className="text-slate-900 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                                <CardTitle className="text-slate-900 dark:text-white flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
                                     <BarChart3 size={20} className="text-blue-500" /> Monthly Revenue Trend
                                 </CardTitle>
                                 <CardDescription className="text-slate-400 text-xs mt-1 font-bold">Sales growth over the last 6 months.</CardDescription>
@@ -189,7 +189,7 @@ export default function Analytics() {
                         {/* ── Expense vs Profit Chart ──────────────────────────────── */}
                         <Card className="enterprise-card overflow-hidden">
                             <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
-                                <CardTitle className="text-slate-900 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                                <CardTitle className="text-slate-900 dark:text-white flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
                                     <PieChart size={20} className="text-emerald-500" /> Financial Health
                                 </CardTitle>
                                 <CardDescription className="text-slate-400 text-xs mt-1 font-bold">Comparison of Expenses vs Net Profit by Month.</CardDescription>
@@ -244,26 +244,26 @@ export default function Analytics() {
                                     No sales data available to rank items.
                                 </div>
                             ) : (
-                                <div className="divide-y divide-slate-100">
+                                <div className="divide-y divide-slate-100 dark:divide-slate-800">
                                     {enhanced?.topItems.map((item, i) => (
-                                        <div key={i} className="group flex items-center gap-8 p-8 hover:bg-slate-50 transition-all duration-300">
+                                        <div key={i} className="group flex items-center gap-8 p-8 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300">
                                             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-950 text-white font-black text-lg group-hover:scale-110 transition-transform">
                                                 {i + 1}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between mb-3">
-                                                    <span className="font-bold text-slate-900 text-lg tracking-tight truncate pr-4">{item.name}</span>
+                                                    <span className="font-bold text-slate-900 dark:text-white text-lg tracking-tight truncate pr-4">{item.name}</span>
                                                     <span className="text-xs font-black text-blue-600 uppercase tracking-widest">{item.quantity} Units</span>
                                                 </div>
                                                 <div className="flex items-center gap-6">
-                                                    <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                                                    <div className="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                                                         <div 
                                                             className="h-full bg-blue-500 rounded-full transition-all duration-1000"
                                                             style={{ width: `${(item.quantity / (enhanced.topItems[0].quantity || 1)) * 100}%` }}
                                                         />
                                                     </div>
                                                     <div className="w-32 text-right">
-                                                        <span className="text-sm font-black text-slate-900 tabular-nums">{fmt(item.revenue)}</span>
+                                                        <span className="text-sm font-black text-slate-900 dark:text-white tabular-nums">{fmt(item.revenue)}</span>
                                                     </div>
                                                 </div>
                                             </div>

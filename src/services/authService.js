@@ -37,6 +37,7 @@ const authService = {
         name: result.name,
         email: result.email,
         roles: result.roles || [], // Backend returns array
+        permissions: result.permissions || [], // Added for RBAC
         tenantId: result.tenantId,
         tenantCode: result.tenantCode,
         profilePictureUrl: result.profilePictureUrl

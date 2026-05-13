@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import MainLayout from '../layouts/MainLayout';
 import Button from '../components/ui/Button';
-import { Card, CardContent } from '../components/ui/Card';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import tenantService from '../services/tenantService';
 import { cn } from '../utils/cn';
 import { toast } from 'react-hot-toast';
@@ -90,64 +90,64 @@ export default function TenantDetails() {
 
     return (
         <MainLayout>
-            {/* Header */}
-            <div className="mb-8 flex items-center justify-between">
-                <div className="flex items-center gap-4">
+            {/* Header Area */}
+            <div className="mb-12 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-6">
                     <button 
                         onClick={() => navigate('/tenants')}
-                        className="p-3 bg-white dark:bg-slate-900 rounded-2xl shadow-sm hover:shadow-md transition-all text-slate-500"
+                        className="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm hover:shadow-md transition-all text-slate-500"
                     >
-                        <ArrowLeft size={20} />
+                        <ArrowLeft size={24} />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                        <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
                             {tenant.name}
                         </h1>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] mt-1">
+                        <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.3em] mt-2 italic">
                             Business Intelligence & Profile
                         </p>
                     </div>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                     <Button 
                         variant="outline" 
-                        className="rounded-2xl border-slate-200"
+                        className="rounded-2xl border-slate-200 h-14 px-8 text-sm font-black uppercase tracking-widest"
                         onClick={handleEditClick}
                     >
                         <Edit3 size={16} className="mr-2" /> Edit Business
                     </Button>
-                    <Button className="bg-rose-500 hover:bg-rose-600 text-white rounded-2xl shadow-lg shadow-rose-500/20">
-                        <Trash2 size={16} />
+                    <Button className="bg-rose-500 hover:bg-rose-600 text-white rounded-2xl shadow-2xl shadow-rose-500/20 h-14 w-14 p-0 flex items-center justify-center">
+                        <Trash2 size={20} />
                     </Button>
                 </div>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-3">
-                {/* Left Column: Profile Card */}
-                <div className="lg:col-span-1 space-y-6">
+            {/* Main Content Grid: 1:2 Split */}
+            <div className="grid gap-10 lg:grid-cols-3">
+                
+                {/* Left Column: Profile & Security (col-span-1) */}
+                <div className="lg:col-span-1 space-y-10">
+                    {/* Profile Card */}
                     <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden">
-                        <div className="h-32 bg-gradient-to-br from-indigo-500 to-purple-600 relative">
-                            <div className="absolute -bottom-10 left-8">
-                                <div className="h-20 w-20 rounded-3xl bg-white dark:bg-slate-800 p-1 shadow-xl">
-                                    <div className="h-full w-full rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 font-black text-2xl">
-                                        {tenant.code}
-                                    </div>
+                        <div className="p-10 pb-0">
+                            <div className="flex items-center gap-6">
+                                <div className="h-16 min-w-[4rem] w-auto px-2 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 font-black text-sm uppercase">
+                                    {tenant.code}
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{tenant.name}</h3>
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{tenant.businessType} Management</p>
                                 </div>
                             </div>
                         </div>
-                        <CardContent className="pt-14 p-8 space-y-6">
-                            <div>
-                                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{tenant.name}</h3>
-                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{tenant.businessType} Management</p>
-                            </div>
-
+                        <CardContent className="p-10 space-y-6">
                             <div className="space-y-4">
                                 <InfoItem icon={Mail} label="Email Address" value={tenant.email} />
                                 <InfoItem icon={Phone} label="Phone Number" value={tenant.phone || 'N/A'} />
                                 <InfoItem icon={MapPin} label="Location" value={tenant.address || 'N/A'} />
                             </div>
 
-                            <div className="pt-6 border-t border-slate-50 dark:border-slate-800">
+                            <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
                                 <div className="flex items-center justify-between">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Account Status</p>
                                     <span className={cn(
@@ -162,9 +162,9 @@ export default function TenantDetails() {
                     </Card>
 
                     {/* Security Protocols */}
-                    <Card className="border-none shadow-xl bg-white dark:bg-slate-900 rounded-[2.5rem] p-8">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
-                            <ShieldCheck size={14} className="text-indigo-500" /> Security Protocols
+                    <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] p-10">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-2">
+                            <ShieldCheck size={16} className="text-indigo-500" /> Security Protocols
                         </h4>
                         <div className="space-y-4">
                             <ProtocolItem label="GPS Geofencing" active={tenant.isGpsMandatory} />
@@ -173,72 +173,86 @@ export default function TenantDetails() {
                     </Card>
                 </div>
 
-                {/* Right Column: Subscription & Metrics */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Subscription Dashboard */}
-                    <Card className="border-none shadow-2xl bg-slate-900 text-white rounded-[3rem] overflow-hidden relative group">
-                        <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none rotate-12 group-hover:rotate-0 transition-transform duration-1000">
-                            <CreditCard size={200} />
+                {/* Right Column: Subscription & Metrics (col-span-2) */}
+                <div className="lg:col-span-2 space-y-10">
+                    {/* Subscription Card - Matching AdminDashboard Distribution Style */}
+                    <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-[2.5rem] overflow-hidden p-10 relative group">
+                        <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none group-hover:scale-110 transition-transform duration-700 text-slate-200">
+                            <CreditCard size={180} />
                         </div>
-                        <CardContent className="p-10 relative z-10">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                                <div className="space-y-4">
-                                    <div className="inline-flex px-4 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em]">
-                                        Service Plan
-                                    </div>
-                                    <h2 className="text-5xl font-black tracking-tighter uppercase italic">{tenant.subscriptionPlan || 'TRIAL'}</h2>
-                                    <p className="text-slate-400 font-medium max-w-sm">Premium enterprise features enabled. Scalable infrastructure for {tenant.businessType} operations.</p>
-                                </div>
-                                <div className="bg-white/5 backdrop-blur-md rounded-[2.5rem] p-8 border border-white/10 text-center min-w-[200px]">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Expires On</p>
-                                    <p className="text-2xl font-black tracking-tight italic">
+                        <div className="relative z-10 space-y-8">
+                            <div>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-indigo-600">Service Plan</h3>
+                                <h2 className="text-3xl font-black tracking-tight mt-2 italic uppercase">{tenant.subscriptionPlan || 'TRIAL'}</h2>
+                            </div>
+
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                <div>
+                                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Expires On</p>
+                                    <p className="text-xl font-black tracking-tight italic">
                                         {tenant.expiryDate ? new Date(tenant.expiryDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'NEVER'}
                                     </p>
-                                    <div className="mt-4 h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                                </div>
+                                <div className="flex-1 max-w-xs">
+                                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                         <div className="h-full bg-indigo-500 w-[75%]" />
                                     </div>
                                 </div>
                             </div>
-                        </CardContent>
+
+                            <div className="pt-6 border-t border-slate-100 dark:border-white/10">
+                                <p className="text-xs text-slate-400 font-bold leading-relaxed uppercase tracking-widest">
+                                    Premium enterprise features enabled. Scalable infrastructure for operations.
+                                </p>
+                            </div>
+                        </div>
                     </Card>
 
                     {/* Stats Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Card className="border-none shadow-xl bg-white dark:bg-slate-900 rounded-[2.5rem] p-8">
-                            <div className="flex items-center justify-between mb-4">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">User Usage</p>
-                                <Users size={16} className="text-indigo-500" />
+                    <div className="grid gap-10 md:grid-cols-2">
+                        <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] p-10">
+                            <div className="flex items-center justify-between mb-6">
+                                <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">User Usage</p>
+                                <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl text-indigo-600">
+                                    <Users size={20} />
+                                </div>
                             </div>
                             <div className="flex items-end gap-2">
-                                <h3 className="text-4xl font-black text-slate-900 dark:text-white">
+                                <h3 className="text-5xl font-black text-slate-900 dark:text-white tabular-nums">
                                     {String(stats?.activeUsers || 0).padStart(2, '0')}
                                 </h3>
                                 <p className="text-sm font-bold text-slate-400 mb-1">/ {tenant.maxUsers || 5} Limit</p>
                             </div>
-                            {stats?.activeUsers >= (tenant.maxUsers || 5) ? (
-                                <p className="text-[10px] text-rose-500 font-black uppercase mt-4 tracking-widest">Quota Exceeded</p>
-                            ) : (
-                                <p className="text-[10px] text-emerald-500 font-black uppercase mt-4 tracking-widest">Within Limit</p>
-                            )}
+                            <div className="mt-4">
+                                {stats?.activeUsers >= (tenant.maxUsers || 5) ? (
+                                    <span className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest">Quota Exceeded</span>
+                                ) : (
+                                    <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest">Within Limit</span>
+                                )}
+                            </div>
                         </Card>
 
-                        <Card className="border-none shadow-xl bg-white dark:bg-slate-900 rounded-[2.5rem] p-8">
-                            <div className="flex items-center justify-between mb-4">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Monthly Transactions</p>
-                                <TrendingUp size={16} className="text-emerald-500" />
+                        <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] p-10">
+                            <div className="flex items-center justify-between mb-6">
+                                <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Monthly Transactions</p>
+                                <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl text-emerald-600">
+                                    <TrendingUp size={20} />
+                                </div>
                             </div>
                             <div className="flex items-end gap-2">
-                                <h3 className="text-4xl font-black text-slate-900 dark:text-white">
+                                <h3 className="text-5xl font-black text-slate-900 dark:text-white tabular-nums">
                                     {stats?.monthlyInvoices?.toLocaleString() || 0}
                                 </h3>
                                 <p className="text-sm font-bold text-slate-400 mb-1">Invoices</p>
                             </div>
-                            <p className="text-[10px] text-emerald-500 font-black uppercase mt-4 tracking-widest">Current Month</p>
+                            <div className="mt-4">
+                                <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest">Current Month</span>
+                            </div>
                         </Card>
                     </div>
 
                     {/* Quick Info Alerts */}
-                    <div className="p-8 rounded-[2.5rem] bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 flex gap-6">
+                    <div className="p-10 rounded-[2.5rem] bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 flex gap-6">
                         <div className="h-12 w-12 rounded-2xl bg-amber-500 flex items-center justify-center text-white shrink-0">
                             <CreditCard size={24} />
                         </div>

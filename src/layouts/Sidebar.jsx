@@ -25,6 +25,7 @@ import { cn } from '../utils/cn';
 import authService from '../services/authService';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import tenantService from '../services/tenantService';
 
 const menuItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -38,8 +39,8 @@ const menuItems = [
     { label: 'Purchases', icon: ShoppingCart, path: '/purchases' },
     { label: 'Expenses', icon: Wallet, path: '/expenses' },
     { label: 'Staff', icon: UserCog, path: '/staff' },
-    { label: 'Kitchen Orders', icon: ChefHat, path: '/kitchen-orders' },
-    { label: 'AI Insights', icon: Sparkles, path: '/ai-insights' },
+    { label: 'Kitchen Orders', icon: ChefHat, path: '/kitchen-orders', featureFlag: 'isKitchenEnabled' },
+    { label: 'AI Insights', icon: Sparkles, path: '/ai-insights', featureFlag: 'isAiEnabled' },
     { label: 'System Logs', icon: Terminal, path: '/logs' },
     { label: 'Tenants', icon: Building2, path: '/tenants', superOnly: true },
     { label: 'Settings', icon: Settings, path: '/settings' },
@@ -84,10 +85,41 @@ export default function Sidebar({ isOpen, onClose }) {
     const navigate = useNavigate();
     const { branding } = useTheme();
     const { t } = useTranslation();
+    const [isKitchenEnabled, setIsKitchenEnabled] = React.useState(false);
+    const [isAiEnabled, setIsAiEnabled] = React.useState(localStorage.getItem('ai_enabled') !== 'false');
+
+    React.useEffect(() => {
+        const handleSettingChange = () => {
+            setIsAiEnabled(localStorage.getItem('ai_enabled') !== 'false');
+        };
+        window.addEventListener('ai-setting-changed', handleSettingChange);
+        return () => window.removeEventListener('ai-setting-changed', handleSettingChange);
+    }, []);
+
+    const fetchTenantSettings = async () => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.tenantId) {
+            try {
+                const data = await tenantService.getById(user.tenantId);
+                setIsKitchenEnabled(data.isKitchenEnabled);
+            } catch (err) {
+                console.error('Failed to fetch tenant settings in Sidebar', err);
+            }
+        }
+    };
+
+    React.useEffect(() => {
+        fetchTenantSettings();
+    }, []);
+
+    React.useEffect(() => {
+        window.addEventListener('tenant-updated', fetchTenantSettings);
+        return () => window.removeEventListener('tenant-updated', fetchTenantSettings);
+    }, []);
 
     return (
         <aside className={cn(
-            "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white border-r border-slate-100 transition-transform duration-500 ease-out dark:bg-slate-950 dark:border-slate-900 lg:relative lg:translate-x-0",
+            "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white border-r border-slate-100 transition-transform duration-500 ease-out dark:bg-slate-950 dark:border-slate-900 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0",
             isOpen ? "translate-x-0" : "-translate-x-full"
         )}>
             {/* Mobile Close Button */}
@@ -122,18 +154,27 @@ export default function Sidebar({ isOpen, onClose }) {
                 </div>
             </div>
 
-            <nav className="flex-1 space-y-1.5 px-6 py-6 overflow-y-auto custom-scrollbar">
+            <nav className="flex-1 space-y-1.5 px-6 py-6 overflow-y-auto custom-scrollbar scroll-smooth">
                 <p className="px-4 mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
                     {t('Menu')}
                 </p>
                 <div className="space-y-1">
                     {menuItems.filter(item => {
+                        // Feature Flag Check
+                        if (item.featureFlag === 'isKitchenEnabled' && !isKitchenEnabled) {
+                            return false;
+                        }
+
+                        if (item.featureFlag === 'isAiEnabled' && !isAiEnabled) {
+                            return false;
+                        }
+
                         const user = JSON.parse(localStorage.getItem('user') || '{}');
                         const roles = user.roles || [];
+                        const permissions = user.permissions || [];
                         const isAdmin = roles.includes('ADMIN');
                         const isOwner = roles.includes('OWNER');
                         const isManager = roles.includes('MANAGER');
-                        const isUser = roles.includes('USER');
 
                         // 1. If user is ADMIN, only show 'Tenants' and 'Dashboard'
                         if (isAdmin) {
@@ -143,29 +184,33 @@ export default function Sidebar({ isOpen, onClose }) {
                         // 2. If user is NOT ADMIN, hide 'Tenants'
                         if (item.path === '/tenants') return false;
 
-                        // --- Role-Based Content Restriction ---
+                        // OWNER Bypass: Owner sees everything
+                        if (isOwner) return true;
 
-                        // OWNER Only: Full Administrative Modules
-                        const ownerOnlyPaths = ['/staff', '/logs', '/settings', '/ai-insights'];
-                        if (ownerOnlyPaths.includes(item.path)) {
-                            return isOwner;
+                        // --- Permission-Based Restriction ---
+                        const permissionMapping = {
+                            '/customers': 'CUSTOMER_READ',
+                            '/invoices': 'INVOICE_READ',
+                            '/returns': 'RETURN_READ',
+                            '/kitchen-orders': 'KITCHEN_READ'
+                        };
+
+                        if (permissionMapping[item.path]) {
+                            return permissions.includes(permissionMapping[item.path]);
                         }
 
-                        // MANAGER & OWNER: Inventory and Business Growth
+                        // --- Role-Based Fallback ---
+
+                        // MANAGER: Inventory and Business Growth
                         const managerPaths = ['/inventory', '/stock-movements', '/suppliers', '/purchases', '/expenses', '/analytics'];
                         if (managerPaths.includes(item.path)) {
-                            return isOwner || isManager;
+                            return isManager;
                         }
 
-                        // USER (Billing), MANAGER, OWNER: Operational Items (Excluding Dashboard)
-                        const operationalPaths = ['/customers', '/invoices', '/returns', '/kitchen-orders'];
-                        if (operationalPaths.includes(item.path)) {
-                            return isOwner || isManager || isUser;
-                        }
-
-                        // Dashboard restricted to OWNER and MANAGER
-                        if (item.path === '/dashboard') {
-                            return isOwner || isManager;
+                        // Restricted to OWNER only (Owner already bypassed, so others return false)
+                        const ownerOnlyPaths = ['/staff', '/logs', '/settings', '/ai-insights', '/dashboard'];
+                        if (ownerOnlyPaths.includes(item.path)) {
+                            return false;
                         }
 
                         return true;

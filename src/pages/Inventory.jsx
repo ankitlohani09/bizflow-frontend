@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Package,
     Plus,
@@ -13,7 +14,8 @@ import {
     FileDown,
     Layers,
     Warehouse,
-    Upload
+    Upload,
+    Eye
 } from 'lucide-react';
 import inventoryService from '../services/inventoryService';
 import MainLayout from '../layouts/MainLayout';
@@ -38,23 +40,24 @@ import Pagination from '../components/ui/Pagination';
 
 function StockBadge({ qty, threshold = 5 }) {
     if (qty <= 0) return (
-        <span className="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-rose-700 border border-rose-100">
+        <span className="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-rose-700 border border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50">
             Out of Stock
         </span>
     );
     if (qty <= threshold) return (
-        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-700 border border-amber-100">
+        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-700 border border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50">
             Low Stock
         </span>
     );
     return (
-        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100">
+        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50">
             In Stock
         </span>
     );
 }
 
 export default function Inventory() {
+    const navigate = useNavigate();
     const [records, setRecords] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -298,6 +301,9 @@ export default function Inventory() {
                                         </TableCell>
                                         <TableCell className="pr-10 text-right">
                                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                                                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-indigo-600 hover:text-white shadow-sm" onClick={() => navigate(`/inventory/${r.id}`)}>
+                                                    <Eye size={16} />
+                                                </Button>
                                                 <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-blue-600 hover:text-white shadow-sm" onClick={() => { setSelectedItem(r); setIsModalOpen(true); }}>
                                                     <ArrowRightLeft size={16} />
                                                 </Button>

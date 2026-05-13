@@ -80,7 +80,7 @@ export default function Suppliers() {
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
                     <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-6 rounded-xl" onClick={() => setModal({ isOpen: true, data: null })}>
-                        <Plus className="h-4 w-4" /> Add Vendor
+                        <Plus className="h-4 w-4" /> Add Supplier
                     </Button>
                 </div>
             </div>
@@ -102,7 +102,7 @@ export default function Suppliers() {
                             <input
                                 type="text"
                                 placeholder="Search by name, contact..."
-                                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-shadow"
+                                className="w-full rounded-xl border border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-800 dark:text-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-shadow"
                                 value={search}
                                 onChange={(e) => {
                                     setSearch(e.target.value);
@@ -127,7 +127,7 @@ export default function Suppliers() {
                     ) : (
                         <Table>
                             <TableHeader>
-                                <TableRow className="bg-slate-50 border-b border-slate-100">
+                                <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
                                     <TableHead className="pl-8 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500">Company</TableHead>
                                     <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Contact Person</TableHead>
                                     <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Email / Phone</TableHead>
@@ -138,16 +138,16 @@ export default function Suppliers() {
                             </TableHeader>
                             <TableBody>
                                 {paginatedSuppliers.map((s) => (
-                                    <TableRow key={s.id} className="group border-slate-50">
+                                    <TableRow key={s.id} className="group border-slate-50 dark:border-slate-800">
                                         <TableCell className="pl-8 py-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
+                                                <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
                                                     <Building2 size={20} />
                                                 </div>
-                                                <span className="font-bold text-slate-900 uppercase tracking-tighter leading-none">{s.name || 'Unknown Vendor'}</span>
+                                                <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tighter leading-none">{s.name || 'Unknown Vendor'}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="font-medium text-slate-600">
+                                        <TableCell className="font-medium text-slate-600 dark:text-slate-300">
                                             {s.contactPerson || '—'}
                                         </TableCell>
                                         <TableCell>
@@ -182,7 +182,7 @@ export default function Suppliers() {
                         </Table>
                     )}
                 </CardContent>
-                
+
                 {!loading && filteredSuppliers.length > 0 && (
                     <Pagination
                         currentPage={currentPage}

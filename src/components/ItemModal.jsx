@@ -37,7 +37,6 @@ export default function ItemModal({ isOpen, onClose, onSuccess, initialData = nu
         taxRate: 0,
         taxRuleId: '',
         lowStockThreshold: 5,
-        trackInventory: true,
         isActive: true,
         hasVariants: false,
         description: '',
@@ -73,7 +72,6 @@ export default function ItemModal({ isOpen, onClose, onSuccess, initialData = nu
                 taxRate: 0,
                 taxRuleId: '',
                 lowStockThreshold: 5,
-                trackInventory: true,
                 isActive: true,
                 hasVariants: false,
                 description: '',
@@ -171,6 +169,11 @@ export default function ItemModal({ isOpen, onClose, onSuccess, initialData = nu
                 taxRate: Number(form.taxRate),
                 lowStockThreshold: Number(form.lowStockThreshold)
             };
+            
+            // Append time to expiryDate if it's just a date string
+            if (payload.expiryDate && !payload.expiryDate.includes('T')) {
+                payload.expiryDate = `${payload.expiryDate}T00:00:00`;
+            }
             
             const idToUpdate = initialData?.itemId || initialData?.id;
             if (idToUpdate) {

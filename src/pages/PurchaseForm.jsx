@@ -170,8 +170,8 @@ export default function PurchaseForm() {
                                         className="w-full h-14 rounded-2xl border-none bg-slate-50 dark:bg-slate-800/50 pl-12 pr-4 text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer"
                                         required
                                     >
-                                        <option value="">Select Supplier...</option>
-                                        {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                        <option value="" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Select Supplier...</option>
+                                        {suppliers.map(s => <option key={s.id} value={s.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">{s.name}</option>)}
                                     </select>
                                 </div>
                             </div>
@@ -194,9 +194,9 @@ export default function PurchaseForm() {
                                     onChange={(e) => setForm({ ...form, status: e.target.value })}
                                     className="w-full h-14 rounded-2xl border-none bg-slate-50 dark:bg-slate-800/50 px-5 text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer"
                                 >
-                                    <option value="PENDING">Pending</option>
-                                    <option value="PAID">Paid</option>
-                                    <option value="RECEIVED">Received</option>
+                                    <option value="PENDING" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Pending</option>
+                                    <option value="PAID" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Paid</option>
+                                    <option value="RECEIVED" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Received</option>
                                 </select>
                             </div>
                         </div>
@@ -209,7 +209,7 @@ export default function PurchaseForm() {
                                 <CardTitle className="text-xl font-black text-slate-900 dark:text-white tracking-tight border-none p-0">Purchase Items</CardTitle>
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Products to be added</p>
                             </div>
-                            <Button type="button" variant="outline" size="sm" onClick={addItem} className="h-10 px-5 border-slate-100 hover:bg-slate-50 text-blue-600 font-black uppercase tracking-widest text-[9px] gap-2 rounded-xl">
+                            <Button type="button" variant="outline" size="sm" onClick={addItem} className="h-10 px-5 border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-blue-600 font-black uppercase tracking-widest text-[9px] gap-2 rounded-xl">
                                 <Plus size={16} /> Add Item
                             </Button>
                         </CardHeader>
@@ -237,8 +237,8 @@ export default function PurchaseForm() {
                                                         className="flex-1 bg-transparent border-none focus:ring-0 text-base font-black text-slate-900 dark:text-white outline-none cursor-pointer"
                                                         required
                                                     >
-                                                        <option value="">Select Product...</option>
-                                                        {catalog.map(p => <option key={p.id} value={p.id}>{p.name} ({p.sku || 'N/A'})</option>)}
+                                                        <option value="" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Select Product...</option>
+                                                        {catalog.map(p => <option key={p.id} value={p.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">{p.name} ({p.sku || 'N/A'})</option>)}
                                                     </select>
                                                 </div>
                                             </TableCell>
@@ -247,7 +247,7 @@ export default function PurchaseForm() {
                                                     <button
                                                         type="button"
                                                         onClick={() => updateItem(idx, 'quantity', Math.max(1, item.quantity - 1))}
-                                                        className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                                        className="h-10 w-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                                                     >
                                                         <X size={14} className="rotate-45" />
                                                     </button>
@@ -261,7 +261,7 @@ export default function PurchaseForm() {
                                                     <button
                                                         type="button"
                                                         onClick={() => updateItem(idx, 'quantity', item.quantity + 1)}
-                                                        className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                                        className="h-10 w-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                                                     >
                                                         <Plus size={14} />
                                                     </button>

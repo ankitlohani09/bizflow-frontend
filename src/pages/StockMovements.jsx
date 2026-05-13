@@ -46,8 +46,8 @@ export default function StockMovements() {
 
     const filteredMovements = movements.filter(m => 
         (m.itemName || '').toLowerCase().includes(search.toLowerCase()) ||
-        (m.reason || '').toLowerCase().includes(search.toLowerCase()) ||
-        (m.type || '').toLowerCase().includes(search.toLowerCase())
+        (m.notes || '').toLowerCase().includes(search.toLowerCase()) ||
+        (m.movementType || '').toLowerCase().includes(search.toLowerCase())
     );
 
     return (
@@ -135,20 +135,20 @@ export default function StockMovements() {
                                         <TableCell>
                                             <span className={cn(
                                                 "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
-                                                move.type === 'IN' 
+                                                move.direction === 'IN' 
                                                     ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
                                                     : "bg-rose-50 text-rose-600 border-rose-100"
                                             )}>
-                                                {move.type === 'IN' ? <ArrowUpCircle size={10} /> : <ArrowDownCircle size={10} />}
-                                                Stock {move.type}
+                                                {move.direction === 'IN' ? <ArrowUpCircle size={10} /> : <ArrowDownCircle size={10} />}
+                                                {move.movementType}
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-center font-black text-slate-900 dark:text-white">
-                                            {move.type === 'IN' ? '+' : '-'}{move.quantity}
+                                            {move.direction === 'IN' ? '+' : '-'}{move.quantity}
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <p className="text-xs font-bold text-slate-600 dark:text-slate-400 italic">
-                                                &quot;{move.reason || 'Stock Changed'}&quot;
+                                                &quot;{move.notes || '—'}&quot;
                                             </p>
                                             <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black italic">
                                                 Done by: {move.createdBy || 'SYSTEM'}
@@ -186,14 +186,14 @@ export default function StockMovements() {
                         <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50">
                             <div className={cn(
                                 "h-12 w-12 rounded-xl flex items-center justify-center",
-                                selectedMovement.type === 'IN' ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
+                                selectedMovement.direction === 'IN' ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
                             )}>
-                                {selectedMovement.type === 'IN' ? <ArrowUpCircle size={24} /> : <ArrowDownCircle size={24} />}
+                                {selectedMovement.direction === 'IN' ? <ArrowUpCircle size={24} /> : <ArrowDownCircle size={24} />}
                             </div>
                             <div>
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Action Type</p>
                                 <p className="text-lg font-black text-slate-900 dark:text-white">
-                                    Stock {selectedMovement.type === 'IN' ? 'Added' : 'Removed'}
+                                    Stock {selectedMovement.direction === 'IN' ? 'Added' : 'Removed'}
                                 </p>
                             </div>
                         </div>
@@ -209,9 +209,9 @@ export default function StockMovements() {
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Quantity</p>
                                 <p className={cn(
                                     "text-sm font-black",
-                                    selectedMovement.type === 'IN' ? "text-emerald-600" : "text-rose-600"
+                                    selectedMovement.direction === 'IN' ? "text-emerald-600" : "text-rose-600"
                                 )}>
-                                    {selectedMovement.type === 'IN' ? '+' : '-'}{selectedMovement.quantity}
+                                    {selectedMovement.direction === 'IN' ? '+' : '-'}{selectedMovement.quantity}
                                 </p>
                             </div>
                         </div>
@@ -250,7 +250,7 @@ export default function StockMovements() {
                         <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100/50 dark:border-indigo-900/30">
                             <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-1">Notes</p>
                             <p className="text-sm font-medium text-slate-700 dark:text-slate-300 italic">
-                                &quot;{selectedMovement.reason || 'No notes added for this change.'}&quot;
+                                &quot;{selectedMovement.notes || 'No notes added for this change.'}&quot;
                             </p>
                         </div>
 

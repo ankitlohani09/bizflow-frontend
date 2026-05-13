@@ -39,12 +39,12 @@ import { QrCode, X, Download } from 'lucide-react';
 function RoleBadge({ role }) {
     const r = (role || '').toUpperCase();
     const styles = {
-        ADMIN:      'bg-indigo-50 text-indigo-700 border-indigo-100',
-        MANAGER:    'bg-blue-50 text-blue-700 border-blue-100',
-        SALES:      'bg-emerald-50 text-emerald-700 border-emerald-100',
-        WAREHOUSE:  'bg-amber-50 text-amber-700 border-amber-100',
-        ACCOUNTANT: 'bg-violet-50 text-violet-700 border-violet-100',
-        HR:         'bg-rose-50 text-rose-700 border-rose-100',
+        ADMIN: 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/50',
+        MANAGER: 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50',
+        SALES: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50',
+        WAREHOUSE: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50',
+        ACCOUNTANT: 'bg-violet-50 text-violet-700 border-violet-100 dark:bg-violet-950/20 dark:text-violet-400 dark:border-violet-900/50',
+        HR: 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50',
     };
     return (
         <span className={cn(
@@ -165,18 +165,18 @@ export default function Staff() {
                     <Button variant="ghost" onClick={fetchStaff} disabled={loading}>
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
-                    <Button 
-                        variant="outline" 
-                        className="gap-2 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 font-bold px-6 rounded-xl shadow-lg shadow-amber-500/10"
+                    <Button
+                        variant="outline"
+                        className="gap-2 border-amber-200 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 hover:bg-amber-100 font-bold px-6 rounded-xl shadow-lg shadow-amber-500/10"
                         onClick={() => setIsQRModalOpen(true)}
                     >
                         <QrCode className="h-4 w-4" /> Attendance QR
                     </Button>
                     <Button variant="outline" className="gap-2 border-slate-200" onClick={handleExportCSV}>
-                        <FileDown className="h-4 w-4" /> Export Roster
+                        <FileDown className="h-4 w-4" /> Export CSV
                     </Button>
                     <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-6 rounded-xl" onClick={() => setModal({ isOpen: true, data: null })}>
-                        <Plus className="h-4 w-4" /> Add Personnel
+                        <Plus className="h-4 w-4" /> Hire New Staff
                     </Button>
                 </div>
             </div>
@@ -185,34 +185,34 @@ export default function Staff() {
             <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
                 <Card className="enterprise-card h-full p-6 transition-all hover:shadow-md">
                     <div className="flex items-center gap-6">
-                        <div className="p-4 rounded-2xl bg-blue-50 text-blue-600">
+                        <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-blue-600">
                             <Users size={28} />
                         </div>
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Count</p>
-                            <p className="text-3xl font-black text-slate-900 leading-none mt-1">{stats.total}</p>
+                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.total}</p>
                         </div>
                     </div>
                 </Card>
                 <Card className="enterprise-card h-full p-6 transition-all hover:shadow-md">
                     <div className="flex items-center gap-6">
-                        <div className="p-4 rounded-2xl bg-emerald-50 text-emerald-600">
+                        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600">
                             <UserCheck size={28} />
                         </div>
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Active Duty</p>
-                            <p className="text-3xl font-black text-slate-900 leading-none mt-1">{stats.active}</p>
+                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.active}</p>
                         </div>
                     </div>
                 </Card>
                 <Card className="enterprise-card h-full p-6 transition-all hover:shadow-md">
                     <div className="flex items-center gap-6">
-                        <div className="p-4 rounded-2xl bg-indigo-50 text-indigo-600">
+                        <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600">
                             <Shield size={28} />
                         </div>
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Unique Roles</p>
-                            <p className="text-3xl font-black text-slate-900 leading-none mt-1">{stats.roles}</p>
+                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.roles}</p>
                         </div>
                     </div>
                 </Card>
@@ -236,7 +236,7 @@ export default function Staff() {
                             <input
                                 type="text"
                                 placeholder="Search Name, Role or CID..."
-                                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow font-medium"
+                                className="w-full rounded-xl border border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-800 dark:text-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow font-medium"
                                 value={search}
                                 onChange={(e) => {
                                     setSearch(e.target.value);
@@ -258,33 +258,33 @@ export default function Staff() {
                         <div className="min-w-[800px]">
                             <Table>
                                 <TableHeader>
-                                    <TableRow className="bg-slate-50 border-b border-slate-100">
-                                        <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('name')}>Identity</TableHead>
-                                        <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('role')}>Classification</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Contact Link</TableHead>
+                                    <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+                                        <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('name')}>Name</TableHead>
+                                        <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('role')}>Role</TableHead>
+                                        <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Contact</TableHead>
                                         <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {paginatedStaff.map((staffMember) => (
-                                        <TableRow 
-                                            key={staffMember.id} 
+                                        <TableRow
+                                            key={staffMember.id}
                                             className={cn(
-                                                !staffMember.isActive && 'opacity-60 bg-slate-50/50', 
-                                                'group border-slate-50'
+                                                !staffMember.isActive && 'opacity-60 bg-slate-50/50 dark:bg-slate-800/20',
+                                                'group border-slate-50 dark:border-slate-800'
                                             )}
                                         >
                                             <TableCell className="pl-8 py-6">
-                                                <div 
+                                                <div
                                                     className="flex items-center gap-4 group cursor-pointer"
                                                     onClick={() => navigate(`/staff/${staffMember.id}`)}
                                                 >
-                                                    <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xl group-hover:bg-blue-50 group-hover:text-blue-500 transition-all shadow-sm">
+                                                    <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-slate-400 dark:text-slate-500 text-xl group-hover:bg-blue-50 group-hover:text-blue-500 transition-all shadow-sm">
                                                         {staffMember.name?.charAt(0)}
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="font-bold text-slate-900 uppercase tracking-tighter leading-none group-hover:text-blue-600 transition-colors">{staffMember.name}</span>
-                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1.5 font-mono">{staffMember.employeeId || `ID_${staffMember.id.toString().padStart(4, '0')}`}</span>
+                                                        <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tighter leading-none group-hover:text-blue-600 transition-colors">{staffMember.name}</span>
+                                                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1.5 font-mono">{staffMember.employeeId || `ID_${staffMember.id.toString().padStart(4, '0')}`}</span>
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -293,10 +293,10 @@ export default function Staff() {
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex flex-col gap-1">
-                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-600 tracking-tight">
+                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 tracking-tight">
                                                         <Mail size={12} className="text-blue-500" /> {staffMember.email || '—'}
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-600 tracking-tight">
+                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 tracking-tight">
                                                         <Phone size={12} className="text-emerald-500" /> {staffMember.phone || '—'}
                                                     </div>
                                                 </div>
@@ -323,7 +323,7 @@ export default function Staff() {
                         </div>
                     )}
                 </CardContent>
-                
+
                 {!loading && filteredStaff.length > 0 && (
                     <Pagination
                         currentPage={currentPage}
@@ -344,7 +344,7 @@ export default function Staff() {
             {/* Attendance QR Modal */}
             {isQRModalOpen && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-100">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2.5rem] shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-100 dark:border-slate-800">
                         <div className="bg-amber-500 p-8 text-white flex justify-between items-center">
                             <div>
                                 <h2 className="text-xl font-black uppercase tracking-tighter">Business QR</h2>
@@ -354,13 +354,13 @@ export default function Staff() {
                                 <X size={20} />
                             </button>
                         </div>
-                        
+
                         <div className="p-8 flex flex-col items-center gap-6">
                             <div className="p-6 bg-white rounded-3xl shadow-xl shadow-slate-200 border-2 border-slate-50">
-                                <QRCodeCanvas 
-                                    value={qrUrl} 
-                                    size={200} 
-                                    level="H" 
+                                <QRCodeCanvas
+                                    value={qrUrl}
+                                    size={200}
+                                    level="H"
                                     includeMargin={false}
                                     imageSettings={{
                                         src: "/logo.png",
@@ -372,7 +372,7 @@ export default function Staff() {
                                     }}
                                 />
                             </div>
-                            
+
                             <div className="text-center space-y-4 w-full">
                                 <div className="space-y-1">
                                     <p className="text-sm font-bold text-slate-900 uppercase tracking-tighter">Instructions</p>
@@ -380,22 +380,22 @@ export default function Staff() {
                                         Display this QR at your shop entrance. Staff can scan using any smartphone to log their attendance securely.
                                     </p>
                                 </div>
-                                
-                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
                                     <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Network Server IP (for Mobile)</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={serverIp}
                                         onChange={(e) => setServerIp(e.target.value)}
                                         placeholder="e.g. 192.168.1.15"
-                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/20 dark:text-white"
                                     />
                                     <p className="text-[8px] text-amber-600 font-bold mt-2 uppercase tracking-wider">Use IP Address to work on mobile</p>
                                 </div>
                             </div>
 
                             <div className="w-full flex gap-2">
-                                <Button 
+                                <Button
                                     className="flex-1 gap-2 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest"
                                     onClick={() => window.print()}
                                 >

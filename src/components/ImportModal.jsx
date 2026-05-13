@@ -71,7 +71,6 @@ export default function ImportModal({ isOpen, onClose, onSuccess }) {
                         costPrice: Number(row['Cost Price'] || row.cost || 0),
                         unit: row.Unit || row.unit || 'pcs',
                         type: row.Type || row.type || 'PRODUCT',
-                        trackInventory: true,
                         taxRate: 0,
                         hasVariants: false,
                         isActive: true

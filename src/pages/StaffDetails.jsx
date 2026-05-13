@@ -25,6 +25,7 @@ import toast from 'react-hot-toast';
 import MainLayout from '../layouts/MainLayout';
 import staffService from '../services/staffService';
 import Button from '../components/ui/Button';
+import Alert from '../components/ui/Alert';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
 import { cn } from '../utils/cn';
@@ -43,6 +44,8 @@ export default function StaffDetails() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
+    const [successMsg, setSuccessMsg] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
     const [isAdvanceModalOpen, setIsAdvanceModalOpen] = useState(false);
     const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
     const [hasBiometric, setHasBiometric] = useState(false);
@@ -79,6 +82,28 @@ export default function StaffDetails() {
     }, [id]);
 
     useEffect(() => { checkBiometric(); }, [checkBiometric]);
+
+    const handleResetPassword = async () => {
+        const newPin = prompt(`Enter new 4-digit PIN for ${staff?.name}:`);
+        if (!newPin) return;
+        
+        if (newPin.length !== 4 || !/^\d+$/.test(newPin)) {
+            toast.error("PIN must be a 4-digit number!");
+            return;
+        }
+
+        try {
+            setSubmitting(true);
+            const updatedStaff = { ...staff, pin: newPin };
+            await staffService.update(id, updatedStaff);
+            setSuccessMsg("PIN reset successfully!");
+            setStaff(updatedStaff);
+        } catch (err) {
+            setErrorMsg(err.message || "Failed to reset PIN");
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     const handleRegisterBiometric = async () => {
         setBiometricLoading(true);
@@ -179,6 +204,9 @@ export default function StaffDetails() {
                 </Button>
             </div>
 
+            {successMsg && <Alert variant="success" message={successMsg} className="mb-4" onClose={() => setSuccessMsg(null)} />}
+            {errorMsg && <Alert variant="error" message={errorMsg} className="mb-4" onClose={() => setErrorMsg(null)} />}
+
             <div className="grid gap-8 lg:grid-cols-3">
                 {/* ── Left Column: Profile Card ──────────────────────── */}
                 <div className="lg:col-span-1 space-y-6">
@@ -194,7 +222,7 @@ export default function StaffDetails() {
                             </div>
                         </div>
                         <CardContent className="pt-16 pb-8">
-                            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">
+                            <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
                                 {staff?.name}
                             </h2>
                             <p className="text-blue-500 font-black uppercase tracking-widest text-[10px] mt-2">
@@ -202,24 +230,24 @@ export default function StaffDetails() {
                             </p>
 
                             <div className="mt-8 space-y-4">
-                                <div className="flex items-center gap-3 text-slate-600">
+                                <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
                                     <Mail size={16} className="text-slate-400" />
                                     <span className="text-sm font-bold">{staff?.email || 'N/A'}</span>
                                 </div>
-                                <div className="flex items-center gap-3 text-slate-600">
+                                <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
                                     <Phone size={16} className="text-slate-400" />
                                     <span className="text-sm font-bold">{staff?.phone || 'N/A'}</span>
                                 </div>
-                                <div className="flex items-center gap-3 text-slate-600">
+                                <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
                                     <Calendar size={16} className="text-slate-400" />
                                     <span className="text-sm font-bold">Joined: {staff?.joinDate || 'Jan 2026'}</span>
                                 </div>
                             </div>
 
-                            <div className="mt-8 pt-8 border-t border-slate-100 grid grid-cols-2 gap-4 text-center">
+                            <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-700 grid grid-cols-2 gap-4 text-center">
                                 <div>
                                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Base Salary</p>
-                                    <p className="text-lg font-black text-slate-900 mt-1">{fmt(staff?.salary)}</p>
+                                    <p className="text-lg font-black text-slate-900 dark:text-white mt-1">{fmt(staff?.salary)}</p>
                                 </div>
                                 <div>
                                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Active Status</p>
@@ -230,6 +258,16 @@ export default function StaffDetails() {
                                         </span>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div className="mt-6">
+                                <Button
+                                    className="w-full bg-slate-900 hover:bg-slate-800 text-white gap-2 font-bold rounded-xl"
+                                    onClick={handleResetPassword}
+                                    disabled={submitting}
+                                >
+                                    <ShieldCheck size={16} /> Reset Staff PIN
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -246,7 +284,7 @@ export default function StaffDetails() {
                                 </div>
                                 <div>
                                     <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Biometric Identity</h4>
-                                    <p className="text-xs font-bold text-slate-900 mt-0.5">
+                                    <p className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
                                         {hasBiometric ? "Device Security Linked" : "No Biometrics Registered"}
                                     </p>
                                 </div>
@@ -255,7 +293,7 @@ export default function StaffDetails() {
                             <Button
                                 className={cn(
                                     "w-full text-[10px] font-black uppercase tracking-widest py-3 rounded-xl gap-2",
-                                    hasBiometric ? "bg-white border-2 border-slate-200 text-slate-500 hover:bg-slate-50" : "bg-blue-600 text-white hover:bg-blue-500"
+                                    hasBiometric ? "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700" : "bg-blue-600 text-white hover:bg-blue-500"
                                 )}
                                 onClick={handleRegisterBiometric}
                                 disabled={biometricLoading}
@@ -338,7 +376,7 @@ export default function StaffDetails() {
                         <CardContent className="p-0 overflow-x-auto">
                             <Table>
                                 <TableHeader>
-                                    <TableRow className="bg-slate-50 border-none hover:bg-transparent">
+                                    <TableRow className="bg-slate-50 dark:bg-slate-800 border-none hover:bg-transparent">
                                         <TableHead className="pl-8 py-4 text-[9px] font-black uppercase tracking-wider text-slate-500">Date</TableHead>
                                         <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">In-Time</TableHead>
                                         <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Out-Time</TableHead>
@@ -353,10 +391,10 @@ export default function StaffDetails() {
                                         </TableRow>
                                     ) : (
                                         attendance.map((log, i) => (
-                                            <TableRow key={i} className="border-slate-50">
-                                                <TableCell className="pl-8 font-black text-slate-900">{log.date}</TableCell>
-                                                <TableCell className="font-bold text-slate-500">{log.checkIn || '—'}</TableCell>
-                                                <TableCell className="font-bold text-slate-500">{log.checkOut || '—'}</TableCell>
+                                            <TableRow key={i} className="border-slate-50 dark:border-slate-800/20">
+                                                <TableCell className="pl-8 font-black text-slate-900 dark:text-white">{log.date}</TableCell>
+                                                <TableCell className="font-bold text-slate-500 dark:text-slate-400">{log.checkIn || '—'}</TableCell>
+                                                <TableCell className="font-bold text-slate-500 dark:text-slate-400">{log.checkOut || '—'}</TableCell>
                                                 <TableCell>
                                                     <div className="flex gap-2">
                                                         {log.photoUrl && (
@@ -410,7 +448,7 @@ export default function StaffDetails() {
                         <CardContent className="p-0 overflow-x-auto">
                             <Table>
                                 <TableHeader>
-                                    <TableRow className="bg-slate-50 border-none hover:bg-transparent">
+                                    <TableRow className="bg-slate-50 dark:bg-slate-800 border-none hover:bg-transparent">
                                         <TableHead className="pl-8 py-4 text-[9px] font-black uppercase tracking-wider text-slate-500">Transaction ID</TableHead>
                                         <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Date</TableHead>
                                         <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Reason</TableHead>
@@ -424,10 +462,10 @@ export default function StaffDetails() {
                                         </TableRow>
                                     ) : (
                                         advances.map((adv, i) => (
-                                            <TableRow key={i} className="border-slate-50">
-                                                <TableCell className="pl-8 font-black text-slate-900 text-[10px] tracking-widest">#ADV-{adv.id}</TableCell>
-                                                <TableCell className="font-bold text-slate-500">{adv.advanceDate}</TableCell>
-                                                <TableCell className="font-bold text-slate-500 truncate max-w-[200px]">{adv.notes}</TableCell>
+                                            <TableRow key={i} className="border-slate-50 dark:border-slate-800/20">
+                                                <TableCell className="pl-8 font-black text-slate-900 dark:text-white text-[10px] tracking-widest">#ADV-{adv.id}</TableCell>
+                                                <TableCell className="font-bold text-slate-500 dark:text-slate-400">{adv.advanceDate}</TableCell>
+                                                <TableCell className="font-bold text-slate-500 dark:text-slate-400 truncate max-w-[200px]">{adv.notes}</TableCell>
                                                 <TableCell className="pr-8 text-right font-black text-rose-600">{fmt(adv.amount)}</TableCell>
                                             </TableRow>
                                         ))

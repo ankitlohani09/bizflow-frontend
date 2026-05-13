@@ -155,11 +155,14 @@ export default function Topbar({ onToggleSidebar }) {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ duration: 0.2, ease: "easeOut" }}
-                                className="absolute right-0 mt-4 w-64 rounded-3xl bg-white p-2 shadow-2xl shadow-indigo-500/10 ring-1 ring-slate-100 dark:bg-slate-950 dark:ring-slate-900"
+                                className="absolute right-0 mt-4 w-80 rounded-3xl bg-white p-2 shadow-2xl shadow-indigo-500/10 ring-1 ring-slate-100 dark:bg-slate-950 dark:ring-slate-900"
                             >
                                 <div className="p-5 bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 mb-2">
                                     <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1.5">Signed in as</p>
-                                    <p className="text-sm font-black text-slate-900 dark:text-white truncate">{user.email || 'admin@bizflow.com'}</p>
+                                    <p className={cn(
+                                        "font-black text-slate-900 dark:text-white truncate",
+                                        (user.email || '').length > 25 ? "text-xs" : "text-sm"
+                                    )}>{user.email || '--'}</p>
                                 </div>
 
                                 <div className="space-y-1">
@@ -177,13 +180,15 @@ export default function Topbar({ onToggleSidebar }) {
                                         <ShieldCheck size={18} />
                                         Security
                                     </button>
-                                    <button
-                                        onClick={() => { navigate('/settings', { state: { tab: 'branding' } }); setShowProfileMenu(false); }}
-                                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-indigo-400 transition-all"
-                                    >
-                                        <Settings size={18} />
-                                        Shop Settings
-                                    </button>
+                                    {(user.roles?.includes('MANAGER') || user.roles?.includes('OWNER')) && (
+                                        <button
+                                            onClick={() => { navigate('/settings', { state: { tab: 'branding' } }); setShowProfileMenu(false); }}
+                                            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-indigo-400 transition-all"
+                                        >
+                                            <Settings size={18} />
+                                            Shop Settings
+                                        </button>
+                                    )}
                                 </div>
 
                                 <div className="mt-2 pt-2 border-t border-slate-50 dark:border-slate-900">

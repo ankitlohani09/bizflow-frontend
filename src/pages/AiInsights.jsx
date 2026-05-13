@@ -16,6 +16,7 @@ import aiService from '../services/aiService';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
+import { formatCurrency } from '../utils/formatCurrency';
 
 export default function AiInsights() {
     const { t } = useTranslation();
@@ -25,6 +26,15 @@ export default function AiInsights() {
         { type: 'ai', text: 'Hello! I am BizFlow AI. How can I help you with your business data today?' }
     ]);
     const [loading, setLoading] = useState(false);
+    const [isAiEnabled, setIsAiEnabled] = useState(localStorage.getItem('ai_enabled') !== 'false');
+
+    useEffect(() => {
+        const handleSettingChange = () => {
+            setIsAiEnabled(localStorage.getItem('ai_enabled') !== 'false');
+        };
+        window.addEventListener('ai-setting-changed', handleSettingChange);
+        return () => window.removeEventListener('ai-setting-changed', handleSettingChange);
+    }, []);
     const [suggestions, setSuggestions] = useState([]);
     const [trends, setTrends] = useState([]);
 
@@ -61,6 +71,35 @@ export default function AiInsights() {
             setLoading(false);
         }
     };
+
+    const renderMessage = (text) => {
+        if (!text) return '';
+        const parts = text.split(/(\*\*.*?\*\*)/g);
+        return parts.map((part, index) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+                return <strong key={index} className="font-bold text-slate-900 dark:text-white">{part.slice(2, -2)}</strong>;
+            }
+            return part;
+        });
+    };
+
+    if (!isAiEnabled) {
+        return (
+            <div className="p-8 flex flex-col items-center justify-center min-h-[calc(100vh-100px)] text-center">
+                <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-4">
+                    <Sparkles size={32} />
+                </div>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">AI Insights is Disabled</h1>
+                <p className="text-slate-500 mb-6 max-w-md">You can enable AI-powered business chat and predictions in the Settings page.</p>
+                <button
+                    onClick={() => navigate('/settings', { state: { tab: 'master' } })}
+                    className="px-6 py-3 bg-slate-900 dark:bg-slate-800 text-white font-bold rounded-xl hover:bg-black transition-colors"
+                >
+                    Go to Settings
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="p-8 grid grid-cols-1 xl:grid-cols-3 gap-8 min-h-[calc(100vh-100px)]">
@@ -122,7 +161,7 @@ export default function AiInsights() {
                                             ? "bg-slate-900 text-white rounded-tr-none"
                                             : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none"
                                     )}>
-                                        {msg.text}
+                                        {renderMessage(msg.text)}
                                     </div>
                                 </motion.div>
                             ))}
@@ -221,9 +260,12 @@ export default function AiInsights() {
                                     </p>
                                 </div>
                             ) : trends.map((trend, idx) => (
-                                <div key={idx} className="flex items-center gap-4">
-                                    <div className="h-2 w-2 rounded-full bg-indigo-500"></div>
-                                    <p className="text-sm font-medium text-white/80">{trend.insight || trend.message}</p>
+                                <div key={idx} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-2 w-2 rounded-full bg-indigo-500"></div>
+                                        <p className="text-sm font-medium text-white/80">{trend.period}</p>
+                                    </div>
+                                    <span className="text-sm font-bold text-white">{trend.sales !== undefined ? formatCurrency(trend.sales) : ''}</span>
                                 </div>
                             ))}
                         </div>

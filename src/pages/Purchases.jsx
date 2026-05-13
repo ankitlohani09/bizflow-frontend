@@ -35,9 +35,9 @@ const fmt = (val) =>
 function PurchaseStatusBadge({ status }) {
     const s = (status || '').toUpperCase();
     const styles = {
-        RECEIVED: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-        PAID: 'bg-blue-50 text-blue-700 border-blue-100',
-        PENDING: 'bg-amber-50 text-amber-700 border-amber-100',
+        RECEIVED: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50',
+        PAID: 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50',
+        PENDING: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50',
     };
     return (
         <span className={cn(
@@ -98,7 +98,7 @@ export default function Purchases() {
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>
                     <Button variant="outline" className="gap-2 border-slate-200 font-bold" onClick={() => navigate('/suppliers')}>
-                        <Building2 className="h-4 w-4" /> Vendors
+                        <Building2 className="h-4 w-4" /> Suppliers
                     </Button>
                     <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-6 rounded-xl" onClick={() => navigate('/purchases/new')}>
                         <Plus className="h-4 w-4" /> New Purchase
@@ -124,7 +124,7 @@ export default function Purchases() {
                             <input
                                 type="text"
                                 placeholder="Search vendor or PO #..."
-                                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all font-medium"
+                                className="w-full rounded-xl border border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-800 dark:text-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all font-medium"
                                 value={search}
                                 onChange={(e) => {
                                     setSearch(e.target.value);
@@ -150,7 +150,7 @@ export default function Purchases() {
                     ) : (
                         <Table>
                             <TableHeader>
-                                <TableRow className="bg-slate-50 border-b border-slate-100">
+                                <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
                                     <TableHead className="pl-8 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500">Order ID</TableHead>
                                     <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Vendor</TableHead>
                                     <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Timeline</TableHead>
@@ -161,16 +161,16 @@ export default function Purchases() {
                             </TableHeader>
                             <TableBody>
                                 {paginatedPurchases.map((p) => (
-                                    <TableRow key={p.id} className="group border-slate-50">
+                                    <TableRow key={p.id} className="group border-slate-50 dark:border-slate-800">
                                         <TableCell className="pl-8 py-6">
                                             <span className="font-bold text-slate-400 font-mono text-xs uppercase tracking-tighter">#PO-{p.id}</span>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-4">
-                                                <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-white transition-colors">
+                                                <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-white dark:group-hover:bg-slate-700 transition-colors">
                                                     <Building2 size={16} />
                                                 </div>
-                                                <span className="font-bold text-slate-900 uppercase tracking-tighter leading-none">{p.supplierName || p.supplier?.name || `Supplier #${p.supplierId}`}</span>
+                                                <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tighter leading-none">{p.supplierName || p.supplier?.name || `Supplier #${p.supplierId}`}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-slate-500 font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">
@@ -179,7 +179,7 @@ export default function Purchases() {
                                         <TableCell>
                                             <PurchaseStatusBadge status={p.status} />
                                         </TableCell>
-                                        <TableCell className="text-right font-black text-slate-900 text-lg tabular-nums">
+                                        <TableCell className="text-right font-black text-slate-900 dark:text-white text-lg tabular-nums">
                                             {fmt(p.totalAmount)}
                                         </TableCell>
                                         <TableCell className="text-right pr-8">
@@ -195,7 +195,7 @@ export default function Purchases() {
                         </Table>
                     )}
                 </CardContent>
-                
+
                 {!loading && filteredPurchases.length > 0 && (
                     <Pagination
                         currentPage={currentPage}

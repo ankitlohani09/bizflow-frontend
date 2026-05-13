@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, Save, X, Bookmark, DollarSign, Calendar, CreditCard, AlignLeft } from 'lucide-react';
+import { Loader2, Save, X, Bookmark, DollarSign, Calendar, CreditCard, AlignLeft, Plus } from 'lucide-react';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
 import Input from './ui/Input';
@@ -73,6 +73,8 @@ export default function ExpenseModal({ isOpen, onClose, onSuccess, expense = nul
                 ...form,
                 amount: Number(form.amount),
                 categoryId: Number(form.categoryId),
+                paymentModeName: form.paymentMethod,
+                title: form.description || 'Expense', // Fallback to 'Expense' if empty
             };
 
             await expenseService.create(payload); // assuming create handles both or we'll add update
@@ -96,22 +98,38 @@ export default function ExpenseModal({ isOpen, onClose, onSuccess, expense = nul
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
                             <Bookmark size={14} className="text-slate-400" /> Category
                         </label>
-                        <select
-                            value={form.categoryId}
-                            onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        >
-                            <option value="">Select Category...</option>
-                            {categories.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="flex gap-2">
+                            <select
+                                value={form.categoryId}
+                                onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                required
+                            >
+                                <option value="">Select Category...</option>
+                                {categories.map((cat) => (
+                                    <option key={cat.id} value={cat.id}>
+                                        {cat.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <button type="button" onClick={async () => {
+                                const name = window.prompt('Enter new category name:');
+                                if (!name) return;
+                                try {
+                                    const result = await expenseService.createCategory({ name });
+                                    const newCat = result.data || result;
+                                    setCategories([...categories, newCat]);
+                                    setForm(p => ({ ...p, categoryId: (newCat.id).toString() }));
+                                } catch (err) {
+                                    alert('Failed to create category.');
+                                }
+                            }} className="px-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400" title="Quick Add Category">
+                                <Plus size={16} />
+                            </button>
+                        </div>
                     </div>
 
                     <Input
@@ -136,13 +154,13 @@ export default function ExpenseModal({ isOpen, onClose, onSuccess, expense = nul
                     />
 
                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
                             <CreditCard size={14} className="text-slate-400" /> Payment Method
                         </label>
                         <select
                             value={form.paymentMethod}
                             onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}
-                            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                         >
                             <option value="CASH">Cash</option>
                             <option value="BANK_TRANSFER">Bank Transfer</option>
@@ -160,13 +178,13 @@ export default function ExpenseModal({ isOpen, onClose, onSuccess, expense = nul
                 />
 
                 <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
                         <AlignLeft size={14} className="text-slate-400" /> Description
                     </label>
                     <textarea
                         value={form.description}
                         onChange={(e) => setForm({ ...form, description: e.target.value })}
-                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                         rows={3}
                         placeholder="What was this expense for?"
                     />

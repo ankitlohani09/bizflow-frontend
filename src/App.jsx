@@ -14,6 +14,7 @@ const Invoices = lazy(() => import('./pages/Invoices'));
 const InvoiceDetails = lazy(() => import('./pages/InvoiceDetails'));
 const InvoiceForm = lazy(() => import('./pages/InvoiceForm'));
 const Inventory = lazy(() => import('./pages/Inventory'));
+const InventoryDetails = lazy(() => import('./pages/InventoryDetails'));
 const StockMovements = lazy(() => import('./pages/StockMovements'));
 const StockHistory = lazy(() => import('./pages/StockHistory'));
 const Expenses = lazy(() => import('./pages/Expenses'));
@@ -24,6 +25,7 @@ const Purchases = lazy(() => import('./pages/Purchases'));
 const PurchaseForm = lazy(() => import('./pages/PurchaseForm'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const Returns = lazy(() => import('./pages/Returns'));
+const ReturnDetails = lazy(() => import('./pages/ReturnDetails'));
 const Settings = lazy(() => import('./pages/Settings'));
 const KitchenOrders = lazy(() => import('./pages/KitchenOrders'));
 const AiInsights = lazy(() => import('./pages/AiInsights'));
@@ -54,7 +56,7 @@ function PageLoader() {
 export default function App() {
   return (
     <ThemeProvider>
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster position="top-right" reverseOrder={false} containerStyle={{ zIndex: 99999 }} />
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
           <AnimatePresence mode="wait">
@@ -71,18 +73,21 @@ export default function App() {
               </Route>
 
               {/* Operational & Billing Access (All Staff) */}
-              <Route element={<ProtectedRoute allowedRoles={['OWNER', 'MANAGER', 'USER']} />}>
+              <Route element={<ProtectedRoute allowedRoles={['OWNER', 'MANAGER', 'CASHIER']} />}>
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/invoices" element={<Invoices />} />
                 <Route path="/invoices/new" element={<InvoiceForm />} />
                 <Route path="/invoices/:id" element={<InvoiceDetails />} />
                 <Route path="/returns" element={<Returns />} />
+                <Route path="/returns/:id" element={<ReturnDetails />} />
                 <Route path="/kitchen-orders" element={<KitchenOrders />} />
+                <Route path="/settings" element={<Settings />} />
               </Route>
 
               {/* Managerial & Inventory Access (Excluding Billing Staff) */}
               <Route element={<ProtectedRoute allowedRoles={['OWNER', 'MANAGER']} />}>
                 <Route path="/inventory" element={<Inventory />} />
+                <Route path="/inventory/:id" element={<InventoryDetails />} />
                 <Route path="/stock-movements" element={<StockMovements />} />
                 <Route path="/inventory/history" element={<StockHistory />} />
                 <Route path="/expenses" element={<Expenses />} />
@@ -96,7 +101,6 @@ export default function App() {
               <Route element={<ProtectedRoute allowedRoles={['OWNER']} />}>
                 <Route path="/staff" element={<Staff />} />
                 <Route path="/staff/:id" element={<StaffDetails />} />
-                <Route path="/settings" element={<Settings />} />
                 <Route path="/ai-insights" element={<AiInsights />} />
                 <Route path="/logs" element={<Logs />} />
               </Route>

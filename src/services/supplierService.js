@@ -1,7 +1,7 @@
 import api from './api';
 
 /**
- * supplierService – Vendor and supply chain management
+ * supplierService – supplier and supply chain management
  *
  * API doc reference:
  *   GET    /suppliers         → list all suppliers

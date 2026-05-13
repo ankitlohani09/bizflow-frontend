@@ -57,6 +57,15 @@ const inventoryService = {
   createStockMovement(adjustmentDto) {
     return api.post('/stock-movements', adjustmentDto);
   },
+
+  /**
+   * Fetch stock movements for a specific item
+   * @param {string|number} itemId
+   * @returns {Promise<Array>}
+   */
+  getMovementsByItem(itemId) {
+    return api.get(`/stock-movements/item/${itemId}`);
+  },
 };
 
 export default inventoryService;

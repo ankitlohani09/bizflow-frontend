@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    PieChart, Pie, Cell
 } from 'recharts';
 import {
     RefreshCw,
@@ -47,6 +48,8 @@ function StatusBadge({ status }) {
         </span>
     );
 }
+
+const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 const container = {
     hidden: { opacity: 0 },
@@ -240,6 +243,10 @@ export default function Dashboard() {
                                                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
                                                     <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                                 </linearGradient>
+                                                <linearGradient id="colorExp" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                                                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                                                </linearGradient>
                                             </defs>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.5} />
                                             <XAxis
@@ -268,10 +275,21 @@ export default function Dashboard() {
                                             <Area
                                                 type="monotone"
                                                 dataKey="sales"
+                                                name="Sales"
                                                 stroke="#6366f1"
                                                 strokeWidth={4}
                                                 fillOpacity={1}
                                                 fill="url(#colorRev)"
+                                                animationDuration={2500}
+                                            />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="expenses"
+                                                name="Expenses"
+                                                stroke="#ef4444"
+                                                strokeWidth={4}
+                                                fillOpacity={1}
+                                                fill="url(#colorExp)"
                                                 animationDuration={2500}
                                             />
                                         </AreaChart>
@@ -285,8 +303,39 @@ export default function Dashboard() {
                                 <CardTitle className="text-indigo-600 dark:text-indigo-400">Best Selling Items</CardTitle>
                                 <CardDescription>Top moving stock</CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-8 p-8">
-                                {(analytics?.topItems || []).slice(0, 5).map((item, idx) => (
+                            <CardContent className="p-8">
+                                <div className="h-[200px] w-full mb-6">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={analytics?.topItems?.map(i => ({ name: i.name, value: i.quantity })) || []}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={60}
+                                                outerRadius={80}
+                                                paddingAngle={5}
+                                                dataKey="value"
+                                            >
+                                                {(analytics?.topItems || []).map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip 
+                                                contentStyle={{
+                                                    borderRadius: '16px',
+                                                    border: 'none',
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                                    backdropFilter: 'blur(12px)',
+                                                    boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
+                                                    fontSize: '12px',
+                                                    fontWeight: 'bold'
+                                                }}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                                <div className="space-y-6">
+                                    {(analytics?.topItems || []).slice(0, 5).map((item, idx) => (
                                     <div key={idx} className="group">
                                         <div className="flex justify-between items-center mb-3">
                                             <span className="text-sm font-black text-slate-800 dark:text-slate-200 truncate w-40">{item.name}</span>
@@ -302,6 +351,7 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                 ))}
+                                </div>
                             </CardContent>
                         </Card>
                     </div>

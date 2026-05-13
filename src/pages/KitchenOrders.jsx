@@ -15,11 +15,11 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '../utils/cn';
 
 const STATUS_CONFIG = {
-    PENDING: { label: 'Pending', color: 'bg-amber-500', light: 'bg-amber-50', text: 'text-amber-700', icon: Clock },
-    PREPARING: { label: 'Preparing', color: 'bg-blue-500', light: 'bg-blue-50', text: 'text-blue-700', icon: ChefHat },
-    READY: { label: 'Ready', color: 'bg-emerald-500', light: 'bg-emerald-50', text: 'text-emerald-700', icon: CheckCircle2 },
-    DELIVERED: { label: 'Delivered', color: 'bg-slate-500', light: 'bg-slate-50', text: 'text-slate-700', icon: CheckCircle2 },
-    CANCELLED: { label: 'Cancelled', color: 'bg-rose-500', light: 'bg-rose-50', text: 'text-rose-700', icon: AlertCircle },
+    PENDING: { label: 'Pending', color: 'bg-amber-500', light: 'bg-amber-50 dark:bg-amber-950/20', text: 'text-amber-700 dark:text-amber-400', icon: Clock },
+    PREPARING: { label: 'Preparing', color: 'bg-blue-500', light: 'bg-blue-50 dark:bg-blue-950/20', text: 'text-blue-700 dark:text-blue-400', icon: ChefHat },
+    READY: { label: 'Ready', color: 'bg-emerald-500', light: 'bg-emerald-50 dark:bg-emerald-950/20', text: 'text-emerald-700 dark:text-emerald-400', icon: CheckCircle2 },
+    DELIVERED: { label: 'Delivered', color: 'bg-slate-500', light: 'bg-slate-50 dark:bg-slate-800/50', text: 'text-slate-700 dark:text-slate-300', icon: CheckCircle2 },
+    CANCELLED: { label: 'Cancelled', color: 'bg-rose-500', light: 'bg-rose-50 dark:bg-rose-950/20', text: 'text-rose-700 dark:text-rose-400', icon: AlertCircle },
 };
 
 export default function KitchenOrders() {

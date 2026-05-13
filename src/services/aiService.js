@@ -9,7 +9,7 @@ const aiService = {
    * @param {string} queryText 
    */
   query: async (queryText) => {
-    return api.post('/ai/query', { query: queryText });
+    return api.post('/ai/query', { query: queryText }, { timeout: 120000 });
   },
 
   /**

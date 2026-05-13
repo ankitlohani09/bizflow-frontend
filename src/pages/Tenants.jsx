@@ -91,7 +91,13 @@ export default function Tenants() {
         e.preventDefault();
         setSubmitting(true);
         try {
-            await tenantService.create(formData);
+            // Append time to expiryDate if it's just a date string
+            const dataToSend = { ...formData };
+            if (dataToSend.expiryDate && !dataToSend.expiryDate.includes('T')) {
+                dataToSend.expiryDate = `${dataToSend.expiryDate}T00:00:00`;
+            }
+            
+            await tenantService.create(dataToSend);
             toast.success('Tenant onboarded successfully!');
             setIsModalOpen(false);
             setFormData({
