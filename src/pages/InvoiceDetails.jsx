@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { formatDateOnly } from '../utils/formatDate';
 import { 
     Receipt, 
     ArrowLeft, 
@@ -253,9 +254,7 @@ export default function InvoiceDetails() {
                                     <Calendar size={10} /> Issue Date
                                 </p>
                                 <p className="font-black text-slate-800 dark:text-white">
-                                    {new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString('en-IN', { 
-                                        day: '2-digit', month: 'short', year: 'numeric' 
-                                    })}
+                                    {formatDateOnly(invoice.invoiceDate || invoice.createdAt)}
                                 </p>
                             </div>
                             <div>
@@ -368,7 +367,7 @@ export default function InvoiceDetails() {
                     <hr />
                     <div className="text-xs">
                         <p>Inv No  : {invoice.invoiceNumber || invoice.id}</p>
-                        <p>Date    : {new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString()}</p>
+                        <p>Date    : {formatDateOnly(invoice.invoiceDate || invoice.createdAt)}</p>
                         <p>Cust    : {invoice.customerName || 'Walk-in Customer'}</p>
                         {invoice.customerPhone && <p>Phone   : {invoice.customerPhone}</p>}
                     </div>

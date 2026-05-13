@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatDateOnly } from '../utils/formatDate';
 import { 
     FileText, 
     Plus, 
@@ -212,7 +213,7 @@ export default function Invoices() {
                                         </TableCell>
                                          <TableCell className="text-slate-600 dark:text-slate-300 font-bold uppercase tracking-tighter text-xs">{invoice.customerName || invoice.customer?.name || 'Walk-in'}</TableCell>
                                         <TableCell className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-                                            {new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
+                                            {formatDateOnly(invoice.invoiceDate || invoice.createdAt)}
                                         </TableCell>
                                          <TableCell className="font-black text-slate-900 dark:text-white text-lg tabular-nums">{fmt(invoice.totalAmount || invoice.grandTotal || 0)}</TableCell>
                                         <TableCell>

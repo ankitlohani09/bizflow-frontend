@@ -15,6 +15,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Pagination from '../components/ui/Pagination';
 import returnService from '../services/returnService';
+import { formatDateOnly, formatTimeOnly } from '../utils/formatDate';
 
 export default function Returns() {
     const navigate = useNavigate();
@@ -179,10 +180,10 @@ export default function Returns() {
                                         <TableCell className="text-right pr-8">
                                             <div className="flex flex-col items-end">
                                                 <span className="text-[11px] font-bold text-slate-900 dark:text-white uppercase tabular-nums">
-                                                    {new Date(r.createdAt).toLocaleDateString()}
+                                                    {formatDateOnly(r.createdAt)}
                                                 </span>
                                                 <span className="text-[10px] font-medium text-slate-400 uppercase leading-none mt-1">
-                                                    {new Date(r.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    {formatTimeOnly(r.createdAt)}
                                                 </span>
                                             </div>
                                         </TableCell>

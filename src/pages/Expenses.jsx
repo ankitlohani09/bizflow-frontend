@@ -32,6 +32,7 @@ import ExpenseModal from '../components/ExpenseModal';
 import { cn } from '../utils/cn';
 import { exportToCSV, flattenData } from '../utils/exportUtils';
 import { TableSkeleton } from '../components/ui/Skeleton';
+import { formatDateOnly } from '../utils/formatDate';
 
 const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
@@ -224,7 +225,7 @@ export default function Expenses() {
                                         <TableCell>
                                             <div className="flex flex-col">
                                                 <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 tracking-tight">
-                                                    <Calendar size={12} className="text-blue-500" /> {new Date(ex.expenseDate || ex.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                    <Calendar size={12} className="text-blue-500" /> {formatDateOnly(ex.expenseDate || ex.createdAt)}
                                                 </div>
                                                 <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
                                                     VIA {ex.paymentMethod || 'CASH_DISBURSEMENT'}

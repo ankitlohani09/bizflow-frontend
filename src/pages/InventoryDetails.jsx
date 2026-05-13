@@ -21,6 +21,7 @@ import Button from '../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
 import { cn } from '../utils/cn';
+import { formatDateTime, formatDateOnly } from '../utils/formatDate';
 
 const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
@@ -117,7 +118,7 @@ export default function InventoryDetails() {
                                 </div>
                                 <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
                                     <Calendar size={16} className="text-slate-400" />
-                                    <span className="text-sm font-bold">Expiry: {inventory?.expiryDate ? new Date(inventory.expiryDate).toLocaleDateString() : 'N/A'}</span>
+                                    <span className="text-sm font-bold">Expiry: {inventory?.expiryDate ? formatDateOnly(inventory.expiryDate) : 'N/A'}</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
                                     <MapPin size={16} className="text-slate-400" />
@@ -213,7 +214,7 @@ export default function InventoryDetails() {
                                         movements.map((mov, i) => (
                                             <TableRow key={i} className="border-slate-50 dark:border-slate-800/20">
                                                 <TableCell className="pl-8 font-black text-slate-900 dark:text-white">
-                                                    {mov.createdAt ? new Date(mov.createdAt).toLocaleString() : '—'}
+                                                    {mov.createdAt ? formatDateTime(mov.createdAt) : '—'}
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className={cn(

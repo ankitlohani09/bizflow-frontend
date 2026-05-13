@@ -35,13 +35,14 @@ import { Palette, Sparkles, Image as ImageIcon } from 'lucide-react';
 import paymentModeService from '../services/paymentModeService';
 import taxRuleService from '../services/taxRuleService';
 import userService from '../services/userService';
+import { TIMEZONE_OPTIONS } from '../utils/formatDate';
 
 /**
- * Settings Page – System configuration and Master Data
+ * Settings Page â€“ System configuration and Master Data
  */
 export default function Settings() {
     const location = useLocation();
-    const { branding, updateBranding } = useTheme();
+    const { branding, updateBranding, timezone, changeTimezone } = useTheme();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const isManagerOrOwner = user.roles?.includes('MANAGER') || user.roles?.includes('OWNER');
     const [activeTab, setActiveTab] = useState(isManagerOrOwner ? 'master' : 'account');
@@ -58,26 +59,33 @@ export default function Settings() {
     const [errorMsg, setErrorMsg] = useState(null);
     const [localBranding, setLocalBranding] = useState(branding);
     const [isAiEnabled, setIsAiEnabled] = useState(localStorage.getItem('ai_enabled') !== 'false');
+    const [currentTime, setCurrentTime] = useState(new Date());
 
-    // ── Tax Rules state ──────────────────────────────────────────────
+    // Live clock tick for timezone preview
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    // â”€â”€ Tax Rules state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [taxRules, setTaxRules] = useState([]);
     const [newTaxRule, setNewTaxRule] = useState({ name: '', rate: '', taxType: 'GST' });
 
-    // ── Payment Modes state ────────────────────────────────────────────
+    // â”€â”€ Payment Modes state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [paymentModes, setPaymentModes] = useState([]);
     const [newModeName, setNewModeName] = useState('');
     const [editingPm, setEditingPm] = useState(null); // Track mode being edited
 
-    // ── Tenant Attendance Settings ─────────────────────────────────────
+    // â”€â”€ Tenant Attendance Settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [tenant, setTenant] = useState(null);
     const [tenantSaving, setTenantSaving] = useState(false);
 
-    // ── Profile State ──────────────────────────────────────────────────
+    // â”€â”€ Profile State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [displayName, setDisplayName] = useState(JSON.parse(localStorage.getItem('user') || '{}').name || '');
     const [phoneNumber, setPhoneNumber] = useState(JSON.parse(localStorage.getItem('user') || '{}').phone || '');
     const [profilePictureUrl, setProfilePictureUrl] = useState(JSON.parse(localStorage.getItem('user') || '{}').profilePictureUrl || '');
 
-    // ── Security State ─────────────────────────────────────────────────
+    // â”€â”€ Security State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -200,7 +208,7 @@ export default function Settings() {
             </div>
 
             <div className="flex flex-col gap-8 lg:flex-row">
-                {/* ── Sidebar Navigation ────────────────────────────────────────── */}
+                {/* â”€â”€ Sidebar Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 <div className="w-full lg:w-64 flex flex-col gap-2">
                     {[
                         { id: 'master', label: 'Business Settings', icon: SettingsIcon },
@@ -231,7 +239,7 @@ export default function Settings() {
                     ))}
                 </div>
 
-                {/* ── Content Area ──────────────────────────────────────────────── */}
+                {/* â”€â”€ Content Area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 <div className="flex-1 space-y-6">
                     {successMsg && <Alert variant="success" message={successMsg} className="mb-4" onClose={() => setSuccessMsg(null)} />}
                     {errorMsg && <Alert variant="error" message={errorMsg} className="mb-4" onClose={() => setErrorMsg(null)} />}
@@ -800,7 +808,7 @@ export default function Settings() {
                                         <Input
                                             label="Current Password"
                                             type="password"
-                                            placeholder="••••••••"
+                                            placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                                             autoComplete="current-password"
                                             value={currentPassword}
                                             onChange={(e) => setCurrentPassword(e.target.value)}
@@ -809,7 +817,7 @@ export default function Settings() {
                                     <Input
                                         label="New Password"
                                         type="password"
-                                        placeholder="••••••••"
+                                        placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                                         autoComplete="new-password"
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
@@ -817,7 +825,7 @@ export default function Settings() {
                                     <Input
                                         label="Confirm New Password"
                                         type="password"
-                                        placeholder="••••••••"
+                                        placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                                         autoComplete="new-password"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}

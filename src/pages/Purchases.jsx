@@ -13,6 +13,7 @@ import {
     Eye,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { formatDateOnly } from '../utils/formatDate';
 import purchaseService from '../services/purchaseService';
 import MainLayout from '../layouts/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
@@ -174,7 +175,7 @@ export default function Purchases() {
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-slate-500 font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">
-                                            {new Date(p.purchaseDate || p.createdAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
+                                            {formatDateOnly(p.purchaseDate || p.createdAt)}
                                         </TableCell>
                                         <TableCell>
                                             <PurchaseStatusBadge status={p.status} />

@@ -18,6 +18,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '.
 import { TableSkeleton } from '../components/ui/Skeleton';
 import Modal from '../components/ui/Modal';
 import { cn } from '../utils/cn';
+import { formatDateOnly, formatTimeOnly, formatDateTime } from '../utils/formatDate';
 
 /**
  * StockMovements – Detailed audit trail of all inventory changes
@@ -120,10 +121,10 @@ export default function StockMovements() {
                                     <TableRow key={i} className="dark:border-slate-800 dark:hover:bg-slate-800/40 group border-b border-slate-50">
                                         <TableCell className="pl-8 py-5">
                                             <p className="text-[10px] font-bold text-slate-900 dark:text-white">
-                                                {new Date(move.createdAt).toLocaleDateString()}
+                                                {formatDateOnly(move.createdAt)}
                                             </p>
                                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                                                {new Date(move.createdAt).toLocaleTimeString()}
+                                                {formatTimeOnly(move.createdAt)}
                                             </p>
                                         </TableCell>
                                         <TableCell>
@@ -220,7 +221,7 @@ export default function StockMovements() {
                             <div className="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800">
                                 <span className="text-xs font-bold text-slate-500">Date & Time</span>
                                 <span className="text-xs font-black text-slate-900 dark:text-white">
-                                    {new Date(selectedMovement.createdAt).toLocaleString()}
+                                    {formatDateTime(selectedMovement.createdAt)}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800">

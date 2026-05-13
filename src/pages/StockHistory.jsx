@@ -23,6 +23,7 @@ import {
     TableCell,
 } from '../components/ui/Table';
 import { cn } from '../utils/cn';
+import { formatDateTime } from '../utils/formatDate';
 
 function MovementBadge({ type }) {
     const t = (type || '').toUpperCase();
@@ -117,7 +118,7 @@ export default function StockHistory() {
                                         <TableCell className="text-slate-500 whitespace-nowrap">
                                             <div className="flex items-center gap-2">
                                                 <Calendar size={14} />
-                                                {new Date(m.createdAt || m.date).toLocaleString()}
+                                                {formatDateTime(m.createdAt || m.date)}
                                             </div>
                                         </TableCell>
                                         <TableCell className="font-bold text-slate-900">

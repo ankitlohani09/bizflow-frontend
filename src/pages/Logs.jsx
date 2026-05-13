@@ -17,26 +17,7 @@ import logService from '../services/logService';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../utils/cn';
 import Pagination from '../components/ui/Pagination';
-
-// Using native Intl.DateTimeFormat instead of date-fns to avoid dependency issues in dev server
-const formatDate = (dateStr, formatType) => {
-    if (!dateStr) return 'N/A';
-    const date = new Date(dateStr);
-    if (formatType === 'dd MMM, HH:mm') {
-        return new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        }).format(date);
-    }
-    if (formatType === 'yyyy') {
-        return date.getFullYear();
-    }
-    return date.toLocaleString();
-};
+import { formatDate } from '../utils/formatDate';
 
 const formatAction = (action) => {
     const mapping = {
@@ -252,7 +233,7 @@ export default function Logs() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-bold text-slate-900 dark:text-white">
-                                                        {(log.createdAt || log.timestamp) ? formatDate(log.createdAt || log.timestamp, 'dd MMM, HH:mm') : 'N/A'}
+                                                        {formatDate(log.createdAt || log.timestamp)}
                                                     </p>
                                                 </div>
                                             </div>

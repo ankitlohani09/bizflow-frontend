@@ -17,6 +17,7 @@ import MainLayout from '../layouts/MainLayout';
 import { Card, CardContent } from '../components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
 import Button from '../components/ui/Button';
+import { formatDateOnly, formatTimeOnly } from '../utils/formatDate';
 
 const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
@@ -176,10 +177,10 @@ export default function ReturnDetails() {
                             <div>
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Date</p>
                                 <h3 className="text-sm font-black text-slate-900 dark:text-white mt-1">
-                                    {new Date(returnObj.createdAt).toLocaleDateString()}
+                                    {formatDateOnly(returnObj.createdAt)}
                                 </h3>
                                 <p className="text-[10px] text-slate-400 font-bold mt-0.5">
-                                    {new Date(returnObj.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    {formatTimeOnly(returnObj.createdAt)}
                                 </p>
                             </div>
                             <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
