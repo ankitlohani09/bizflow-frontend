@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { formatDateOnly } from '../utils/formatDate';
-import { 
-    Receipt, 
-    ArrowLeft, 
-    Download, 
-    Printer, 
-    CreditCard, 
-    Loader2, 
+import {
+    Receipt,
+    ArrowLeft,
+    Download,
+    Printer,
+    CreditCard,
+    Loader2,
     RotateCcw,
     MessageCircle,
     MapPin,
@@ -149,11 +149,11 @@ export default function InvoiceDetails() {
             `}</style>
 
             <div className="max-w-[1000px] mx-auto px-4 py-8">
-                
+
                 {/* Action Bar */}
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
-                    <button 
-                        onClick={() => navigate('/invoices')} 
+                    <button
+                        onClick={() => navigate('/invoices')}
                         className="flex items-center gap-2 text-slate-600 hover:text-primary font-bold text-[14px] uppercase tracking-widest transition-colors"
                     >
                         <ArrowLeft size={16} /> Back to Invoices
@@ -179,7 +179,7 @@ export default function InvoiceDetails() {
 
                 {/* Invoice Container (A4 / Screen View) */}
                 <div className="invoice-container bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden relative">
-                    
+
                     {/* Top Accent Bar */}
                     <div className="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
 
@@ -289,7 +289,7 @@ export default function InvoiceDetails() {
                                         <th className="pb-4">Item Detail</th>
                                         <th className="pb-4 text-center">Qty</th>
                                         <th className="pb-4 text-right">Unit Price</th>
-                                        <th className="pb-4 text-right">Line Total</th>
+                                        <th className="pb-4 text-right">Subtotal</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -299,13 +299,15 @@ export default function InvoiceDetails() {
                                                 <p className="text-sm font-bold text-slate-800 dark:text-white">{item.itemName || 'Product'}</p>
                                                 <div className="flex flex-wrap gap-x-2 text-[14px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">
                                                     <span>SKU: {item.sku || 'N/A'}</span>
-                                                    {item.taxRuleName && <span>| Tax: {item.taxRuleName} ({item.taxRate}%)</span>}
+                                                    {item.taxRate > 0 && <span>| Tax: {item.taxRate}% (₹{((item.subtotal * item.taxRate) / 100).toFixed(2)})</span>}
                                                     {item.discountPct > 0 && <span>| Disc: {item.discountPct}%</span>}
+                                                    {item.batchNo && <span>| Batch: {item.batchNo}</span>}
+                                                    {item.expiryDate && <span>| Exp: {new Date(item.expiryDate).toLocaleDateString()}</span>}
                                                 </div>
                                             </td>
                                             <td className="py-5 text-center text-sm font-bold text-slate-600 dark:text-slate-300">{item.quantity}</td>
                                             <td className="py-5 text-right text-sm font-bold text-slate-600 dark:text-slate-300">{fmt(item.unitPrice)}</td>
-                                            <td className="py-5 text-right text-sm font-semibold text-slate-900 dark:text-white">{fmt(item.lineTotal || (item.quantity * item.unitPrice))}</td>
+                                            <td className="py-5 text-right text-sm font-semibold text-slate-900 dark:text-white">{fmt(item.subtotal || (item.quantity * item.unitPrice))}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -327,14 +329,22 @@ export default function InvoiceDetails() {
                                         <span>Subtotal</span>
                                         <span className="text-slate-900 dark:text-white">{fmt(invoice.subtotal)}</span>
                                     </div>
-                                    <div className="flex justify-between text-indigo-600">
-                                        <span>Tax Amount</span>
-                                        <span>+{fmt(invoice.taxAmount)}</span>
-                                    </div>
+                                    {invoice.taxAmount > 0 && (
+                                        <div className="flex justify-between text-indigo-600">
+                                            <span>Tax Amount</span>
+                                            <span>+{fmt(invoice.taxAmount)}</span>
+                                        </div>
+                                    )}
                                     {invoice.discountAmount > 0 && (
                                         <div className="flex justify-between text-rose-500">
                                             <span>Discount</span>
                                             <span>-{fmt(invoice.discountAmount)}</span>
+                                        </div>
+                                    )}
+                                    {invoice.shippingAmount > 0 && (
+                                        <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                                            <span>Shipping Charges</span>
+                                            <span>+{fmt(invoice.shippingAmount)}</span>
                                         </div>
                                     )}
                                 </div>
@@ -342,7 +352,7 @@ export default function InvoiceDetails() {
                                     <span className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest">Amount Payable</span>
                                     <span className="text-2xl font-semibold text-indigo-600 dark:text-indigo-400 tracking-tighter">{fmt(invoice.grandTotal)}</span>
                                 </div>
-                                
+
                                 <div className="space-y-1 pt-2 border-t border-slate-50 dark:border-slate-800">
                                     <div className="flex justify-between text-[14px] font-bold text-slate-500">
                                         <span>Paid Amount</span>
@@ -443,12 +453,12 @@ export default function InvoiceDetails() {
                 </div>
 
             </div>
-            
-            <ReturnModal 
-                isOpen={isReturnModalOpen} 
-                onClose={() => setIsReturnModalOpen(false)} 
-                onSuccess={() => navigate('/returns')} 
-                invoice={invoice} 
+
+            <ReturnModal
+                isOpen={isReturnModalOpen}
+                onClose={() => setIsReturnModalOpen(false)}
+                onSuccess={() => navigate('/returns')}
+                invoice={invoice}
             />
         </MainLayout>
     );

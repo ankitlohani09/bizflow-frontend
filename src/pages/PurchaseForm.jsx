@@ -65,7 +65,7 @@ export default function PurchaseForm() {
         status: 'UNPAID',
         remarks: '',
         items: [
-            { itemId: '', quantity: 1, purchasePrice: 0, total: 0 }
+            { itemId: '', quantity: 1, purchasePrice: 0, total: 0, batchNo: '', expiryDate: '' }
         ],
     });
 
@@ -102,7 +102,7 @@ export default function PurchaseForm() {
     const addItem = () => {
         setForm(f => ({
             ...f,
-            items: [...f.items, { itemId: '', quantity: 1, purchasePrice: 0, total: 0 }]
+            items: [...f.items, { itemId: '', quantity: 1, purchasePrice: 0, total: 0, batchNo: '', expiryDate: '' }]
         }));
     };
 
@@ -139,6 +139,8 @@ export default function PurchaseForm() {
                 quantity: Number(item.quantity),
                 unitCost: Number(item.purchasePrice),
                 lineTotal: Number(item.total),
+                batchNo: item.batchNo || null,
+                expiryDate: item.expiryDate || null,
             }));
 
             await purchaseService.create({
@@ -289,10 +291,12 @@ export default function PurchaseForm() {
                             <Table className="border-separate border-spacing-0">
                                 <TableHeader>
                                     <TableRow className="bg-slate-50/30 dark:bg-slate-800/30 hover:bg-transparent border-none">
-                                        <TableHead className="pl-6 py-4 text-[12px] font-semibold uppercase tracking-widest text-slate-400 w-[45%]">Product Name</TableHead>
-                                        <TableHead className="py-4 text-[12px] font-semibold uppercase tracking-widest text-slate-400 text-center w-[20%]">Quantity</TableHead>
-                                        <TableHead className="py-4 text-[12px] font-semibold uppercase tracking-widest text-slate-400 text-right w-[20%]">Buy Price</TableHead>
-                                        <TableHead className="pr-6 py-4 text-[12px] font-semibold uppercase tracking-widest text-slate-400 text-right w-[15%]">Total</TableHead>
+                                        <TableHead className="pl-6 py-4 text-[12px] font-semibold uppercase tracking-widest text-slate-400 w-[30%]">Product Name</TableHead>
+                                        <TableHead className="py-4 text-[12px] font-semibold uppercase tracking-widest text-slate-400 w-[15%]">Batch No</TableHead>
+                                        <TableHead className="py-4 text-[12px] font-semibold uppercase tracking-widest text-slate-400 w-[15%]">Expiry</TableHead>
+                                        <TableHead className="py-4 text-[12px] font-semibold uppercase tracking-widest text-slate-400 text-center w-[15%]">Quantity</TableHead>
+                                        <TableHead className="py-4 text-[12px] font-semibold uppercase tracking-widest text-slate-400 text-right w-[15%]">Buy Price</TableHead>
+                                        <TableHead className="pr-6 py-4 text-[12px] font-semibold uppercase tracking-widest text-slate-400 text-right w-[10%]">Total</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -313,6 +317,23 @@ export default function PurchaseForm() {
                                                         {catalog.map(p => <option key={p.id} value={p.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">{p.name} ({p.sku || 'N/A'})</option>)}
                                                     </select>
                                                 </div>
+                                            </TableCell>
+                                            <TableCell className="py-3">
+                                                <input
+                                                    type="text"
+                                                    value={item.batchNo || ''}
+                                                    onChange={(e) => updateItem(idx, 'batchNo', e.target.value)}
+                                                    placeholder="Batch..."
+                                                    className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 h-10 border border-transparent text-sm font-semibold text-slate-900 dark:text-white focus:ring-0 outline-none"
+                                                />
+                                            </TableCell>
+                                            <TableCell className="py-3">
+                                                <input
+                                                    type="date"
+                                                    value={item.expiryDate || ''}
+                                                    onChange={(e) => updateItem(idx, 'expiryDate', e.target.value)}
+                                                    className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 h-10 border border-transparent text-sm font-semibold text-slate-900 dark:text-white focus:ring-0 outline-none cursor-pointer"
+                                                />
                                             </TableCell>
                                             <TableCell className="py-3">
                                                 <div className="flex items-center justify-center gap-3">

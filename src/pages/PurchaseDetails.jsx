@@ -193,7 +193,7 @@ export default function PurchaseDetails() {
                                         <th className="pb-4">Item Detail</th>
                                         <th className="pb-4 text-center">Qty</th>
                                         <th className="pb-4 text-right">Unit Cost</th>
-                                        <th className="pb-4 text-right">Line Total</th>
+                                        <th className="pb-4 text-right">Subtotal</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
