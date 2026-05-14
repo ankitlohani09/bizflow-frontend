@@ -128,12 +128,12 @@ export default function Suppliers() {
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
-                                    <TableHead className="pl-8 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500">Company</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Contact Person</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Email / Phone</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Location</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Tax ID</TableHead>
-                                    <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
+                                    <TableHead className="pl-8 py-4 text-[14px] font-black uppercase tracking-wider text-slate-500">Company</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Contact Person</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Email / Phone</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Location</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Tax ID</TableHead>
+                                    <TableHead className="text-right pr-8 text-[14px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -151,17 +151,17 @@ export default function Suppliers() {
                                             {s.contactPerson || '—'}
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex flex-col text-xs text-slate-500 gap-1">
+                                            <div className="flex flex-col text-[14px] text-slate-500 gap-1">
                                                 <div className="flex items-center gap-1.5 font-bold tracking-tight"><Mail size={12} className="text-blue-500" /> {s.email || '—'}</div>
                                                 <div className="flex items-center gap-1.5 font-bold tracking-tight"><Phone size={12} className="text-emerald-500" /> {s.phone || '—'}</div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold tracking-tight">
+                                            <div className="flex items-center gap-1.5 text-[14px] text-slate-500 font-bold tracking-tight">
                                                 <MapPin size={12} className="text-rose-500/70" /> {s.city || '—'}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="font-mono text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                                        <TableCell className="font-mono text-[14px] font-black text-slate-400 uppercase tracking-widest">
                                             {s.taxId || 'UNREGISTERED'}
                                         </TableCell>
                                         <TableCell className="text-right pr-8">

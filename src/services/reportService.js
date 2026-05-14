@@ -56,7 +56,7 @@ const reportService = {
      */
     async getFinancialSummary() {
         try {
-            const { invoices, purchases, expenses } = await this._getRawData();
+            const { invoices, purchases, expenses, inventory } = await this._getRawData();
 
             const revenue = invoices
                 .filter(inv => (inv.paymentStatus || inv.status) === 'PAID')
@@ -71,11 +71,16 @@ const reportService = {
             const totalCosts = purchaseCosts + directExpenses;
             const netProfit = revenue - totalCosts;
 
+            const lowStockCount = inventory ? inventory.filter(i => (i.availableQty || 0) < 10).length : 0;
+            const totalItems = inventory ? inventory.length : 0;
+
             return {
                 revenue,
                 costs: totalCosts,
                 netProfit,
                 margin: revenue > 0 ? ((netProfit / revenue) * 100).toFixed(2) : 0,
+                lowStockCount,
+                totalItems,
                 breakdown: {
                     invoices: invoices.length,
                     purchases: purchases.length,
@@ -183,8 +188,9 @@ const reportService = {
             if (summary.revenue > 0) {
                 insights.push({
                     type: 'POSITIVE',
-                    category: 'REVENUE',
-                    text: `Strong monthly performance detected. Current revenue is ${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(summary.revenue)}.`,
+                    category: 'SALES',
+                    textKey: 'sales_insight',
+                    params: { amount: new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(summary.revenue) },
                     relevance: 0.9
                 });
             }
@@ -194,14 +200,16 @@ const reportService = {
                 insights.push({
                     type: 'POSITIVE',
                     category: 'PROFIT',
-                    text: `Exceptional profit margins of ${summary.margin}% observed. The business is operating efficiently.`,
+                    textKey: 'profit_good_insight',
+                    params: { margin: summary.margin },
                     relevance: 0.85
                 });
             } else if (parseFloat(summary.margin) < 5 && summary.revenue > 0) {
                 insights.push({
                     type: 'WARNING',
                     category: 'PROFIT',
-                    text: `Low profit margins detected (${summary.margin}%). Consider reviewing expense buckets or procurement costs.`,
+                    textKey: 'profit_low_insight',
+                    params: { margin: summary.margin },
                     relevance: 0.95
                 });
             }
@@ -210,9 +218,10 @@ const reportService = {
             const topItem = analytics.topItems[0];
             if (topItem) {
                 insights.push({
-                    type: 'INFO',
-                    category: 'INVENTORY',
-                    text: `"${topItem.name}" is your highest velocity item this period. Ensure adequate stock levels to prevent stockouts.`,
+                    type: 'POSITIVE',
+                    category: 'STOCK',
+                    textKey: 'stock_insight',
+                    params: { itemName: topItem.name },
                     relevance: 0.8
                 });
             }
@@ -220,9 +229,9 @@ const reportService = {
             // 4. Expense Insight
             if (summary.costs > summary.revenue * 0.5) {
                 insights.push({
-                    type: 'CAUTION',
+                    type: 'WARNING',
                     category: 'EXPENSES',
-                    text: "Operational costs are exceeding 50% of revenue. Verify if this matches seasonal procurement targets.",
+                    textKey: 'expense_insight',
                     relevance: 0.9
                 });
             }

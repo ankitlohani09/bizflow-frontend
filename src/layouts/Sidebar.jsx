@@ -131,27 +131,26 @@ export default function Sidebar({ isOpen, onClose }) {
             </button>
 
             <div className="flex h-24 shrink-0 items-center gap-4 px-8">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-xl shadow-primary/20">
-                    {branding.logoUrl ? (
-                        <img
-                            src={branding.logoUrl.startsWith('http') || branding.logoUrl.startsWith('blob:') || branding.logoUrl.startsWith('data:')
-                                ? branding.logoUrl
-                                : `${import.meta.env.VITE_API_URL}${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`}
-                            alt="Logo"
-                            className="h-7 w-auto object-contain"
-                        />
-                    ) : (
-                        <Store className="h-6 w-6" />
-                    )}
-                </div>
-                <div>
-                    <h2 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
-                        {branding.companyName || 'BizFlow'}
-                    </h2>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-                        Shop POS
-                    </p>
-                </div>
+                {branding.logoUrl ? (
+                    <img
+                        src={branding.logoUrl.startsWith('http') || branding.logoUrl.startsWith('blob:') || branding.logoUrl.startsWith('data:')
+                            ? branding.logoUrl
+                            : `${import.meta.env.VITE_API_URL}${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`}
+                        alt="Logo"
+                        className="h-14 w-auto object-contain max-w-[200px]"
+                    />
+                ) : (
+                    <>
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-xl shadow-primary/20">
+                            <Store className="h-7 w-7" />
+                        </div>
+                        <div>
+                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                                {branding.companyName || 'BizFlow'}
+                            </h2>
+                        </div>
+                    </>
+                )}
             </div>
 
             <nav className="flex-1 space-y-1.5 px-6 py-6 overflow-y-auto custom-scrollbar scroll-smooth">

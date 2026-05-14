@@ -104,7 +104,7 @@ export default function InventoryDetails() {
                                 {inventory?.itemName}
                             </h2>
                             <p className="text-blue-500 font-black uppercase tracking-widest text-[10px] mt-2">
-                                SKU: {inventory?.sku || 'N/A'}
+                                SKU: {inventory?.sku || inventory?.barcode || 'N/A'}
                             </p>
 
                             <div className="mt-8 space-y-4">
@@ -159,7 +159,7 @@ export default function InventoryDetails() {
                             <div className="flex justify-between items-end border-b border-white/5 pb-4">
                                 <div>
                                     <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Available</p>
-                                    <p className="text-xl font-black text-white mt-1">{inventory?.availableQty || 0}</p>
+                                    <p className="text-xl font-black text-emerald-500 mt-1">{inventory?.availableQty || 0}</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Reserved</p>

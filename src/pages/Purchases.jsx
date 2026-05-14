@@ -42,7 +42,7 @@ function PurchaseStatusBadge({ status }) {
     };
     return (
         <span className={cn(
-            'inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider',
+            'inline-flex items-center rounded-full border px-2 py-0.5 text-[14px] font-black uppercase tracking-wider',
             styles[s] ?? 'bg-rose-50 text-rose-700 border-rose-100'
         )}>
             {status || 'Unknown'}
@@ -152,19 +152,19 @@ export default function Purchases() {
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
-                                    <TableHead className="pl-8 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500">Order ID</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Vendor</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Timeline</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
-                                    <TableHead className="text-right text-[10px] font-black uppercase tracking-wider text-slate-500">Net Cost</TableHead>
-                                    <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
+                                    <TableHead className="pl-8 py-4 text-[14px] font-black uppercase tracking-wider text-slate-500">Order ID</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Vendor</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Timeline</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
+                                    <TableHead className="text-right text-[14px] font-black uppercase tracking-wider text-slate-500">Net Cost</TableHead>
+                                    <TableHead className="text-right pr-8 text-[14px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {paginatedPurchases.map((p) => (
                                     <TableRow key={p.id} className="group border-slate-50 dark:border-slate-800">
                                         <TableCell className="pl-8 py-6">
-                                            <span className="font-bold text-slate-400 font-mono text-xs uppercase tracking-tighter">#PO-{p.id}</span>
+                                            <span className="font-bold text-slate-400 font-mono text-[14px] uppercase tracking-tighter">#PO-{p.id}</span>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-4">
@@ -174,7 +174,7 @@ export default function Purchases() {
                                                 <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tighter leading-none">{p.supplierName || p.supplier?.name || `Supplier #${p.supplierId}`}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-slate-500 font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">
+                                        <TableCell className="text-slate-500 font-bold text-[14px] uppercase tracking-widest whitespace-nowrap">
                                             {formatDateOnly(p.purchaseDate || p.createdAt)}
                                         </TableCell>
                                         <TableCell>

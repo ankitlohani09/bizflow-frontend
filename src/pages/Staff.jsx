@@ -48,7 +48,7 @@ function RoleBadge({ role }) {
     };
     return (
         <span className={cn(
-            'inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider',
+            'inline-flex items-center rounded-full border px-2 py-0.5 text-[14px] font-bold uppercase tracking-wider',
             styles[r] ?? 'bg-slate-50 text-slate-500 border-slate-100'
         )}>
             {role || 'Other'}
@@ -189,7 +189,7 @@ export default function Staff() {
                             <Users size={28} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Count</p>
+                            <p className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400">Total Count</p>
                             <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.total}</p>
                         </div>
                     </div>
@@ -200,7 +200,7 @@ export default function Staff() {
                             <UserCheck size={28} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Active Duty</p>
+                            <p className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400">Active Duty</p>
                             <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.active}</p>
                         </div>
                     </div>
@@ -211,7 +211,7 @@ export default function Staff() {
                             <Shield size={28} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Unique Roles</p>
+                            <p className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400">Unique Roles</p>
                             <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.roles}</p>
                         </div>
                     </div>
@@ -259,10 +259,10 @@ export default function Staff() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
-                                        <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('name')}>Name</TableHead>
-                                        <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('role')}>Role</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Contact</TableHead>
-                                        <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
+                                        <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[14px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('name')}>Name</TableHead>
+                                        <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[14px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('role')}>Role</TableHead>
+                                        <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Contact</TableHead>
+                                        <TableHead className="text-right pr-8 text-[14px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -284,7 +284,7 @@ export default function Staff() {
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tighter leading-none group-hover:text-blue-600 transition-colors">{staffMember.name}</span>
-                                                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1.5 font-mono">{staffMember.employeeId || `ID_${staffMember.id.toString().padStart(4, '0')}`}</span>
+                                                        <span className="text-[14px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1.5 font-mono">{staffMember.employeeId || `ID_${staffMember.id.toString().padStart(4, '0')}`}</span>
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -293,10 +293,10 @@ export default function Staff() {
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex flex-col gap-1">
-                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 tracking-tight">
+                                                    <div className="flex items-center gap-2 text-[14px] font-bold text-slate-600 dark:text-slate-300 tracking-tight">
                                                         <Mail size={12} className="text-blue-500" /> {staffMember.email || '—'}
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 tracking-tight">
+                                                    <div className="flex items-center gap-2 text-[14px] font-bold text-slate-600 dark:text-slate-300 tracking-tight">
                                                         <Phone size={12} className="text-emerald-500" /> {staffMember.phone || '—'}
                                                     </div>
                                                 </div>
@@ -348,7 +348,7 @@ export default function Staff() {
                         <div className="bg-amber-500 p-8 text-white flex justify-between items-center">
                             <div>
                                 <h2 className="text-xl font-black uppercase tracking-tighter">Business QR</h2>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-amber-100">Attendance Scan Point</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-amber-100">Attendance Scan Point</p>
                             </div>
                             <button onClick={() => setIsQRModalOpen(false)} className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
                                 <X size={20} />
@@ -376,21 +376,21 @@ export default function Staff() {
                             <div className="text-center space-y-4 w-full">
                                 <div className="space-y-1">
                                     <p className="text-sm font-bold text-slate-900 uppercase tracking-tighter">Instructions</p>
-                                    <p className="text-[10px] font-bold text-slate-400 leading-relaxed px-4">
+                                    <p className="text-[14px] font-bold text-slate-400 leading-relaxed px-4">
                                         Display this QR at your shop entrance. Staff can scan using any smartphone to log their attendance securely.
                                     </p>
                                 </div>
 
                                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Network Server IP (for Mobile)</label>
+                                    <label className="text-[14px] font-black text-slate-400 uppercase tracking-widest block mb-2">Network Server IP (for Mobile)</label>
                                     <input
                                         type="text"
                                         value={serverIp}
                                         onChange={(e) => setServerIp(e.target.value)}
                                         placeholder="e.g. 192.168.1.15"
-                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/20 dark:text-white"
+                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-[14px] font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/20 dark:text-white"
                                     />
-                                    <p className="text-[8px] text-amber-600 font-bold mt-2 uppercase tracking-wider">Use IP Address to work on mobile</p>
+                                    <p className="text-[14px] text-amber-600 font-bold mt-2 uppercase tracking-wider">Use IP Address to work on mobile</p>
                                 </div>
                             </div>
 

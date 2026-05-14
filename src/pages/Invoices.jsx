@@ -37,7 +37,7 @@ function StatusBadge({ status }) {
     };
     return (
         <span className={cn(
-            'inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider',
+            'inline-flex items-center rounded-full border px-2 py-0.5 text-[14px] font-black uppercase tracking-wider',
             styles[s] ?? 'bg-slate-50 text-slate-500 border-slate-100'
         )}>
             {status || 'Unknown'}
@@ -178,7 +178,7 @@ export default function Invoices() {
                                             setCurrentPage(1);
                                         }}
                                         className={cn(
-                                            'px-3 py-1 text-[10px] font-black uppercase tracking-widest transition-all rounded-lg',
+                                            'px-3 py-1 text-[14px] font-black uppercase tracking-widest transition-all rounded-lg',
                                             statusFilter === status
                                                 ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm'
                                                 : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
@@ -197,12 +197,12 @@ export default function Invoices() {
                          <Table>
                             <TableHeader>
                                 <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
-                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500 pl-8 py-4" onClick={() => handleSort('id')}>Invoice info</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('customerName')}>Customer</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('invoiceDate')}>Timeline</TableHead>
-                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[10px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('totalAmount')}>Amount</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
-                                    <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[14px] font-black uppercase tracking-wider text-slate-500 pl-8 py-4" onClick={() => handleSort('id')}>Invoice info</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[14px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('customerName')}>Customer</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[14px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('invoiceDate')}>Timeline</TableHead>
+                                    <TableHead className="cursor-pointer hover:text-slate-900 text-[14px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('totalAmount')}>Amount</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
+                                    <TableHead className="text-right pr-8 text-[14px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -211,8 +211,8 @@ export default function Invoices() {
                                          <TableCell className="font-bold text-slate-900 dark:text-white pl-8 py-6 leading-none">
                                             {invoice.invoiceNumber || `#INV-${invoice.formattedId || invoice.id || 'N/A'}`}
                                         </TableCell>
-                                         <TableCell className="text-slate-600 dark:text-slate-300 font-bold uppercase tracking-tighter text-xs">{invoice.customerName || invoice.customer?.name || 'Walk-in'}</TableCell>
-                                        <TableCell className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+                                         <TableCell className="text-slate-600 dark:text-slate-300 font-bold uppercase tracking-tighter text-[14px]">{invoice.customerName || invoice.customer?.name || 'Walk-in'}</TableCell>
+                                        <TableCell className="text-slate-400 font-bold text-[14px] uppercase tracking-widest">
                                             {formatDateOnly(invoice.invoiceDate || invoice.createdAt)}
                                         </TableCell>
                                          <TableCell className="font-black text-slate-900 dark:text-white text-lg tabular-nums">{fmt(invoice.totalAmount || invoice.grandTotal || 0)}</TableCell>

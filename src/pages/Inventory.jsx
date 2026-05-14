@@ -225,22 +225,22 @@ export default function Inventory() {
                     ) : (
                         <Table className="border-separate border-spacing-0">
                             <TableHeader>
-                                    <TableRow className="bg-slate-50/30 dark:bg-slate-800/30 hover:bg-transparent border-none">
-                                        <TableHead className="pl-10 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 cursor-pointer" onClick={() => handleSort('itemName')}>Product Name</TableHead>
-                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">SKU / Batch</TableHead>
-                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Expiry</TableHead>
-                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</TableHead>
-                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center cursor-pointer" onClick={() => handleSort('availableQty')}>Available</TableHead>
-                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Price</TableHead>
-                                        <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</TableHead>
-                                        <TableHead className="pr-10 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</TableHead>
-                                    </TableRow>
+                                <TableRow className="bg-slate-50/30 dark:bg-slate-800/30 hover:bg-transparent border-none">
+                                    <TableHead className="pl-10 py-5 text-[15px] font-black uppercase tracking-widest text-slate-400 cursor-pointer" onClick={() => handleSort('itemName')}>Product Name</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400">SKU / Batch</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400">Expiry</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400">Category</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400 text-center cursor-pointer" onClick={() => handleSort('availableQty')}>Available</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400 text-right">Price</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400">Status</TableHead>
+                                    <TableHead className="pr-10 py-5 text-[15px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</TableHead>
+                                </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {paginatedRecords.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={8} className="py-24 text-center">
-                                            <p className="text-xs font-black text-slate-300 uppercase tracking-[0.3em]">No Assets Found in Matrix</p>
+                                            <p className="text-[15px] font-black text-slate-300 uppercase tracking-[0.3em]">No Assets Found in Matrix</p>
                                         </TableCell>
                                     </TableRow>
                                 ) : paginatedRecords.map((r) => (
@@ -257,11 +257,11 @@ export default function Inventory() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col">
-                                                <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest font-mono leading-none">
+                                                <span className="text-[15px] font-black text-slate-900 dark:text-white uppercase tracking-widest font-mono leading-none">
                                                     {r.sku || r.barcode || r.itemId || '—'}
                                                 </span>
                                                 {r.batchNo && (
-                                                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">
+                                                    <span className="text-[15px] font-black text-slate-400 uppercase tracking-tighter mt-1">
                                                         Batch: {r.batchNo}
                                                     </span>
                                                 )}
@@ -269,14 +269,14 @@ export default function Inventory() {
                                         </TableCell>
                                         <TableCell>
                                             <span className={cn(
-                                                "text-[10px] font-black uppercase tracking-widest",
+                                                "text-[15px] font-black uppercase tracking-widest",
                                                 r.expiryDate && new Date(r.expiryDate) < new Date() ? "text-rose-500" : "text-slate-400"
                                             )}>
                                                 {r.expiryDate ? new Date(r.expiryDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—'}
                                             </span>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-[10px] font-bold text-slate-500">
+                                            <span className="text-[15px] font-bold text-slate-500">
                                                 {r.categoryName || r.category?.name || r.category || '—'}
                                             </span>
                                         </TableCell>
@@ -285,15 +285,15 @@ export default function Inventory() {
                                                 <span className="text-lg font-black text-slate-900 dark:text-white tabular-nums">
                                                     {Number(r.availableQty ?? 0).toLocaleString()}
                                                 </span>
-                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Sellable</span>
+                                                <span className="text-[15px] font-black text-emerald-500 uppercase tracking-widest">Sellable</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-sm font-black text-slate-900 dark:text-white tracking-tighter tabular-nums">
+                                                <span className="text-base font-black text-slate-900 dark:text-white tracking-tighter tabular-nums">
                                                     {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(r.sellingPrice || 0)}
                                                 </span>
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Unit Rate</span>
+                                                <span className="text-[15px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Unit Rate</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -318,7 +318,7 @@ export default function Inventory() {
                         </Table>
                     )}
                 </CardContent>
-                
+
                 {!loading && filteredRecords.length > 0 && (
                     <div className="p-10 border-t border-slate-50 dark:border-slate-800">
                         <Pagination

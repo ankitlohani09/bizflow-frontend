@@ -69,7 +69,7 @@ export default function Returns() {
             <MainLayout title="Auditing Returns...">
                 <div className="flex h-96 flex-col items-center justify-center gap-4">
                     <Loader2 className="h-12 w-12 animate-spin text-blue-500 opacity-20" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Scanning Return Ledger...</p>
+                    <p className="text-[14px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Scanning Return Ledger...</p>
                 </div>
             </MainLayout>
         );
@@ -110,12 +110,12 @@ export default function Returns() {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
-                                <TableHead className="pl-8 py-5 text-[10px] font-black uppercase tracking-wider text-slate-500">Transaction Info</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Item Detail</TableHead>
-                                <TableHead className="text-center text-[10px] font-black uppercase tracking-wider text-slate-500">Condition</TableHead>
-                                <TableHead className="text-center text-[10px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
-                                <TableHead className="text-right text-[10px] font-black uppercase tracking-wider text-slate-500">Qty</TableHead>
-                                <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Timestamp</TableHead>
+                                <TableHead className="pl-8 py-5 text-[14px] font-black uppercase tracking-wider text-slate-500">Transaction Info</TableHead>
+                                <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Item Detail</TableHead>
+                                <TableHead className="text-center text-[14px] font-black uppercase tracking-wider text-slate-500">Condition</TableHead>
+                                <TableHead className="text-center text-[14px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
+                                <TableHead className="text-right text-[14px] font-black uppercase tracking-wider text-slate-500">Qty</TableHead>
+                                <TableHead className="text-right pr-8 text-[14px] font-black uppercase tracking-wider text-slate-500">Timestamp</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -124,7 +124,7 @@ export default function Returns() {
                                     <TableCell colSpan={6} className="h-64 text-center">
                                         <div className="flex flex-col items-center gap-2 opacity-20">
                                             <RotateCcw size={48} />
-                                            <p className="text-[10px] font-black uppercase tracking-widest">No returns found in ledger</p>
+                                            <p className="text-[14px] font-black uppercase tracking-widest">No returns found in ledger</p>
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -138,7 +138,7 @@ export default function Returns() {
                                         <TableCell className="pl-8 py-6">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-black text-slate-900 dark:text-white leading-tight">INV #{r.invoiceId}</span>
-                                                <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 mt-0.5">
+                                                <span className="text-[14px] font-bold text-slate-400 flex items-center gap-1 mt-0.5">
                                                     <User size={10} /> {r.customerName || 'Direct Client'}
                                                 </span>
                                             </div>
@@ -149,13 +149,13 @@ export default function Returns() {
                                                     <Package size={20} />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-xs font-black text-slate-700 dark:text-slate-300">{r.itemName}</span>
-                                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight">{r.reason || 'No reason provided'}</span>
+                                                    <span className="text-[14px] font-black text-slate-700 dark:text-slate-300">{r.itemName}</span>
+                                                    <span className="text-[14px] font-bold text-slate-500 uppercase tracking-tight">{r.reason || 'No reason provided'}</span>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <span className={`inline-flex px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${r.condition === 'GOOD'
+                                            <span className={`inline-flex px-2.5 py-1 rounded-full text-[14px] font-black uppercase tracking-widest ${r.condition === 'GOOD'
                                                     ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
                                                     : r.condition === 'DAMAGED'
                                                         ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400'
@@ -165,7 +165,7 @@ export default function Returns() {
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <span className={`inline-flex px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${r.status === 'APPROVED'
+                                            <span className={`inline-flex px-2.5 py-1 rounded-full text-[14px] font-black uppercase tracking-widest ${r.status === 'APPROVED'
                                                     ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
                                                     : r.status === 'PENDING' || !r.status
                                                         ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400'
@@ -179,10 +179,10 @@ export default function Returns() {
                                         </TableCell>
                                         <TableCell className="text-right pr-8">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-[11px] font-bold text-slate-900 dark:text-white uppercase tabular-nums">
+                                                <span className="text-[14px] font-bold text-slate-900 dark:text-white uppercase tabular-nums">
                                                     {formatDateOnly(r.createdAt)}
                                                 </span>
-                                                <span className="text-[10px] font-medium text-slate-400 uppercase leading-none mt-1">
+                                                <span className="text-[14px] font-medium text-slate-400 uppercase leading-none mt-1">
                                                     {formatTimeOnly(r.createdAt)}
                                                 </span>
                                             </div>

@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
     Plus, X, Users, Loader2, Barcode,
     CreditCard, Layers,
@@ -19,23 +22,33 @@ import { cn } from '../utils/cn';
 const fmt = (val) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val ?? 0);
 
+const customerSchema = z.object({
+    name: z.string().min(1, 'Name is required'),
+    phone: z.string().regex(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
+    email: z.string().email('Invalid email format').optional().or(z.literal('')),
+    address: z.string().optional()
+});
+
 /**
  * QuickAddCustomerModal
  */
 function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [form, setForm] = useState({ name: '', phone: '', email: '', address: '' });
+
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        resolver: zodResolver(customerSchema),
+        defaultValues: { name: '', phone: '', email: '', address: '' },
+        mode: 'onChange'
+    });
 
     if (!isOpen) return null;
 
-    async function handleSave(e) {
-        e.preventDefault();
-        if (!form.name || !form.phone) return setError('Name and Phone are mandatory.');
+    const onSubmit = async (data) => {
         setLoading(true);
         setError(null);
         try {
-            const result = await customerService.create(form);
+            const result = await customerService.create(data);
             onSuccess(result);
             onClose();
         } catch (err) {
@@ -43,7 +56,7 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
@@ -52,31 +65,50 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
                     <h3 className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-widest">Register Customer</h3>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"><X size={18} /></button>
                 </div>
-                <form onSubmit={handleSave} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
                     {error && <div className="p-3 bg-rose-50 text-rose-600 text-xs font-bold rounded-lg">{error}</div>}
-                    
+
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name *</label>
+                        <label className="text-[15px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name *</label>
                         <div className="relative">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                            <input autoFocus value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold dark:bg-slate-800 dark:border-slate-700 dark:text-white transition-all focus:ring-2 focus:ring-indigo-500/20" placeholder="Customer Name" />
+                            <input
+                                autoFocus
+                                {...register('name')}
+                                className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold dark:bg-slate-800 dark:border-slate-700 dark:text-white transition-all focus:ring-2 focus:ring-indigo-500/20"
+                                placeholder="Customer Name"
+                            />
                         </div>
+                        {errors.name && <p className="text-rose-500 text-[10px] font-bold mt-0.5 ml-1">{errors.name.message}</p>}
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number *</label>
+                        <label className="text-[15px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number *</label>
                         <div className="relative">
                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                            <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold dark:bg-slate-800 dark:border-slate-700 dark:text-white transition-all focus:ring-2 focus:ring-indigo-500/20" placeholder="10-digit Mobile" />
+                            <input
+                                type="tel"
+                                {...register('phone')}
+                                maxLength={10}
+                                className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold dark:bg-slate-800 dark:border-slate-700 dark:text-white transition-all focus:ring-2 focus:ring-indigo-500/20"
+                                placeholder="10-digit Mobile"
+                            />
                         </div>
+                        {errors.phone && <p className="text-rose-500 text-[10px] font-bold mt-0.5 ml-1">{errors.phone.message}</p>}
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Shipping Address</label>
+                        <label className="text-[15px] font-black text-slate-400 uppercase tracking-widest ml-1">Shipping Address</label>
                         <div className="relative">
                             <MapPin className="absolute left-3 top-3 text-slate-400" size={14} />
-                            <textarea rows={2} value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className="w-full pl-9 pr-4 pt-2 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold resize-none dark:bg-slate-800 dark:border-slate-700 dark:text-white transition-all focus:ring-2 focus:ring-indigo-500/20" placeholder="Enter full address" />
+                            <textarea
+                                rows={2}
+                                {...register('address')}
+                                className="w-full pl-9 pr-4 pt-2 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold resize-none dark:bg-slate-800 dark:border-slate-700 dark:text-white transition-all focus:ring-2 focus:ring-indigo-500/20"
+                                placeholder="Enter full address"
+                            />
                         </div>
+                        {errors.address && <p className="text-rose-500 text-[10px] font-bold mt-0.5 ml-1">{errors.address.message}</p>}
                     </div>
 
                     <button disabled={loading} type="submit" className="w-full h-12 bg-indigo-600 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -107,7 +139,7 @@ export default function InvoiceForm() {
     const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
 
     const [form, setForm] = useState({
-        customerId: '', 
+        customerId: '',
         customerName: 'Walk-in Customer',
         customerPhone: '',
         customerAddress: '',
@@ -245,9 +277,9 @@ export default function InvoiceForm() {
 
     async function handleSubmit(e) {
         e.preventDefault();
-        
+
         if (form.items.length === 0) return setError('Please add items to cart.');
-        
+
         const invalidQty = form.items.some(i => Number(i.quantity) <= 0);
         if (invalidQty) return setError('Quantity must be greater than 0.');
 
@@ -312,12 +344,12 @@ export default function InvoiceForm() {
 
     return (
         <MainLayout title="POS Terminal">
-            <QuickAddCustomerModal 
-                isOpen={isQuickAddOpen} 
-                onClose={() => setIsQuickAddOpen(false)} 
-                onSuccess={(c) => { setCustomers(p => [c, ...p]); selectCustomer(c); }} 
+            <QuickAddCustomerModal
+                isOpen={isQuickAddOpen}
+                onClose={() => setIsQuickAddOpen(false)}
+                onSuccess={(c) => { setCustomers(p => [c, ...p]); selectCustomer(c); }}
             />
-            
+
             <div className="h-[calc(100vh-64px)] bg-slate-50/50 dark:bg-slate-950/50 overflow-hidden">
                 <div className="max-w-[1700px] mx-auto h-full px-4 pt-4 flex flex-col">
 
@@ -335,7 +367,7 @@ export default function InvoiceForm() {
                         </div>
                         <AnimatePresence>
                             {error && (
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
@@ -348,10 +380,10 @@ export default function InvoiceForm() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="flex-1 flex gap-4 min-h-0 pb-4">
-                        
+
                         {/* ── LEFT COLUMN (Cart & Search) ── */}
                         <div className="flex-[8] flex flex-col gap-4 min-w-0">
-                            
+
                             {/* Search & Barcode Card */}
                             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-4 transition-all">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -368,7 +400,7 @@ export default function InvoiceForm() {
                                         />
                                         <AnimatePresence>
                                             {showItemDropdown && (
-                                                <motion.div 
+                                                <motion.div
                                                     initial={{ opacity: 0, y: 5 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: 5 }}
@@ -395,12 +427,12 @@ export default function InvoiceForm() {
                                     </div>
                                     <div className="relative">
                                         <Barcode className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                                        <input 
-                                            type="text" 
-                                            placeholder="Scan Barcode here..." 
-                                            value={barcode} 
-                                            onChange={(e) => setBarcode(e.target.value)} 
-                                            onKeyDown={(e) => e.key === 'Enter' && handleBarcodeScan(e)} 
+                                        <input
+                                            type="text"
+                                            placeholder="Scan Barcode here..."
+                                            value={barcode}
+                                            onChange={(e) => setBarcode(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleBarcodeScan(e)}
                                             className="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 outline-none text-sm transition-all shadow-inner focus:ring-2 focus:ring-indigo-500/10 dark:text-white"
                                         />
                                     </div>
@@ -410,13 +442,13 @@ export default function InvoiceForm() {
                             {/* Cart Table Card */}
                             <div className="flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 flex flex-col min-h-0 overflow-hidden transition-all">
                                 <div className="px-6 py-4 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
-                                    <div className="flex items-center gap-2 text-[10px] font-black text-slate-700 dark:text-white uppercase tracking-widest">
+                                    <div className="flex items-center gap-2 text-[15px] font-black text-slate-700 dark:text-white uppercase tracking-widest">
                                         <ShoppingCart size={14} className="text-slate-400" /> Current Cart ({form.items.length})
                                     </div>
                                 </div>
                                 <div className="flex-1 overflow-auto custom-scrollbar">
                                     <table className="w-full text-left text-xs border-collapse">
-                                        <thead className="sticky top-0 bg-white dark:bg-slate-900 shadow-sm z-10 text-slate-400 font-black uppercase text-[9px] tracking-widest border-b border-slate-50 dark:border-slate-800">
+                                        <thead className="sticky top-0 bg-white dark:bg-slate-900 shadow-sm z-10 text-slate-400 font-black uppercase text-[15px] tracking-widest border-b border-slate-50 dark:border-slate-800">
                                             <tr>
                                                 <th className="px-6 py-4">Item Detail</th>
                                                 <th className="px-4 py-4 text-center">Stock</th>
@@ -429,7 +461,7 @@ export default function InvoiceForm() {
                                         <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                                             <AnimatePresence>
                                                 {form.items.map((item, index) => (
-                                                    <motion.tr 
+                                                    <motion.tr
                                                         key={item.itemId}
                                                         initial={{ opacity: 0, y: 10 }}
                                                         animate={{ opacity: 1, y: 0 }}
@@ -446,9 +478,9 @@ export default function InvoiceForm() {
                                                             </div>
                                                         </td>
                                                         <td className="px-4 py-4 text-center">
-                                                            <span className={cn("px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest", 
-                                                                item.stock < 10 
-                                                                    ? 'bg-rose-50 text-rose-500 dark:bg-rose-900/20 dark:text-rose-400' 
+                                                            <span className={cn("px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                                                                item.stock < 10
+                                                                    ? 'bg-rose-50 text-rose-500 dark:bg-rose-900/20 dark:text-rose-400'
                                                                     : 'bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
                                                             )}>
                                                                 {item.stock}
@@ -488,10 +520,10 @@ export default function InvoiceForm() {
                         </div>
 
                         {/* ── RIGHT COLUMN (Customer & Checkout) ── */}
-                        <div className="flex-[4] flex flex-col gap-4 min-w-[380px]">
-                            
+                        <div className="flex-[4] flex flex-col gap-4 min-w-[380px] min-h-0">
+
                             {/* Customer Section Card */}
-                            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-5 space-y-4 transition-all">
+                            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-5 space-y-4 transition-all shrink-0">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2 text-[10px] font-black text-slate-700 dark:text-white uppercase tracking-widest"><Users size={14} className="text-indigo-600" /> Customer</div>
                                     <button type="button" onClick={() => setIsQuickAddOpen(true)} className="flex items-center gap-1 text-[9px] font-black text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400 px-2.5 py-1 rounded-full hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-all uppercase tracking-widest"><Plus size={12} /> New</button>
@@ -499,17 +531,17 @@ export default function InvoiceForm() {
                                 <div id="customer-search-box" className="space-y-3 relative">
                                     <div className="relative">
                                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                        <input 
-                                            type="text" 
-                                            placeholder={form.customerName} 
-                                            value={customerSearch} 
-                                            onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); }} 
-                                            onFocus={() => setShowCustomerDropdown(true)} 
+                                        <input
+                                            type="text"
+                                            placeholder={form.customerName}
+                                            value={customerSearch}
+                                            onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); }}
+                                            onFocus={() => setShowCustomerDropdown(true)}
                                             className="w-full h-10 pl-9 pr-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 outline-none text-xs font-bold text-slate-700 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 transition-all focus:ring-2 focus:ring-indigo-500/10"
                                         />
                                         <AnimatePresence>
                                             {showCustomerDropdown && (
-                                                <motion.div 
+                                                <motion.div
                                                     initial={{ opacity: 0, y: 5 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: 5 }}
@@ -532,10 +564,10 @@ export default function InvoiceForm() {
                                             )}
                                         </AnimatePresence>
                                     </div>
-                                    
+
                                     <AnimatePresence>
                                         {form.customerPhone && (
-                                            <motion.div 
+                                            <motion.div
                                                 initial={{ opacity: 0, height: 0 }}
                                                 animate={{ opacity: 1, height: 'auto' }}
                                                 exit={{ opacity: 0, height: 0 }}
@@ -544,7 +576,7 @@ export default function InvoiceForm() {
                                                 <div className="flex items-center gap-2 text-[10px] font-black text-slate-600 dark:text-slate-300"><Phone size={10} className="text-indigo-500" /> {form.customerPhone}</div>
                                                 {form.customerAddress && (
                                                     <div className="flex items-start gap-2 text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                                                        <MapPin size={10} className="text-indigo-500 mt-0.5 shrink-0" /> 
+                                                        <MapPin size={10} className="text-indigo-500 mt-0.5 shrink-0" />
                                                         <span className="leading-relaxed">{form.customerAddress}</span>
                                                     </div>
                                                 )}
@@ -559,20 +591,20 @@ export default function InvoiceForm() {
                             </div>
 
                             {/* Checkout Card */}
-                            <div className="flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-5 flex flex-col gap-4 min-h-0 overflow-visible transition-all">
-                                
+                            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-5 flex flex-col gap-4 transition-all">
+
                                 {/* Totals Summary */}
                                 <div className="space-y-2.5 bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/50 dark:to-slate-800/20 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-inner">
-                                    <div className="flex justify-between text-slate-500 font-black text-[10px] uppercase tracking-widest">
+                                    <div className="flex justify-between text-slate-500 font-black text-[15px] uppercase tracking-widest">
                                         <span>Subtotal</span>
                                         <span className="text-slate-800 dark:text-white tabular-nums">{fmt(totals.subtotal)}</span>
                                     </div>
-                                    <div className="flex justify-between text-slate-500 font-black text-[10px] uppercase tracking-widest">
+                                    <div className="flex justify-between text-slate-500 font-black text-[15px] uppercase tracking-widest">
                                         <span>Tax (GST)</span>
                                         <span className="text-emerald-600 dark:text-emerald-400 tabular-nums">+{fmt(totals.taxAmount)}</span>
                                     </div>
                                     <div className="pt-2 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Discount</span>
+                                        <span className="text-[15px] font-black text-slate-400 uppercase tracking-widest">Discount</span>
                                         <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-0.5">
                                             <span className="text-[9px] font-bold text-slate-300 dark:text-slate-600 mr-1">₹</span>
                                             <input type="number" value={form.discountAmount} onChange={(e) => setForm(p => ({ ...p, discountAmount: e.target.value }))} className="w-16 text-right font-bold text-xs outline-none bg-transparent dark:text-white" />
@@ -585,7 +617,7 @@ export default function InvoiceForm() {
                                 </div>
 
                                 {/* Payment Modes */}
-                                <div className="flex-1 min-h-0 overflow-auto custom-scrollbar space-y-3">
+                                <div className="space-y-3">
                                     <div className="flex items-center justify-between">
                                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Payment Method</label>
                                         <button type="button" onClick={() => setForm(p => ({ ...p, splitPayments: p.splitPayments.length > 0 ? [] : paymentModes.map(m => ({ paymentModeId: m.id, name: m.name, amount: 0 })) }))} className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline">
@@ -596,13 +628,13 @@ export default function InvoiceForm() {
                                     {form.splitPayments.length === 0 ? (
                                         <div className="grid grid-cols-2 gap-2">
                                             {paymentModes.map(mode => (
-                                                <button 
-                                                    key={mode.id} 
-                                                    type="button" 
-                                                    onClick={() => setForm(p => ({ ...p, selectedPaymentModeId: mode.id }))} 
-                                                    className={cn("px-4 py-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center gap-1.5 justify-center", 
-                                                        form.selectedPaymentModeId === mode.id 
-                                                            ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-600/20" 
+                                                <button
+                                                    key={mode.id}
+                                                    type="button"
+                                                    onClick={() => setForm(p => ({ ...p, selectedPaymentModeId: mode.id }))}
+                                                    className={cn("px-4 py-3 rounded-xl border text-[15px] font-black uppercase tracking-widest transition-all flex flex-col items-center gap-1.5 justify-center",
+                                                        form.selectedPaymentModeId === mode.id
+                                                            ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-600/20"
                                                             : "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 dark:hover:border-slate-600"
                                                     )}
                                                 >
@@ -621,11 +653,11 @@ export default function InvoiceForm() {
                                                     </div>
                                                     <div className="flex items-center">
                                                         <span className="text-slate-300 dark:text-slate-600 mr-1">₹</span>
-                                                        <input 
-                                                            type="number" 
-                                                            value={sp.amount} 
-                                                            onChange={(e) => setForm(p => ({ ...p, splitPayments: p.splitPayments.map((s, i) => i === idx ? { ...s, amount: Number(e.target.value) } : s) }))} 
-                                                            className="w-20 text-right bg-transparent outline-none font-bold dark:text-white" 
+                                                        <input
+                                                            type="number"
+                                                            value={sp.amount}
+                                                            onChange={(e) => setForm(p => ({ ...p, splitPayments: p.splitPayments.map((s, i) => i === idx ? { ...s, amount: Number(e.target.value) } : s) }))}
+                                                            className="w-20 text-right bg-transparent outline-none font-bold dark:text-white"
                                                         />
                                                     </div>
                                                 </div>
@@ -635,12 +667,12 @@ export default function InvoiceForm() {
                                 </div>
 
                                 {/* Submit Button */}
-                                <button 
-                                    disabled={submitting || form.items.length === 0} 
-                                    type="submit" 
-                                    className={cn("w-full h-14 rounded-xl flex items-center justify-center gap-3 text-xs font-black uppercase tracking-widest transition-all", 
-                                        submitting || form.items.length === 0 
-                                            ? "bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed" 
+                                <button
+                                    disabled={submitting || form.items.length === 0}
+                                    type="submit"
+                                    className={cn("w-full h-14 rounded-xl flex items-center justify-center gap-3 text-xs font-black uppercase tracking-widest transition-all",
+                                        submitting || form.items.length === 0
+                                            ? "bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed"
                                             : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-600/30 hover:scale-[1.02]"
                                     )}
                                 >

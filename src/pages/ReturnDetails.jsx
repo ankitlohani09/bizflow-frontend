@@ -75,7 +75,7 @@ export default function ReturnDetails() {
             <MainLayout title="Loading Return...">
                 <div className="flex h-96 flex-col items-center justify-center gap-4">
                     <Loader2 className="h-12 w-12 animate-spin text-blue-500 opacity-20" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Fetching Return Data...</p>
+                    <p className="text-[14px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Fetching Return Data...</p>
                 </div>
             </MainLayout>
         );
@@ -109,7 +109,7 @@ export default function ReturnDetails() {
                     <div>
                         <div className="flex items-center gap-2">
                             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{returnObj.returnNumber}</h1>
-                            <span className={`inline-flex px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                            <span className={`inline-flex px-2.5 py-1 rounded-full text-[14px] font-black uppercase tracking-widest ${
                                 returnObj.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' :
                                 returnObj.status === 'PENDING' || !returnObj.status ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400' :
                                 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400'
@@ -147,7 +147,7 @@ export default function ReturnDetails() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Refund</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-500">Total Refund</p>
                                 <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">{fmt(returnObj.totalRefund)}</h3>
                             </div>
                             <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
@@ -161,7 +161,7 @@ export default function ReturnDetails() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Refund Mode</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-500">Refund Mode</p>
                                 <h3 className="text-xl font-black text-slate-900 dark:text-white mt-1 uppercase">{returnObj.paymentModeName || 'N/A'}</h3>
                             </div>
                             <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
@@ -175,11 +175,11 @@ export default function ReturnDetails() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Date</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-500">Date</p>
                                 <h3 className="text-sm font-black text-slate-900 dark:text-white mt-1">
                                     {formatDateOnly(returnObj.createdAt)}
                                 </h3>
-                                <p className="text-[10px] text-slate-400 font-bold mt-0.5">
+                                <p className="text-[14px] text-slate-400 font-bold mt-0.5">
                                     {formatTimeOnly(returnObj.createdAt)}
                                 </p>
                             </div>
@@ -194,11 +194,11 @@ export default function ReturnDetails() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Created By</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-500">Created By</p>
                                 <h3 className="text-sm font-black text-slate-900 dark:text-white mt-1 truncate max-w-[120px]">
                                     {returnObj.createdBy?.split('@')[0] || 'System'}
                                 </h3>
-                                <p className="text-[10px] text-slate-400 font-bold mt-0.5 truncate max-w-[120px]">
+                                <p className="text-[14px] text-slate-400 font-bold mt-0.5 truncate max-w-[120px]">
                                     {returnObj.createdBy || ''}
                                 </p>
                             </div>
@@ -218,10 +218,10 @@ export default function ReturnDetails() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
-                                        <TableHead className="pl-8 py-5 text-[10px] font-black uppercase tracking-wider text-slate-500">Item Details</TableHead>
-                                        <TableHead className="text-right text-[10px] font-black uppercase tracking-wider text-slate-500">Qty</TableHead>
-                                        <TableHead className="text-right text-[10px] font-black uppercase tracking-wider text-slate-500">Price</TableHead>
-                                        <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-wider text-slate-500">Total</TableHead>
+                                        <TableHead className="pl-8 py-5 text-[14px] font-black uppercase tracking-wider text-slate-500">Item Details</TableHead>
+                                        <TableHead className="text-right text-[14px] font-black uppercase tracking-wider text-slate-500">Qty</TableHead>
+                                        <TableHead className="text-right text-[14px] font-black uppercase tracking-wider text-slate-500">Price</TableHead>
+                                        <TableHead className="text-right pr-8 text-[14px] font-black uppercase tracking-wider text-slate-500">Total</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -233,13 +233,13 @@ export default function ReturnDetails() {
                                                         <Package size={20} />
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-xs font-black text-slate-700 dark:text-slate-300">{item.itemName}</span>
+                                                        <span className="text-[14px] font-black text-slate-700 dark:text-slate-300">{item.itemName}</span>
                                                         {item.variantName && (
-                                                            <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 mt-0.5">
+                                                            <span className="text-[14px] font-bold text-slate-400 flex items-center gap-1 mt-0.5">
                                                                 <Tag size={10} /> {item.variantName}
                                                             </span>
                                                         )}
-                                                        <span className={`inline-flex self-start mt-1 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${
+                                                        <span className={`inline-flex self-start mt-1 px-1.5 py-0.5 rounded text-[14px] font-black uppercase tracking-widest ${
                                                             item.conditionType === 'GOOD' 
                                                             ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' 
                                                             : item.conditionType === 'DAMAGED'
@@ -251,13 +251,13 @@ export default function ReturnDetails() {
                                                     </div>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-right font-black text-slate-900 dark:text-white tabular-nums text-xs">
+                                            <TableCell className="text-right font-black text-slate-900 dark:text-white tabular-nums text-[14px]">
                                                 {item.quantity}
                                             </TableCell>
-                                            <TableCell className="text-right font-black text-slate-900 dark:text-white tabular-nums text-xs">
+                                            <TableCell className="text-right font-black text-slate-900 dark:text-white tabular-nums text-[14px]">
                                                 {fmt(item.unitPrice)}
                                             </TableCell>
-                                            <TableCell className="text-right pr-8 font-black text-slate-900 dark:text-white tabular-nums text-xs">
+                                            <TableCell className="text-right pr-8 font-black text-slate-900 dark:text-white tabular-nums text-[14px]">
                                                 {fmt(item.lineTotal)}
                                             </TableCell>
                                         </TableRow>
@@ -271,7 +271,7 @@ export default function ReturnDetails() {
                     {returnObj.reason && (
                         <Card className="bg-white border-none dark:bg-slate-900">
                             <CardContent className="p-6">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Return Reason</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-500 mb-2">Return Reason</p>
                                 <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">
                                     {returnObj.reason}
                                 </p>
@@ -285,7 +285,7 @@ export default function ReturnDetails() {
                     {/* Customer Card */}
                     <Card className="bg-white border-none dark:bg-slate-900">
                         <CardContent className="p-6">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Customer Details</p>
+                            <p className="text-[14px] font-black uppercase tracking-widest text-slate-500 mb-4">Customer Details</p>
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
                                     <User size={20} />
@@ -294,7 +294,7 @@ export default function ReturnDetails() {
                                     <h4 className="text-sm font-black text-slate-900 dark:text-white">
                                         {returnObj.customerName || 'Direct Client'}
                                     </h4>
-                                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                                    <p className="text-[14px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
                                         {returnObj.customerPhone || 'No phone provided'}
                                     </p>
                                 </div>
@@ -305,7 +305,7 @@ export default function ReturnDetails() {
                     {/* Invoice Ref Card */}
                     <Card className="bg-white border-none dark:bg-slate-900">
                         <CardContent className="p-6">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Original Invoice</p>
+                            <p className="text-[14px] font-black uppercase tracking-widest text-slate-500 mb-4">Original Invoice</p>
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2">
                                     <Receipt size={16} className="text-slate-400" />
@@ -314,7 +314,7 @@ export default function ReturnDetails() {
                                 <Button 
                                     onClick={() => navigate(`/invoices/${returnObj.invoiceId}`)}
                                     variant="ghost" 
-                                    className="text-xs font-bold text-indigo-600 dark:text-indigo-400 h-8"
+                                    className="text-[14px] font-bold text-indigo-600 dark:text-indigo-400 h-8"
                                 >
                                     View Invoice
                                 </Button>

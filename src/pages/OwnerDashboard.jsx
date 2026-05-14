@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell
@@ -68,6 +69,7 @@ const item = {
 
 export default function Dashboard() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [summary, setSummary] = useState(null);
@@ -113,7 +115,7 @@ export default function Dashboard() {
                         className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-500/20 rounded-2xl px-6"
                         onClick={() => navigate('/invoices/new')}
                     >
-                        <ReceiptText className="h-4 w-4" /> New Bill
+                        <ReceiptText className="h-4 w-4" /> Create New Invoice
                     </Button>
                 </div>
             </div>
@@ -132,7 +134,7 @@ export default function Dashboard() {
                     </Button>
                 </div>
             ) : (
-                <motion.div 
+                <motion.div
                     variants={container}
                     initial="hidden"
                     animate="show"
@@ -144,84 +146,128 @@ export default function Dashboard() {
                             title="Total Sales"
                             value={fmt(summary?.revenue)}
                             icon={TrendingUp}
-                            colorClass="icon-box-blue"
                             subtitle={`${recentInvoices.length} invoices registered`}
                         />
                         <MetricCard
                             title="Total Expenses"
-                            value={fmt(summary?.expenses)}
+                            value={fmt(summary?.costs)}
                             icon={TrendingDown}
-                            colorClass="icon-box-rose"
-                            subtitle={`${summary?.expenseCount || 0} expense records`}
+                            subtitle={`${summary?.breakdown?.expenses || 0} expense records`}
                         />
                         <MetricCard
                             title="Net Profit"
                             value={fmt(summary?.netProfit)}
                             icon={ArrowUpRight}
-                            colorClass="icon-box-emerald"
                             subtitle="On track for Q2"
                         />
                         <MetricCard
                             title="Low Stock"
-                            value={analytics?.topItems?.filter(i => i.quantity < 10).length || 0}
+                            value={summary?.lowStockCount || 0}
                             icon={AlertCircle}
-                            colorClass="icon-box-amber"
-                            subtitle={`of ${analytics?.topItems?.length || 0} items`}
+                            subtitle={`of ${summary?.totalItems || 0} items`}
                         />
                     </div>
 
                     {/* AI Advisor Section - Solid Dark for Maximum Readability & Premium Feel */}
                     {insights.length > 0 && (
-                        <div className="bg-slate-900 rounded-[3rem] p-10 shadow-2xl relative overflow-hidden group">
+                        <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[3rem] p-10 shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100/50 dark:border-slate-800/50 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:scale-110 transition-transform duration-700">
-                                <Sparkles size={160} className="text-indigo-400" />
+                                <Sparkles size={160} className="text-indigo-500 dark:text-indigo-400" />
                             </div>
-                            
+
                             <div className="relative z-10">
                                 <div className="flex items-center justify-between mb-10">
                                     <div className="flex items-center gap-5">
-                                        <div className="p-4 bg-indigo-500/20 rounded-2xl border border-indigo-500/30">
-                                            <Lightbulb className="text-indigo-400" size={32} />
+                                        <div className="p-4 bg-indigo-50 dark:bg-indigo-500/20 rounded-2xl border border-indigo-100 dark:border-indigo-500/30">
+                                            <Lightbulb className="text-indigo-600 dark:text-indigo-400" size={32} />
                                         </div>
                                         <div>
-                                            <h3 className="text-white font-black uppercase tracking-[0.2em] text-sm leading-tight">BizFlow AI Advisor</h3>
-                                            <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Smart Insights Engine v2.0</p>
+                                            <h3 className="text-slate-900 dark:text-white font-black uppercase tracking-[0.2em] text-sm leading-tight">{t("Smart Business Tips")}</h3>
+                                            <p className="text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mt-1">{t("AI Powered Advice")}</p>
                                         </div>
                                     </div>
-                                    <div className="hidden sm:flex px-5 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full">
-                                        <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest animate-pulse">Neural Analysis Live</span>
+                                    <div className="hidden sm:flex px-5 py-2 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-full">
+                                        <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest animate-pulse">Neural Analysis Live</span>
                                     </div>
                                 </div>
 
-                                <div className="grid gap-6 md:grid-cols-2">
-                                    {insights.map((insight, idx) => (
-                                        <motion.div 
-                                            key={idx}
-                                            whileHover={{ y: -5 }}
-                                            className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] hover:bg-white/10 hover:border-indigo-500/30 transition-all duration-300 shadow-xl"
-                                        >
-                                            <div className="flex items-start gap-6">
-                                                <div className={cn(
-                                                    "p-3 rounded-xl shrink-0",
-                                                    insight.type === 'POSITIVE' ? "bg-emerald-500/20 text-emerald-400" :
-                                                    insight.type === 'WARNING' ? "bg-amber-500/20 text-amber-400" :
-                                                    "bg-rose-500/20 text-rose-400"
-                                                )}>
-                                                    {insight.type === 'POSITIVE' ? <TrendingUp size={22} /> :
-                                                     insight.type === 'WARNING' ? <ShieldAlert size={22} /> :
-                                                     <AlertCircle size={22} />}
-                                                </div>
-                                                <div>
-                                                    <p className="text-slate-100 text-[15px] font-bold leading-relaxed tracking-tight">{insight.text}</p>
-                                                    <div className="mt-5 flex items-center gap-4">
-                                                        <span className="text-[10px] font-black text-indigo-400/60 uppercase tracking-widest">{insight.category}</span>
-                                                        <div className="h-1 w-1 rounded-full bg-slate-700" />
-                                                        <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Confidence: {(insight.relevance * 100).toFixed(0)}%</span>
+                                <div className="relative">
+                                    {/* Vertical Line */}
+                                    <div className="absolute left-6 top-2 bottom-2 w-0.5 bg-slate-200 dark:bg-slate-800" />
+
+                                    <div className="space-y-8">
+                                        {insights.map((insight, idx) => {
+                                            const isHero = idx === 0;
+                                            return (
+                                                <motion.div
+                                                    key={idx}
+                                                    whileHover={{ x: 5 }}
+                                                    className="relative pl-16"
+                                                >
+                                                    {/* Timeline Node */}
+                                                    {isHero ? (
+                                                        <div className="absolute left-[0.8rem] top-1.5 h-5 w-5 rounded-full border-4 border-white dark:border-slate-900 bg-indigo-500 shadow-[0_0_10px_#6366f1] animate-pulse" />
+                                                    ) : (
+                                                        <div className={cn(
+                                                            "absolute left-[1.1rem] top-2 h-3 w-3 rounded-full border-2 border-white dark:border-slate-900",
+                                                            insight.type === 'POSITIVE' ? "bg-emerald-500" :
+                                                                insight.type === 'WARNING' ? "bg-amber-500" :
+                                                                    "bg-rose-500"
+                                                        )} />
+                                                    )}
+
+                                                    {/* Insight Card */}
+                                                    <div className={cn(
+                                                        "border transition-all duration-300 shadow-xl backdrop-blur-md p-6 rounded-2xl",
+                                                        isHero
+                                                            ? "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-100 dark:border-indigo-500/30 hover:border-indigo-200 dark:hover:border-indigo-500/50"
+                                                            : "bg-white dark:bg-indigo-500/5 border-slate-100 dark:border-white/5 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:border-indigo-100 dark:hover:border-indigo-500/20"
+                                                    )}>
+                                                        <div className="flex items-start gap-4">
+                                                            <div className={cn(
+                                                                "p-2.5 rounded-lg shrink-0",
+                                                                insight.type === 'POSITIVE' ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" :
+                                                                    insight.type === 'WARNING' ? "bg-amber-500/20 text-amber-600 dark:text-amber-400" :
+                                                                        "bg-rose-500/20 text-rose-600 dark:text-rose-400"
+                                                            )}>
+                                                                {insight.type === 'POSITIVE' ? <TrendingUp size={isHero ? 22 : 18} /> :
+                                                                    insight.type === 'WARNING' ? <ShieldAlert size={isHero ? 22 : 18} /> :
+                                                                        <AlertCircle size={isHero ? 22 : 18} />}
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <div className="flex items-center justify-between mb-1">
+                                                                    <p className={cn(
+                                                                        "text-slate-800 dark:text-slate-100 font-bold leading-relaxed tracking-tight",
+                                                                        isHero ? "text-[16px]" : "text-[14px]"
+                                                                    )}>
+                                                                        {t(insight.textKey, insight.params)}
+                                                                    </p>
+                                                                    {isHero && (
+                                                                        <span className="text-[9px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded-full uppercase tracking-widest ml-2 shrink-0">Top Tip</span>
+                                                                    )}
+                                                                </div>
+                                                                <div className="mt-4 flex items-center justify-between">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-[9px] font-black text-indigo-600/60 dark:text-indigo-400/60 uppercase tracking-widest">{insight.category}</span>
+                                                                        <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                                                                        <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Confidence: {(insight.relevance * 100).toFixed(0)}%</span>
+                                                                    </div>
+                                                                    <div className="w-20 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                                        <div className={cn(
+                                                                            "h-full rounded-full",
+                                                                            insight.type === 'POSITIVE' ? "bg-emerald-500" :
+                                                                                insight.type === 'WARNING' ? "bg-amber-500" :
+                                                                                    "bg-rose-500"
+                                                                        )} style={{ width: `${insight.relevance * 100}%` }} />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ))}
+                                                </motion.div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -229,7 +275,7 @@ export default function Dashboard() {
 
                     {/* Chart Row */}
                     <div className="grid gap-8 lg:grid-cols-3">
-                        <Card className="lg:col-span-2 border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden">
+                        <Card className="lg:col-span-2 border border-slate-100/50 dark:border-slate-800/50 shadow-2xl shadow-slate-200/50 dark:shadow-none bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[2.5rem] overflow-hidden">
                             <CardHeader className="p-8 border-b border-slate-100 dark:border-slate-800/50">
                                 <CardTitle className="text-indigo-600 dark:text-indigo-400">Sales Graph</CardTitle>
                                 <CardDescription>Sales performance over time</CardDescription>
@@ -298,7 +344,7 @@ export default function Dashboard() {
                             </CardContent>
                         </Card>
 
-                        <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden">
+                        <Card className="border border-slate-100/50 dark:border-slate-800/50 shadow-2xl shadow-slate-200/50 dark:shadow-none bg-white/70 dark:bg-slate-950/80 backdrop-blur-xl rounded-[2.5rem] overflow-hidden hover:border-indigo-500/20 transition-all duration-500">
                             <CardHeader className="p-8 border-b border-slate-100 dark:border-slate-800/50">
                                 <CardTitle className="text-indigo-600 dark:text-indigo-400">Best Selling Items</CardTitle>
                                 <CardDescription>Top moving stock</CardDescription>
@@ -320,7 +366,7 @@ export default function Dashboard() {
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                 ))}
                                             </Pie>
-                                            <Tooltip 
+                                            <Tooltip
                                                 contentStyle={{
                                                     borderRadius: '16px',
                                                     border: 'none',
@@ -336,28 +382,31 @@ export default function Dashboard() {
                                 </div>
                                 <div className="space-y-6">
                                     {(analytics?.topItems || []).slice(0, 5).map((item, idx) => (
-                                    <div key={idx} className="group">
-                                        <div className="flex justify-between items-center mb-3">
-                                            <span className="text-sm font-black text-slate-800 dark:text-slate-200 truncate w-40">{item.name}</span>
-                                            <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{item.quantity} Units</span>
+                                        <div key={idx} className="group">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
+                                                    <span className="text-sm font-black text-slate-800 dark:text-slate-200 truncate w-40">{item.name}</span>
+                                                </div>
+                                                <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{item.quantity} Units</span>
+                                            </div>
+                                            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${(item.quantity / (analytics?.topItems[0]?.quantity || 1)) * 100}%` }}
+                                                    transition={{ duration: 1.5, ease: "easeOut", delay: idx * 0.1 }}
+                                                    className="h-full bg-gradient-to-r from-indigo-500 to-sky-500 rounded-full"
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                animate={{ width: `${(item.quantity / (analytics?.topItems[0]?.quantity || 1)) * 100}%` }}
-                                                transition={{ duration: 1.5, ease: "easeOut", delay: idx * 0.1 }}
-                                                className="h-full bg-gradient-to-r from-indigo-500 to-sky-500 rounded-full"
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
 
                     {/* Recent Invoices */}
-                    <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden">
+                    <Card className="border border-slate-100/50 dark:border-slate-800/50 shadow-2xl shadow-slate-200/50 dark:shadow-none bg-white/70 dark:bg-slate-950/80 backdrop-blur-xl rounded-[2.5rem] overflow-hidden hover:border-indigo-500/20 transition-all duration-500">
                         <CardHeader className="flex flex-row items-center justify-between p-8 border-b border-slate-50 dark:border-slate-800/50">
                             <div>
                                 <CardTitle className="text-indigo-600 dark:text-indigo-400">Recent Bills</CardTitle>
@@ -377,11 +426,11 @@ export default function Dashboard() {
                                 </TableHeader>
                                 <TableBody>
                                     {recentInvoices.map((invoice) => (
-                                        <TableRow key={invoice.id} className="dark:hover:bg-slate-800/30 border-slate-50 dark:border-slate-800/50 group h-16">
+                                        <TableRow key={invoice.id} className="dark:hover:bg-indigo-500/5 border-slate-50 dark:border-slate-800/50 group h-16 transition-colors duration-300">
                                             <TableCell className="font-black text-slate-900 dark:text-slate-200 pl-8">
                                                 {invoice.invoiceNumber || (`#INV-${invoice.id}`)}
                                             </TableCell>
-                                            <TableCell className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[11px] tracking-tight">{invoice.customerName || 'Direct Sale'}</TableCell>
+                                            <TableCell className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[11px] tracking-tight">{invoice.customerName || 'Walk-In Customer'}</TableCell>
                                             <TableCell className="font-black text-slate-900 dark:text-white tabular-nums">{fmt(invoice.grandTotal || invoice.totalAmount || 0)}</TableCell>
                                             <TableCell className="pr-8 text-right"><StatusBadge status={invoice.paymentStatus || invoice.status} /></TableCell>
                                         </TableRow>
@@ -396,13 +445,19 @@ export default function Dashboard() {
     );
 }
 
-function MetricCard({ title, value, subtitle, icon: Icon, colorClass }) {
+function MetricCard({ title, value, subtitle, icon: Icon }) {
     return (
         <motion.div variants={item}>
-            <Card className="p-8 group hover:border-indigo-500/20 transition-all duration-500 bg-white dark:bg-slate-900 shadow-xl border-none">
+            <Card className="p-8 group hover:border-indigo-500/30 transition-all duration-500 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100/50 dark:border-slate-800/50 rounded-[2rem]">
                 <div className="flex items-center gap-6">
-                    <div className={cn("transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg", colorClass)}>
-                        <Icon size={28} />
+                    <div className={cn(
+                        "p-4 rounded-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg flex items-center justify-center",
+                        title === "Total Sales" ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20" :
+                            title === "Total Expenses" ? "bg-rose-500/10 text-rose-500 border border-rose-500/20" :
+                                title === "Net Profit" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                                    "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                    )}>
+                        <Icon size={24} />
                     </div>
                     <div>
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{title}</p>

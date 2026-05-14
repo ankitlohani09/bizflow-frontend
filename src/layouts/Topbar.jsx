@@ -17,7 +17,9 @@ export default function Topbar({ onToggleSidebar }) {
     const navigate = useNavigate();
     const [isFullscreen, setIsFullscreen] = React.useState(false);
     const [showProfileMenu, setShowProfileMenu] = React.useState(false);
+    const [showLangMenu, setShowLangMenu] = React.useState(false);
     const menuRef = React.useRef(null);
+    const langMenuRef = React.useRef(null);
     const [user, setUser] = React.useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
 
     // Listen for user updates without page reload
@@ -35,6 +37,9 @@ export default function Topbar({ onToggleSidebar }) {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
                 setShowProfileMenu(false);
             }
+            if (langMenuRef.current && !langMenuRef.current.contains(event.target)) {
+                setShowLangMenu(false);
+            }
         }
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -47,6 +52,13 @@ export default function Topbar({ onToggleSidebar }) {
 
     const changeLanguage = (lng) => {
         i18n.changeLanguage(lng);
+        
+        // Google Translate Cookie
+        const value = `/en/${lng}`;
+        document.cookie = `googtrans=${value}; path=/;`;
+        
+        // Reload to apply translation
+        window.location.reload();
     };
 
     const toggleFullScreen = () => {
@@ -103,15 +115,51 @@ export default function Topbar({ onToggleSidebar }) {
                 </motion.button>
 
                 {/* Language Switcher */}
-                <select
-                    onChange={(e) => changeLanguage(e.target.value)}
-                    value={i18n.language}
-                    className="h-10 rounded-xl bg-slate-50 px-3 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-100 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 focus:outline-none transition-all"
-                >
-                    <option value="en">EN</option>
-                    <option value="hi">HI</option>
-                    <option value="hg">HG</option>
-                </select>
+                <div className="relative" ref={langMenuRef}>
+                    <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setShowLangMenu(!showLangMenu)}
+                        className="h-10 rounded-xl bg-slate-50 px-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-100 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 focus:outline-none transition-all"
+                    >
+                        {i18n.language.toUpperCase()}
+                        <ChevronDown size={12} className={cn("text-slate-400 transition-transform duration-300", showLangMenu && "rotate-180")} />
+                    </motion.button>
+
+                    <AnimatePresence>
+                        {showLangMenu && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                transition={{ duration: 0.2, ease: "easeOut" }}
+                                className="absolute right-0 mt-2 w-32 rounded-2xl bg-white p-1.5 shadow-2xl shadow-indigo-500/10 ring-1 ring-slate-100 dark:bg-slate-950 dark:ring-slate-900 z-50"
+                            >
+                                <div className="space-y-0.5">
+                                    {[
+                                        { key: 'en', label: 'English' },
+                                        { key: 'hi', label: 'Hindi' }
+                                    ].map((lang) => (
+                                        <button
+                                            key={lang.key}
+                                            onClick={() => { changeLanguage(lang.key); setShowLangMenu(false); }}
+                                            className={cn(
+                                                "flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-[11px] font-bold tracking-wide transition-all",
+                                                i18n.language === lang.key
+                                                    ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400"
+                                                    : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-900"
+                                            )}
+                                        >
+                                            <span>{lang.label}</span>
+                                            {i18n.language === lang.key && (
+                                                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
 
                 <div className="h-6 w-[1px] bg-slate-100 dark:bg-slate-900 mx-2" />
 
@@ -137,7 +185,7 @@ export default function Topbar({ onToggleSidebar }) {
                         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20 font-black text-sm ring-4 ring-indigo-500/10 transition-transform group-hover:scale-105 overflow-hidden">
                             {user.profilePictureUrl ? (
                                 <img
-                                    src={(import.meta.env.VITE_API_URL) + user.profilePictureUrl}
+                                    src={user.profilePictureUrl.startsWith('http') ? user.profilePictureUrl : (import.meta.env.VITE_API_URL) + user.profilePictureUrl}
                                     className="h-full w-full object-cover"
                                     alt="Avatar"
                                 />

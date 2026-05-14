@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
     Settings as SettingsIcon,
     Database,
@@ -37,12 +40,17 @@ import taxRuleService from '../services/taxRuleService';
 import userService from '../services/userService';
 import { TIMEZONE_OPTIONS } from '../utils/formatDate';
 
+const profileSchema = z.object({
+    displayName: z.string().min(1, 'Name is required'),
+    phoneNumber: z.string().regex(/^[0-9]{10}$/, 'Phone number must be 10 digits')
+});
+
 /**
  * Settings Page â€“ System configuration and Master Data
  */
 export default function Settings() {
     const location = useLocation();
-    const { branding, updateBranding, timezone, changeTimezone } = useTheme();
+    const { branding, updateBranding, setBrandingPreview, timezone, changeTimezone } = useTheme();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const isManagerOrOwner = user.roles?.includes('MANAGER') || user.roles?.includes('OWNER');
     const [activeTab, setActiveTab] = useState(isManagerOrOwner ? 'master' : 'account');
@@ -81,8 +89,14 @@ export default function Settings() {
     const [tenantSaving, setTenantSaving] = useState(false);
 
     // â”€â”€ Profile State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    const [displayName, setDisplayName] = useState(JSON.parse(localStorage.getItem('user') || '{}').name || '');
-    const [phoneNumber, setPhoneNumber] = useState(JSON.parse(localStorage.getItem('user') || '{}').phone || '');
+    const { register: registerProfile, handleSubmit: handleSubmitProfile, reset: resetProfile, formState: { errors: profileErrors } } = useForm({
+        resolver: zodResolver(profileSchema),
+        defaultValues: {
+            displayName: JSON.parse(localStorage.getItem('user') || '{}').name || '',
+            phoneNumber: JSON.parse(localStorage.getItem('user') || '{}').phone || ''
+        },
+        mode: 'onChange'
+    });
     const [profilePictureUrl, setProfilePictureUrl] = useState(JSON.parse(localStorage.getItem('user') || '{}').profilePictureUrl || '');
 
     // â”€â”€ Security State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -258,7 +272,7 @@ export default function Settings() {
                                                 </div>
                                                 <div>
                                                     <CardTitle className="text-slate-900 dark:text-white border-none font-black text-lg p-0">Payment Modes</CardTitle>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configure accepted payment methods</p>
+                                                    <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configure accepted payment methods</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -271,7 +285,7 @@ export default function Settings() {
                                                 onChange={(e) => setNewModeName(e.target.value)}
                                                 className="flex-1 bg-slate-50 dark:bg-slate-800 border-none h-12 rounded-2xl font-bold dark:text-white"
                                             />
-                                            <Button type="submit" className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest text-[10px]">
+                                            <Button type="submit" className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest text-[14px]">
                                                 {editingPm ? 'Update' : 'Add'}
                                             </Button>
                                         </form>
@@ -303,7 +317,7 @@ export default function Settings() {
                                             </div>
                                             <div>
                                                 <CardTitle className="text-slate-900 dark:text-white border-none font-black text-lg p-0">Tax Rules (GST/VAT)</CardTitle>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage reusable tax configurations</p>
+                                                <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage reusable tax configurations</p>
                                             </div>
                                         </div>
                                     </CardHeader>
@@ -311,7 +325,7 @@ export default function Settings() {
                                         <form onSubmit={handleAddTaxRule} className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-8">
                                             <div className="md:col-span-5"><Input placeholder="Rule Label" value={newTaxRule.name} onChange={(e) => setNewTaxRule({ ...newTaxRule, name: e.target.value })} className="h-12 bg-slate-50 dark:bg-slate-800 border-none font-bold dark:text-white" /></div>
                                             <div className="md:col-span-4"><Input type="number" placeholder="Rate %" value={newTaxRule.rate} onChange={(e) => setNewTaxRule({ ...newTaxRule, rate: e.target.value })} className="h-12 bg-slate-50 dark:bg-slate-800 border-none font-bold dark:text-white" /></div>
-                                            <div className="md:col-span-3"><Button type="submit" className="h-12 w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black uppercase tracking-widest text-[10px]">Add Rule</Button></div>
+                                            <div className="md:col-span-3"><Button type="submit" className="h-12 w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black uppercase tracking-widest text-[14px]">Add Rule</Button></div>
                                         </form>
 
                                         <div className="space-y-2">
@@ -340,7 +354,7 @@ export default function Settings() {
                                             </div>
                                             <div>
                                                 <CardTitle className="text-slate-900 dark:text-white border-none font-black text-lg p-0">App Modules</CardTitle>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Enable or disable features</p>
+                                                <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mt-1">Enable or disable features</p>
                                             </div>
                                         </div>
                                     </CardHeader>
@@ -352,7 +366,7 @@ export default function Settings() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Kitchen Module</p>
-                                                    <p className="text-[10px] text-slate-400 font-bold mt-1">Enable Kitchen Orders for Restaurant mode</p>
+                                                    <p className="text-[14px] text-slate-400 font-bold mt-1">Enable Kitchen Orders for Restaurant mode</p>
                                                 </div>
                                             </div>
                                             <button
@@ -377,7 +391,7 @@ export default function Settings() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">AI Insights</p>
-                                                    <p className="text-[10px] text-slate-400 font-bold mt-1">Enable AI-powered business chat and predictions</p>
+                                                    <p className="text-[14px] text-slate-400 font-bold mt-1">Enable AI-powered business chat and predictions</p>
                                                 </div>
                                             </div>
                                             <button
@@ -415,7 +429,7 @@ export default function Settings() {
                                             </div>
                                             <div>
                                                 <CardTitle className="text-slate-900 dark:text-white border-none font-black text-xl p-0">Attendance Rules</CardTitle>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Enforce security for staff check-ins</p>
+                                                <p className="text-[14px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Enforce security for staff check-ins</p>
                                             </div>
                                         </div>
                                     </CardHeader>
@@ -428,7 +442,7 @@ export default function Settings() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">AI Face Verification</p>
-                                                        <p className="text-[10px] text-slate-400 font-bold mt-1">Enforce mandatory check-in selfie</p>
+                                                        <p className="text-[14px] text-slate-400 font-bold mt-1">Enforce mandatory check-in selfie</p>
                                                     </div>
                                                 </div>
                                                 <button
@@ -453,7 +467,7 @@ export default function Settings() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">GPS Geofencing</p>
-                                                        <p className="text-[10px] text-slate-400 font-bold mt-1">Validate physical store presence</p>
+                                                        <p className="text-[14px] text-slate-400 font-bold mt-1">Validate physical store presence</p>
                                                     </div>
                                                 </div>
                                                 <button
@@ -475,7 +489,7 @@ export default function Settings() {
                                         <div className="mt-6 p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800">
                                             <div className="flex gap-3">
                                                 <ShieldCheck size={16} className="text-indigo-400 shrink-0" />
-                                                <p className="text-[10px] text-slate-500 font-bold leading-relaxed">
+                                                <p className="text-[14px] text-slate-500 font-bold leading-relaxed">
                                                     Protocols are enforced globally for all QR-based staff attendance. Mobile devices will prompt for hardware permissions.
                                                 </p>
                                             </div>
@@ -528,7 +542,7 @@ export default function Settings() {
                             <CardContent className="space-y-10 p-8">
                                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                                     <div className="space-y-4">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Primary Identity Color</label>
+                                        <label className="text-[14px] font-black text-slate-400 uppercase tracking-widest">Primary Identity Color</label>
                                         <div className="flex items-center gap-4">
                                             <input
                                                 type="color"
@@ -553,27 +567,56 @@ export default function Settings() {
                                 </div>
 
                                 <div
-                                    className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition-all overflow-hidden relative"
+                                    className="p-10 rounded-3xl bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center group cursor-pointer hover:border-primary/50 dark:hover:border-primary/50 transition-all overflow-hidden relative shadow-sm hover:shadow-xl hover:shadow-primary/5"
                                     onClick={() => document.getElementById('logo-upload').click()}
                                 >
                                     {localBranding.logoUrl ? (
-                                        <div className="relative h-24 w-full flex items-center justify-center">
-                                            <img
-                                                src={localBranding.logoUrl.startsWith('blob:') || localBranding.logoUrl.startsWith('data:') || localBranding.logoUrl.startsWith('http')
-                                                    ? localBranding.logoUrl
-                                                    : `${import.meta.env.VITE_API_URL}${localBranding.logoUrl.startsWith('/') ? '' : '/'}${localBranding.logoUrl}`}
-                                                alt="Logo Preview"
-                                                className="h-full object-contain"
-                                            />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-[10px] font-black uppercase">Click to Change</div>
+                                        <div className="relative w-full flex flex-col items-center justify-center gap-4">
+                                            <div className="relative h-32 w-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-100 dark:border-slate-800">
+                                                <img
+                                                    src={localBranding.logoUrl.startsWith('blob:') || localBranding.logoUrl.startsWith('data:') || localBranding.logoUrl.startsWith('http')
+                                                        ? localBranding.logoUrl
+                                                        : `${import.meta.env.VITE_API_URL}${localBranding.logoUrl.startsWith('/') ? '' : '/'}${localBranding.logoUrl}`}
+                                                    alt="Logo Preview"
+                                                    className="h-full object-contain"
+                                                />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-2xl text-white text-[14px] font-black uppercase tracking-widest">Click to Change</div>
+                                            </div>
+                                            
+                                            {/* Premium Remove Button inside the card */}
+                                            <button
+                                                className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/90 dark:bg-slate-800/90 shadow-lg flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all transform hover:scale-110 z-10"
+                                                onClick={async (e) => {
+                                                    e.stopPropagation(); // Prevent triggering file upload
+                                                    try {
+                                                        await brandingService.deleteLogo();
+                                                        setLocalBranding(prev => ({ ...prev, logoUrl: null }));
+                                                        
+                                                        // Live preview in sidebar
+                                                        setBrandingPreview({ logoUrl: null });
+                                                        
+                                                        setSuccessMsg('Logo removed successfully!');
+                                                        window.dispatchEvent(new Event('theme-updated'));
+                                                        
+                                                        // Reset file input value so the same file can be selected again
+                                                        const fileInput = document.getElementById('logo-upload');
+                                                        if (fileInput) fileInput.value = '';
+                                                    } catch (error) {
+                                                        console.error('Failed to delete logo:', error);
+                                                        setSuccessMsg('Failed to remove logo.');
+                                                    }
+                                                }}
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
                                         </div>
                                     ) : (
                                         <>
-                                            <div className="h-16 w-16 rounded-2xl bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center text-slate-300 group-hover:text-blue-500 transition-colors">
-                                                <ImageIcon size={32} />
+                                            <div className="h-20 w-20 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
+                                                <ImageIcon size={36} />
                                             </div>
-                                            <p className="mt-4 text-xs font-black text-slate-900 dark:text-white uppercase tracking-tighter">Upload Company Logo</p>
-                                            <p className="text-[10px] text-slate-400 font-bold mt-1">PNG or SVG, max 500kb</p>
+                                            <p className="mt-6 text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Upload Company Logo</p>
+                                            <p className="text-[11px] text-slate-400 font-bold mt-2 tracking-wide">PNG or SVG, max 500kb</p>
                                         </>
                                     )}
                                     <input
@@ -584,18 +627,16 @@ export default function Settings() {
                                         onChange={async (e) => {
                                             const file = e.target.files[0];
                                             if (file) {
-                                                // 1. Show instant local preview
                                                 const previewUrl = URL.createObjectURL(file);
                                                 setLocalBranding(p => ({ ...p, logoUrl: previewUrl }));
+                                                
+                                                // Live preview in sidebar
+                                                setBrandingPreview({ logoUrl: previewUrl });
 
                                                 try {
                                                     setSuccessMsg('Syncing logo with server...');
                                                     const res = await brandingService.uploadLogo(file);
-
-                                                    // IMPORTANT: Get the actual server path from response
                                                     const serverPath = res.logoUrl || res.path || res.url;
-
-                                                    // 2. Once uploaded, update state with SERVER URL, not blob
                                                     setLocalBranding(p => ({ ...p, logoUrl: serverPath }));
                                                     setSuccessMsg('Branding asset synced successfully!');
                                                 } catch (error) {
@@ -609,7 +650,7 @@ export default function Settings() {
 
                                 <div className="pt-6 border-t border-slate-100 flex justify-end">
                                     <Button
-                                        className="bg-slate-900 dark:bg-slate-800 hover:bg-black dark:hover:bg-slate-700 text-white px-10 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl shadow-xl shadow-slate-200 dark:shadow-none"
+                                        className="bg-slate-900 dark:bg-slate-800 hover:bg-black dark:hover:bg-slate-700 text-white px-10 font-black uppercase tracking-widest text-[14px] h-12 rounded-xl shadow-xl shadow-slate-200 dark:shadow-none"
                                         onClick={async () => {
                                             // Final safety check: if it's a blob, don't save it
                                             if (localBranding.logoUrl && localBranding.logoUrl.startsWith('blob:')) {
@@ -640,7 +681,7 @@ export default function Settings() {
                                         <div className="h-32 w-32 rounded-[2.5rem] bg-indigo-50 dark:bg-indigo-950/20 border-4 border-white dark:border-slate-800 shadow-2xl shadow-indigo-500/10 flex items-center justify-center overflow-hidden">
                                             {profilePictureUrl ? (
                                                 <img
-                                                    src={(import.meta.env.VITE_API_URL) + profilePictureUrl}
+                                                    src={profilePictureUrl.startsWith('http') ? profilePictureUrl : (import.meta.env.VITE_API_URL) + profilePictureUrl}
                                                     className="h-full w-full object-cover"
                                                     alt="Profile"
                                                 />
@@ -715,33 +756,51 @@ export default function Settings() {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <Input label="Display Name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-                                    <Input label="Email Address" defaultValue={JSON.parse(localStorage.getItem('user') || '{}').email} disabled />
-                                    <Input label="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="Enter phone number" />
-                                </div>
+                                <form onSubmit={handleSubmitProfile(async (data) => {
+                                    const user = JSON.parse(localStorage.getItem('user') || '{}');
+                                    try {
+                                        await userService.updateProfile(user.id, { name: data.displayName, phone: data.phoneNumber, email: user.email });
+                                        // Update local storage
+                                        localStorage.setItem('user', JSON.stringify({ ...user, name: data.displayName, phone: data.phoneNumber }));
+                                        setSuccessMsg('Account data saved successfully.');
+                                        setErrorMsg(null);
+                                        window.dispatchEvent(new Event('user-updated'));
+                                    } catch (err) {
+                                        setSuccessMsg(null);
+                                        setErrorMsg(err.message || 'Failed to save account data.');
+                                    }
+                                })}>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <Input 
+                                                label="Display Name" 
+                                                {...registerProfile('displayName')} 
+                                                className={profileErrors.displayName ? 'border-rose-500' : ''}
+                                            />
+                                            {profileErrors.displayName && <p className="text-rose-500 text-[14px] font-bold mt-0.5 ml-1">{profileErrors.displayName.message}</p>}
+                                        </div>
+                                        <Input label="Email Address" defaultValue={JSON.parse(localStorage.getItem('user') || '{}').email} disabled />
+                                        <div>
+                                            <Input 
+                                                label="Phone Number" 
+                                                {...registerProfile('phoneNumber')} 
+                                                maxLength={10}
+                                                placeholder="Enter phone number" 
+                                                className={profileErrors.phoneNumber ? 'border-rose-500' : ''}
+                                            />
+                                            {profileErrors.phoneNumber && <p className="text-rose-500 text-[14px] font-bold mt-0.5 ml-1">{profileErrors.phoneNumber.message}</p>}
+                                        </div>
+                                    </div>
 
-                                <div className="pt-6 border-t border-slate-100 flex justify-end">
-                                    <Button
-                                        className="bg-slate-900 dark:bg-slate-800 text-white px-8 font-bold rounded-xl h-12 shadow-xl shadow-slate-200 dark:shadow-none"
-                                        onClick={async () => {
-                                            const user = JSON.parse(localStorage.getItem('user') || '{}');
-                                            try {
-                                                await userService.updateProfile(user.id, { name: displayName, phone: phoneNumber, email: user.email });
-                                                // Update local storage
-                                                localStorage.setItem('user', JSON.stringify({ ...user, name: displayName, phone: phoneNumber }));
-                                                setSuccessMsg('Account data saved successfully.');
-                                                setErrorMsg(null);
-                                                window.dispatchEvent(new Event('user-updated'));
-                                            } catch (err) {
-                                                setSuccessMsg(null);
-                                                setErrorMsg(err.message || 'Failed to save account data.');
-                                            }
-                                        }}
-                                    >
-                                        Save Account Data
-                                    </Button>
-                                </div>
+                                    <div className="pt-6 border-t border-slate-100 flex justify-end mt-6">
+                                        <Button
+                                            type="submit"
+                                            className="bg-slate-900 dark:bg-slate-800 text-white px-8 font-bold rounded-xl h-12 shadow-xl shadow-slate-200 dark:shadow-none"
+                                        >
+                                            Save Account Data
+                                        </Button>
+                                    </div>
+                                </form>
                             </CardContent>
                         </Card>
                     )}
@@ -755,26 +814,26 @@ export default function Settings() {
                                     </div>
                                     <div>
                                         <CardTitle className="text-slate-900 dark:text-white border-none font-black text-xl p-0">Current Subscription</CardTitle>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Manage your service plan and usage limits</p>
+                                        <p className="text-[14px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Manage your service plan and usage limits</p>
                                     </div>
                                 </div>
                             </CardHeader>
                             <CardContent className="p-10 space-y-10">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Active Plan</p>
+                                        <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest mb-2">Active Plan</p>
                                         <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase">{tenant?.subscriptionPlan || 'TRIAL'}</h4>
-                                        <span className="inline-flex mt-3 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 text-[9px] font-black uppercase">Active Now</span>
+                                        <span className="inline-flex mt-3 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 text-[14px] font-black uppercase">Active Now</span>
                                     </div>
                                     <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Valid Until</p>
+                                        <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest mb-2">Valid Until</p>
                                         <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase">
                                             {tenant?.expiryDate ? new Date(tenant.expiryDate).toLocaleDateString() : 'N/A'}
                                         </h4>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase mt-2">Auto-renewal: Disabled</p>
+                                        <p className="text-[14px] font-bold text-slate-400 uppercase mt-2">Auto-renewal: Disabled</p>
                                     </div>
                                     <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">User Quota</p>
+                                        <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest mb-2">User Quota</p>
                                         <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase">{tenant?.maxUsers || 5} Staff</h4>
                                         <div className="w-full h-1.5 bg-slate-200 rounded-full mt-4 overflow-hidden">
                                             <div className="h-full bg-amber-500 w-[60%]" />
@@ -786,7 +845,7 @@ export default function Settings() {
                                     <div className="relative z-10">
                                         <h3 className="text-xl font-black uppercase tracking-tight">Upgrade your plan</h3>
                                         <p className="text-slate-400 text-sm mt-2 max-w-md font-medium">Unlock advanced AI insights, unlimited staff accounts, and custom invoice templates with our Enterprise plan.</p>
-                                        <Button className="mt-8 bg-white text-slate-900 hover:bg-slate-100 px-8 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl">
+                                        <Button className="mt-8 bg-white text-slate-900 hover:bg-slate-100 px-8 font-black uppercase tracking-widest text-[14px] h-12 rounded-xl">
                                             View Pricing Models
                                         </Button>
                                     </div>

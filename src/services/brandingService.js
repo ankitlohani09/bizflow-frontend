@@ -20,6 +20,11 @@ const brandingService = {
             },
         });
         return response;
+    },
+
+    deleteLogo: async () => {
+        const response = await api.delete('/white-label/settings/logo');
+        return response;
     }
 };
 

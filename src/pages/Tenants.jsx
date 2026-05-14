@@ -197,11 +197,11 @@ export default function Tenants() {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50/50 dark:bg-slate-800/20 hover:bg-transparent border-none">
-                                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-8 h-14">Business Name</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 h-14">Plan & Quota</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 h-14 text-center">Expiry</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 h-14 text-center">Status</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pr-8 h-14 text-right">Actions</TableHead>
+                                <TableHead className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 pl-8 h-14">Business Name</TableHead>
+                                <TableHead className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 h-14">Plan & Quota</TableHead>
+                                <TableHead className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 h-14 text-center">Expiry</TableHead>
+                                <TableHead className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 h-14 text-center">Status</TableHead>
+                                <TableHead className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 pr-8 h-14 text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -234,38 +234,38 @@ export default function Tenants() {
                                                 </div>
                                                 <div>
                                                     <p className="font-black text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 transition-colors">{tenant.name}</p>
-                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{tenant.businessType}</p>
+                                                    <p className="text-[14px] text-slate-400 font-bold uppercase tracking-widest">{tenant.businessType}</p>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="space-y-1">
                                                 <span className={cn(
-                                                    "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                                                    "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[14px] font-black uppercase tracking-widest",
                                                     tenant.subscriptionPlan === 'ENTERPRISE' ? "bg-amber-500/10 text-amber-600 border border-amber-500/20" :
                                                     tenant.subscriptionPlan === 'PRO' ? "bg-indigo-500/10 text-indigo-600 border border-indigo-500/20" :
                                                     "bg-slate-500/10 text-slate-600 border border-slate-500/20"
                                                 )}>
                                                     {tenant.subscriptionPlan || 'TRIAL'}
                                                 </span>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest ml-1">
+                                                <p className="text-[14px] text-slate-400 font-bold uppercase tracking-widest ml-1">
                                                     Max {tenant.maxUsers || 5} Users
                                                 </p>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <div className="flex flex-col items-center">
-                                                <p className="text-xs font-black text-slate-700 dark:text-slate-300">
+                                                <p className="text-[14px] font-black text-slate-700 dark:text-slate-300">
                                                     {tenant.expiryDate ? new Date(tenant.expiryDate).toLocaleDateString() : 'N/A'}
                                                 </p>
                                                 {tenant.expiryDate && new Date(tenant.expiryDate) < new Date() && (
-                                                    <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">Expired</span>
+                                                    <span className="text-[14px] font-black text-rose-500 uppercase tracking-widest">Expired</span>
                                                 )}
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <span className={cn(
-                                                "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                                                "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[14px] font-black uppercase tracking-widest",
                                                 tenant.isActive 
                                                     ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" 
                                                     : "bg-rose-500/10 text-rose-600 border border-rose-500/20"
@@ -279,7 +279,7 @@ export default function Tenants() {
                                                     e.stopPropagation();
                                                     navigate(`/tenants/${tenant.id}`);
                                                 }}
-                                                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-500 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 ml-auto"
+                                                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-500 font-black text-[14px] uppercase tracking-widest flex items-center gap-2 ml-auto"
                                             >
                                                 View <ArrowUpRight size={14} />
                                             </button>

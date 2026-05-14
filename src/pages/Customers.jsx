@@ -193,7 +193,7 @@ export default function Customers() {
                 <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-8">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <CardTitle className="dark:text-white tracking-tighter uppercase font-black text-slate-400 text-[10px] tracking-widest mb-1">Registered Clients</CardTitle>
+                            <CardTitle className="dark:text-white tracking-tighter uppercase font-black text-slate-400 text-[14px] tracking-widest mb-1">Registered Clients</CardTitle>
                             <CardDescription className="dark:text-slate-400 font-medium capitalize text-lg text-slate-900 tracking-tighter">
                                 {loading ? 'Querying database...' : `Managing ${filteredCustomers.length} active relations.`}
                             </CardDescription>
@@ -239,10 +239,10 @@ export default function Customers() {
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tighter text-sm leading-none">{customer.name}</span>
                                                         {customer.loyaltyPoints > 500 && (
-                                                            <span className="bg-amber-100 text-amber-700 text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase ring-1 ring-amber-200 shadow-sm">VIP</span>
+                                                            <span className="bg-amber-100 text-amber-700 text-[12px] px-1.5 py-0.5 rounded-full font-black uppercase ring-1 ring-amber-200 shadow-sm">VIP</span>
                                                         )}
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1.5">
+                                                    <div className="flex items-center gap-1.5 text-[14px] text-slate-400 font-bold uppercase tracking-widest mt-1.5">
                                                         <Mail size={10} className="text-blue-500" /> {customer.email || 'NO_INTERNAL_MAIL'}
                                                     </div>
                                                 </div>
@@ -250,7 +250,7 @@ export default function Customers() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="space-y-1">
-                                                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400">
+                                                <div className="flex items-center gap-1.5 text-[14px] font-bold text-slate-600 dark:text-slate-400">
                                                     <Phone size={12} className="text-emerald-500" /> {customer.phone || 'N/A'}
                                                 </div>
                                             </div>

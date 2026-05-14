@@ -26,7 +26,14 @@ const resources = {
       "Apply Visual System": "Apply Visual System",
       "Kitchen Orders": "Kitchen Orders",
       "AI Insights": "AI Insights",
-      "System Logs": "System Logs"
+      "System Logs": "System Logs",
+      "Smart Business Tips": "Smart Business Tips",
+      "AI Powered Advice": "AI Powered Advice",
+      "sales_insight": "Great! Your total sales this month are {{amount}}.",
+      "profit_good_insight": "Your profit margin is very good ({{margin}}%). You are making good money!",
+      "profit_low_insight": "Your profit margin is low ({{margin}}%). Try to reduce your expenses or purchase costs.",
+      "stock_insight": "\"{{itemName}}\" is selling very fast. Make sure you have enough stock.",
+      "expense_insight": "Your expenses are more than half of your sales. Try to control your costs."
     }
   },
   hi: {
@@ -52,7 +59,14 @@ const resources = {
       "Apply Visual System": "सिस्टम अपडेट करें",
       "Kitchen Orders": "रसोई के आदेश",
       "AI Insights": "एआई अंतर्दृष्टि",
-      "System Logs": "सिस्टम लॉग"
+      "System Logs": "सिस्टम लॉग",
+      "Smart Business Tips": "स्मार्ट बिज़नेस टिप्स",
+      "AI Powered Advice": "एआई संचालित सलाह",
+      "sales_insight": "बहुत बढ़िया! इस महीने आपकी कुल बिक्री {{amount}} है।",
+      "profit_good_insight": "आपका प्रॉफिट मार्जिन बहुत अच्छा है ({{margin}}%)। आप अच्छा पैसा कमा रहे हैं!",
+      "profit_low_insight": "आपका प्रॉफिट मार्जिन कम है ({{margin}}%)। अपने खर्चों या खरीद लागत को कम करने का प्रयास करें।",
+      "stock_insight": "\"{{itemName}}\" बहुत तेज़ी से बिक रहा है। सुनिश्चित करें कि आपके पास पर्याप्त स्टॉक है।",
+      "expense_insight": "आपके खर्चे आपकी बिक्री के आधे से अधिक हैं। अपने खर्चों को नियंत्रित करने का प्रयास करें।"
     }
   },
   hg: {
@@ -78,7 +92,14 @@ const resources = {
       "Apply Visual System": "Sab update karein",
       "Kitchen Orders": "Kitchen Orders",
       "AI Insights": "Smart AI Report",
-      "System Logs": "System Logs"
+      "System Logs": "System Logs",
+      "Smart Business Tips": "Smart Business Tips",
+      "AI Powered Advice": "AI Powered Advice",
+      "sales_insight": "Great! Is mahine aapki total sales {{amount}} hai.",
+      "profit_good_insight": "Aapka profit margin bahut accha hai ({{margin}}%). Aap accha paisa kama rahe hain!",
+      "profit_low_insight": "Aapka profit margin kam hai ({{margin}}%). Apne kharche ya purchase cost kam karne ki koshish karein.",
+      "stock_insight": "\"{{itemName}}\" bahut fast sell ho rha hai. Ensure karein ki aapke paas full stock ho.",
+      "expense_insight": "Aapke kharche sales ke aadhe se zyada hain. Apne kharchon ko control karne ki koshish karein."
     }
   }
 };

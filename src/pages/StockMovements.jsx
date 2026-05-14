@@ -59,7 +59,7 @@ export default function StockMovements() {
                         <ArrowLeft size={14} /> Back to Inventory
                     </Button>
                     <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-widest uppercase">Stock Movements</h1>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Inventory Movement & Adjustment Records</p>
+                    <p className="text-[14px] font-black uppercase tracking-widest text-slate-400">Inventory Movement & Adjustment Records</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" className="gap-2 dark:border-slate-800" onClick={fetchData} disabled={loading}>
@@ -76,7 +76,7 @@ export default function StockMovements() {
                                 <History size={24} />
                             </div>
                             <div>
-                                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-blue-500">System Events</CardTitle>
+                                <CardTitle className="text-[14px] font-black uppercase tracking-widest text-blue-500">System Events</CardTitle>
                                 <CardDescription className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tighter">
                                     {filteredMovements.length} Stock changes recorded
                                 </CardDescription>
@@ -108,22 +108,22 @@ export default function StockMovements() {
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-transparent hover:bg-transparent border-b-2 border-slate-900 dark:border-slate-800">
-                                    <TableHead className="pl-8 py-4 text-[9px] font-black uppercase tracking-widest">Date & Time</TableHead>
-                                    <TableHead className="text-[9px] font-black uppercase tracking-widest">Item Name</TableHead>
-                                    <TableHead className="text-[9px] font-black uppercase tracking-widest">Action</TableHead>
-                                    <TableHead className="text-center text-[9px] font-black uppercase tracking-widest">Qty</TableHead>
-                                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-right">Notes</TableHead>
-                                    <TableHead className="pr-8 text-right text-[9px] font-black uppercase tracking-widest">Options</TableHead>
+                                    <TableHead className="pl-8 py-4 text-[14px] font-black uppercase tracking-widest">Date & Time</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-widest">Item Name</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-widest">Action</TableHead>
+                                    <TableHead className="text-center text-[14px] font-black uppercase tracking-widest">Qty</TableHead>
+                                    <TableHead className="text-[14px] font-black uppercase tracking-widest text-right">Notes</TableHead>
+                                    <TableHead className="pr-8 text-right text-[14px] font-black uppercase tracking-widest">Options</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {filteredMovements.map((move, i) => (
                                     <TableRow key={i} className="dark:border-slate-800 dark:hover:bg-slate-800/40 group border-b border-slate-50">
                                         <TableCell className="pl-8 py-5">
-                                            <p className="text-[10px] font-bold text-slate-900 dark:text-white">
+                                            <p className="text-[14px] font-bold text-slate-900 dark:text-white">
                                                 {formatDateOnly(move.createdAt)}
                                             </p>
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                            <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest">
                                                 {formatTimeOnly(move.createdAt)}
                                             </p>
                                         </TableCell>
@@ -131,11 +131,11 @@ export default function StockMovements() {
                                             <p className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tighter text-sm">
                                                 {move.itemName || 'Unknown Product'}
                                             </p>
-                                            <p className="text-[10px] text-slate-400 font-bold">SKU: {move.sku || 'N/A'}</p>
+                                            <p className="text-[14px] text-slate-400 font-bold">SKU: {move.sku || 'N/A'}</p>
                                         </TableCell>
                                         <TableCell>
                                             <span className={cn(
-                                                "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
+                                                "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[14px] font-black uppercase tracking-widest border",
                                                 move.direction === 'IN' 
                                                     ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
                                                     : "bg-rose-50 text-rose-600 border-rose-100"
@@ -151,7 +151,7 @@ export default function StockMovements() {
                                             <p className="text-xs font-bold text-slate-600 dark:text-slate-400 italic">
                                                 &quot;{move.notes || '—'}&quot;
                                             </p>
-                                            <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black italic">
+                                            <p className="text-[14px] text-slate-400 uppercase tracking-widest font-black italic">
                                                 Done by: {move.createdBy || 'SYSTEM'}
                                             </p>
                                         </TableCell>
@@ -192,7 +192,7 @@ export default function StockMovements() {
                                 {selectedMovement.direction === 'IN' ? <ArrowUpCircle size={24} /> : <ArrowDownCircle size={24} />}
                             </div>
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Action Type</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-400">Action Type</p>
                                 <p className="text-lg font-black text-slate-900 dark:text-white">
                                     Stock {selectedMovement.direction === 'IN' ? 'Added' : 'Removed'}
                                 </p>
@@ -201,13 +201,13 @@ export default function StockMovements() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Item Name</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-400 mb-1">Item Name</p>
                                 <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
                                     {selectedMovement.itemName}
                                 </p>
                             </div>
                             <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Quantity</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-400 mb-1">Quantity</p>
                                 <p className={cn(
                                     "text-sm font-black",
                                     selectedMovement.direction === 'IN' ? "text-emerald-600" : "text-rose-600"
@@ -219,29 +219,29 @@ export default function StockMovements() {
 
                         <div className="space-y-4">
                             <div className="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800">
-                                <span className="text-xs font-bold text-slate-500">Date & Time</span>
-                                <span className="text-xs font-black text-slate-900 dark:text-white">
+                                <span className="text-[14px] font-bold text-slate-500">Date & Time</span>
+                                <span className="text-[14px] font-black text-slate-900 dark:text-white">
                                     {formatDateTime(selectedMovement.createdAt)}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800">
-                                <span className="text-xs font-bold text-slate-500">Done By</span>
-                                <span className="text-xs font-black text-indigo-600">
+                                <span className="text-[14px] font-bold text-slate-500">Done By</span>
+                                <span className="text-[14px] font-black text-indigo-600">
                                     {selectedMovement.createdBy || 'System Admin'}
                                 </span>
                             </div>
                             {selectedMovement.batchNo && (
                                 <div className="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800">
-                                    <span className="text-xs font-bold text-slate-500">Batch No</span>
-                                    <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                                    <span className="text-[14px] font-bold text-slate-500">Batch No</span>
+                                    <span className="text-[14px] font-black text-slate-900 dark:text-white uppercase tracking-wider">
                                         {selectedMovement.batchNo}
                                     </span>
                                 </div>
                             )}
                             {selectedMovement.referenceType && (
                                 <div className="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800">
-                                    <span className="text-xs font-bold text-slate-500">Ref Type</span>
-                                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                                    <span className="text-[14px] font-bold text-slate-500">Ref Type</span>
+                                    <span className="text-[14px] font-black text-slate-400 uppercase tracking-widest">
                                         {selectedMovement.referenceType}
                                     </span>
                                 </div>
@@ -249,14 +249,14 @@ export default function StockMovements() {
                         </div>
 
                         <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100/50 dark:border-indigo-900/30">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-1">Notes</p>
+                            <p className="text-[14px] font-black uppercase tracking-widest text-indigo-500 mb-1">Notes</p>
                             <p className="text-sm font-medium text-slate-700 dark:text-slate-300 italic">
                                 &quot;{selectedMovement.notes || 'No notes added for this change.'}&quot;
                             </p>
                         </div>
 
                         <Button 
-                            className="w-full h-12 rounded-2xl font-black uppercase tracking-widest text-[10px]"
+                            className="w-full h-12 rounded-2xl font-black uppercase tracking-widest text-[14px]"
                             onClick={() => setIsModalOpen(false)}
                         >
                             Close Details

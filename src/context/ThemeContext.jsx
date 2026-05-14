@@ -89,6 +89,10 @@ export function ThemeProvider({ children }) {
         setTimezoneState(tz);   // context re-render trigger
     };
     
+    const setBrandingPreview = (newBranding) => {
+        setBranding(prev => ({ ...prev, ...newBranding }));
+    };
+    
     const updateBranding = async (newBranding) => {
         setBranding(prev => ({ ...prev, ...newBranding }));
         try {
@@ -103,7 +107,7 @@ export function ThemeProvider({ children }) {
     };
 
     return (
-        <ThemeContext.Provider value={{ isDarkMode, toggleTheme, branding, updateBranding, refreshBranding: fetchSettings, timezone, changeTimezone }}>
+        <ThemeContext.Provider value={{ isDarkMode, toggleTheme, branding, updateBranding, setBrandingPreview, refreshBranding: fetchSettings, timezone, changeTimezone }}>
             {children}
         </ThemeContext.Provider>
     );

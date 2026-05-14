@@ -121,16 +121,16 @@ export default function Expenses() {
                     </div>
                     <div className="relative z-10 flex flex-col justify-between h-full">
                         <div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500">Global Burn Rate</span>
+                            <span className="text-[14px] font-black uppercase tracking-[0.2em] text-rose-500">Global Burn Rate</span>
                             <h2 className="text-5xl font-black tracking-tighter tabular-nums mt-4">{fmt(totalSpending)}</h2>
-                            <p className="mt-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
+                            <p className="mt-2 text-slate-400 text-[14px] font-bold uppercase tracking-widest">
                                 Processing {filteredExpenses.length} verified expenditures
                             </p>
                         </div>
                         <div className="mt-8 flex gap-4">
                             <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
                                 <div className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">Live Monitoring</span>
+                                <span className="text-[14px] font-black uppercase tracking-widest">Live Monitoring</span>
                             </div>
                         </div>
                     </div>
@@ -142,7 +142,7 @@ export default function Expenses() {
                                 <TrendingUp size={24} />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Avg. Per Entry</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-400">Avg. Per Entry</p>
                                 <p className="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">
                                     {fmt(filteredExpenses.length > 0 ? totalSpending / filteredExpenses.length : 0)}
                                 </p>
@@ -155,7 +155,7 @@ export default function Expenses() {
                                 <Receipt size={24} />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Entries</p>
+                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-400">Total Entries</p>
                                 <p className="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">
                                     {filteredExpenses.length}
                                 </p>
@@ -218,16 +218,16 @@ export default function Expenses() {
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tighter leading-none">{ex.categoryName || ex.category?.name || 'GEN_EXPENSE'}</span>
-                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 truncate max-w-[200px]">{ex.description || 'REF_NOT_STATED'}</span>
+                                                    <span className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 truncate max-w-[200px]">{ex.description || 'REF_NOT_STATED'}</span>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col">
-                                                <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 tracking-tight">
+                                                <div className="flex items-center gap-2 text-[14px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
                                                     <Calendar size={12} className="text-blue-500" /> {formatDateOnly(ex.expenseDate || ex.createdAt)}
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                                <div className="flex items-center gap-1.5 text-[14px] font-black text-slate-400 uppercase tracking-widest mt-1">
                                                     VIA {ex.paymentMethod || 'CASH_DISBURSEMENT'}
                                                 </div>
                                             </div>

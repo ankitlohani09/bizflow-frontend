@@ -225,7 +225,7 @@ export default function StaffDetails() {
                             <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
                                 {staff?.name}
                             </h2>
-                            <p className="text-blue-500 font-black uppercase tracking-widest text-[10px] mt-2">
+                            <p className="text-blue-500 font-black uppercase tracking-widest text-[14px] mt-2">
                                 {staff?.role || 'Staff Member'}
                             </p>
 
@@ -246,14 +246,14 @@ export default function StaffDetails() {
 
                             <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-700 grid grid-cols-2 gap-4 text-center">
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Base Salary</p>
+                                    <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest">Base Salary</p>
                                     <p className="text-lg font-black text-slate-900 dark:text-white mt-1">{fmt(staff?.salary)}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Active Status</p>
+                                    <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest">Active Status</p>
                                     <div className="flex items-center justify-center gap-1.5 mt-2">
                                         <div className={cn("h-2 w-2 rounded-full", staff?.isActive ? "bg-emerald-500" : "bg-slate-300")} />
-                                        <span className={cn("text-xs font-black uppercase tracking-tighter", staff?.isActive ? "text-emerald-600" : "text-slate-400")}>
+                                        <span className={cn("text-[14px] font-black uppercase tracking-tighter", staff?.isActive ? "text-emerald-600" : "text-slate-400")}>
                                             {staff?.isActive ? "Active" : "Inactive"}
                                         </span>
                                     </div>
@@ -283,8 +283,8 @@ export default function StaffDetails() {
                                     {hasBiometric ? <ShieldCheck size={18} /> : <Fingerprint size={18} />}
                                 </div>
                                 <div>
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Biometric Identity</h4>
-                                    <p className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
+                                    <h4 className="text-[14px] font-black uppercase tracking-widest text-slate-500">Biometric Identity</h4>
+                                    <p className="text-[14px] font-bold text-slate-900 dark:text-white mt-0.5">
                                         {hasBiometric ? "Device Security Linked" : "No Biometrics Registered"}
                                     </p>
                                 </div>
@@ -292,7 +292,7 @@ export default function StaffDetails() {
 
                             <Button
                                 className={cn(
-                                    "w-full text-[10px] font-black uppercase tracking-widest py-3 rounded-xl gap-2",
+                                    "w-full text-[14px] font-black uppercase tracking-widest py-3 rounded-xl gap-2",
                                     hasBiometric ? "bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700" : "bg-blue-600 text-white hover:bg-blue-500"
                                 )}
                                 onClick={handleRegisterBiometric}
@@ -301,7 +301,7 @@ export default function StaffDetails() {
                                 {biometricLoading ? "Processing..." : hasBiometric ? "Re-link Device" : "Register Fingerprint"}
                             </Button>
                             {!window.isSecureContext && (
-                                <p className="text-[9px] text-rose-500 font-bold mt-3 leading-tight italic">
+                                <p className="text-[14px] text-rose-500 font-bold mt-3 leading-tight italic">
                                     ⚠️ Security Error: Real biometrics requires a secure (HTTPS) connection.
                                 </p>
                             )}
@@ -316,28 +316,28 @@ export default function StaffDetails() {
                             <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
                                 <Wallet className="text-blue-400" size={20} />
                             </div>
-                            <h3 className="font-black uppercase tracking-widest text-[10px] text-slate-400">Payroll Engine</h3>
+                            <h3 className="font-black uppercase tracking-widest text-[14px] text-slate-400">Payroll Engine</h3>
                         </div>
 
                         <div className="space-y-6">
                             <div className="flex justify-between items-end border-b border-white/5 pb-4">
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Attendance</p>
+                                    <p className="text-[14px] font-black text-slate-500 uppercase tracking-widest">Attendance</p>
                                     <p className="text-xl font-black text-white mt-1">{presentDays} Days</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Gross Earned</p>
+                                    <p className="text-[14px] font-black text-slate-500 uppercase tracking-widest">Gross Earned</p>
                                     <p className="text-xl font-black text-white mt-1">{fmt(currentEarnings)}</p>
                                 </div>
                             </div>
 
                             <div className="flex justify-between items-end border-b border-white/5 pb-4">
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Advances</p>
+                                    <p className="text-[14px] font-black text-slate-500 uppercase tracking-widest">Advances</p>
                                     <p className="text-xl font-black text-rose-400 mt-1">- {fmt(totalAdvances)}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Net Payout</p>
+                                    <p className="text-[14px] font-black text-slate-500 uppercase tracking-widest">Net Payout</p>
                                     <p className="text-2xl font-black text-blue-400 mt-1">{fmt(netPayout)}</p>
                                 </div>
                             </div>
@@ -360,13 +360,13 @@ export default function StaffDetails() {
                         <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <CardTitle className="text-slate-900 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                                    <CardTitle className="text-slate-900 flex items-center gap-2 text-[14px] font-black uppercase tracking-widest">
                                         <Clock size={20} className="text-blue-500" /> Attendance Records
                                     </CardTitle>
-                                    <CardDescription className="text-slate-400 text-xs mt-1 font-bold lowercase">Chronological log of check-ins and check-outs.</CardDescription>
+                                    <CardDescription className="text-slate-400 text-[14px] mt-1 font-bold lowercase">Chronological log of check-ins and check-outs.</CardDescription>
                                 </div>
                                 <Button
-                                    className="gap-2 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg shadow-blue-500/20"
+                                    className="gap-2 bg-blue-600 hover:bg-blue-500 text-white text-[14px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg shadow-blue-500/20"
                                     onClick={() => setIsAttendanceModalOpen(true)}
                                 >
                                     Mark Attendance
@@ -377,11 +377,11 @@ export default function StaffDetails() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50 dark:bg-slate-800 border-none hover:bg-transparent">
-                                        <TableHead className="pl-8 py-4 text-[9px] font-black uppercase tracking-wider text-slate-500">Date</TableHead>
-                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">In-Time</TableHead>
-                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Out-Time</TableHead>
-                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Verification</TableHead>
-                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500 pr-8 text-right">Status</TableHead>
+                                        <TableHead className="pl-8 py-4 text-[14px] font-black uppercase tracking-wider text-slate-500">Date</TableHead>
+                                        <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">In-Time</TableHead>
+                                        <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Out-Time</TableHead>
+                                        <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Verification</TableHead>
+                                        <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500 pr-8 text-right">Status</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -407,12 +407,12 @@ export default function StaffDetails() {
                                                                 <MapPin size={14} />
                                                             </a>
                                                         )}
-                                                        {!log.photoUrl && !log.location && <span className="text-[10px] text-slate-400">Manual</span>}
+                                                        {!log.photoUrl && !log.location && <span className="text-[14px] text-slate-400">Manual</span>}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="pr-8 text-right">
                                                     <span className={cn(
-                                                        "inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest",
+                                                        "inline-flex items-center gap-1 text-[14px] font-black uppercase tracking-widest",
                                                         log.status === 'PRESENT' ? "text-emerald-500" : "text-rose-500"
                                                     )}>
                                                         {log.status === 'PRESENT' ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
@@ -432,13 +432,13 @@ export default function StaffDetails() {
                         <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <CardTitle className="text-slate-900 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                                    <CardTitle className="text-slate-900 flex items-center gap-2 text-[14px] font-black uppercase tracking-widest">
                                         <History size={20} className="text-amber-500" /> Advance Ledger
                                     </CardTitle>
-                                    <CardDescription className="text-slate-400 text-xs mt-1 font-bold lowercase">Detailed tracking of financial advances and adjustments.</CardDescription>
+                                    <CardDescription className="text-slate-400 text-[14px] mt-1 font-bold lowercase">Detailed tracking of financial advances and adjustments.</CardDescription>
                                 </div>
                                 <Button
-                                    className="gap-2 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl"
+                                    className="gap-2 bg-slate-900 hover:bg-slate-800 text-white text-[14px] font-black uppercase tracking-widest px-4 py-2 rounded-xl"
                                     onClick={() => setIsAdvanceModalOpen(true)}
                                 >
                                     Give Advance
@@ -449,10 +449,10 @@ export default function StaffDetails() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50 dark:bg-slate-800 border-none hover:bg-transparent">
-                                        <TableHead className="pl-8 py-4 text-[9px] font-black uppercase tracking-wider text-slate-500">Transaction ID</TableHead>
-                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Date</TableHead>
-                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Reason</TableHead>
-                                        <TableHead className="text-right pr-8 text-[9px] font-black uppercase tracking-wider text-slate-500">Amount</TableHead>
+                                        <TableHead className="pl-8 py-4 text-[14px] font-black uppercase tracking-wider text-slate-500">Transaction ID</TableHead>
+                                        <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Date</TableHead>
+                                        <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Reason</TableHead>
+                                        <TableHead className="text-right pr-8 text-[14px] font-black uppercase tracking-wider text-slate-500">Amount</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -463,7 +463,7 @@ export default function StaffDetails() {
                                     ) : (
                                         advances.map((adv, i) => (
                                             <TableRow key={i} className="border-slate-50 dark:border-slate-800/20">
-                                                <TableCell className="pl-8 font-black text-slate-900 dark:text-white text-[10px] tracking-widest">#ADV-{adv.id}</TableCell>
+                                                <TableCell className="pl-8 font-black text-slate-900 dark:text-white text-[14px] tracking-widest">#ADV-{adv.id}</TableCell>
                                                 <TableCell className="font-bold text-slate-500 dark:text-slate-400">{adv.advanceDate}</TableCell>
                                                 <TableCell className="font-bold text-slate-500 dark:text-slate-400 truncate max-w-[200px]">{adv.notes}</TableCell>
                                                 <TableCell className="pr-8 text-right font-black text-rose-600">{fmt(adv.amount)}</TableCell>
