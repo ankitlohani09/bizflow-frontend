@@ -146,7 +146,7 @@ export default function Sidebar({ isOpen, onClose }) {
                         </div>
                         <div>
                             <h2 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
-                                {branding.companyName || 'BizFlow'}
+                                {branding.brandName || 'BizFlow'}
                             </h2>
                         </div>
                     </>

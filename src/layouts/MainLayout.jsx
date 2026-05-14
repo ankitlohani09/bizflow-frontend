@@ -21,12 +21,12 @@ export default function MainLayout({ children }) {
             {/* Sidebar with state control */}
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-            <div className="flex flex-1 flex-col overflow-x-hidden">
+            <div className="flex flex-1 flex-col h-screen overflow-hidden">
                 {/* Topbar with mobile menu toggle */}
                 <Topbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
                 {/* Main Content Area */}
-                <main className="flex-1 p-4 md:p-8">
+                <main className="flex-1 p-4 md:p-8 overflow-y-auto">
                     <div className="mx-auto max-w-[1700px] animate-in fade-in duration-700">
                         {children}
                     </div>

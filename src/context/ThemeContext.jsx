@@ -13,7 +13,7 @@ export function ThemeProvider({ children }) {
 
     const [branding, setBranding] = useState({
         primaryColor: '#6366f1',
-        companyName: 'BizFlow',
+        brandName: 'BizFlow',
         logoUrl: null
     });
 
@@ -33,20 +33,26 @@ export function ThemeProvider({ children }) {
                 if (data) {
                     const newBranding = {
                         primaryColor: data.primaryColor || '#6366f1',
-                        companyName: data.brandName || 'BizFlow',
-                        logoUrl: data.logoUrl || null
+                        brandName: data.brandName || 'BizFlow',
+                        logoUrl: data.logoUrl || null,
+                        companyAddress: data.address || null
                     };
                     setBranding(newBranding);
                     localStorage.setItem('branding', JSON.stringify(newBranding));
                 }
 
-                // 2. Fetch Tenant Settings (including Timezone)
+                // 2. Fetch Tenant Settings (including Timezone and Address)
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
                 if (user.tenantId) {
                     const tenantData = await tenantService.getById(user.tenantId);
-                    if (tenantData && tenantData.timezone) {
-                        setTimezoneState(tenantData.timezone);
-                        localStorage.setItem('app_timezone', tenantData.timezone);
+                    if (tenantData) {
+                        if (tenantData.timezone) {
+                            setTimezoneState(tenantData.timezone);
+                            localStorage.setItem('app_timezone', tenantData.timezone);
+                        }
+                        if (tenantData.address) {
+                            setBranding(prev => ({ ...prev, companyAddress: tenantData.address }));
+                        }
                     }
                 }
             } catch (error) {

@@ -148,7 +148,7 @@ export default function InvoiceForm() {
         customerAddress: '',
         invoiceDate: new Date().toISOString().split('T')[0],
         items: [],
-        discountAmount: 0,
+        discountPercent: 0,
         shippingAmount: 0,
         selectedPaymentModeId: '',
         splitPayments: [],
@@ -193,9 +193,12 @@ export default function InvoiceForm() {
         const taxAmount = form.items.reduce((acc, i) => {
             return acc + ((Number(i.subtotal) || 0) * (Number(i.taxRate) || 0)) / 100;
         }, 0);
-        const grandTotal = subtotal + taxAmount - (Number(form.discountAmount) || 0) + (Number(form.shippingAmount) || 0);
-        return { subtotal, taxAmount, grandTotal };
-    }, [form.items, form.discountAmount, form.shippingAmount]);
+        const discountAmount = (subtotal * (Number(form.discountPercent) || 0)) / 100;
+        const exactTotal = subtotal + taxAmount - discountAmount + (Number(form.shippingAmount) || 0);
+        const grandTotal = Math.round(exactTotal);
+        const roundOff = grandTotal - exactTotal;
+        return { subtotal, taxAmount, discountAmount, grandTotal, roundOff };
+    }, [form.items, form.discountPercent, form.shippingAmount]);
 
     const filteredInventory = useMemo(() => {
         if (!itemSearch.trim()) return inventory.slice(0, 5);
@@ -304,7 +307,7 @@ export default function InvoiceForm() {
                 invoiceDate: form.invoiceDate,
                 subtotal: totals.subtotal,
                 taxAmount: totals.taxAmount,
-                discountAmount: Number(form.discountAmount),
+                discountAmount: totals.discountAmount,
                 shippingAmount: Number(form.shippingAmount) || 0,
                 grandTotal: totals.grandTotal,
                 invoiceType: 'SALE',
@@ -363,17 +366,21 @@ export default function InvoiceForm() {
                 <div className="max-w-[1700px] mx-auto h-full px-4 pt-4 flex flex-col">
 
                     {/* ── Header Area ── */}
-                    <div className="flex items-center justify-between mb-4 px-2">
-                        <div className="flex items-center gap-4">
-                            <div>
-                                <h1 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight uppercase">New Sale</h1>
-                                <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Fast & Secure Checkout</p>
+                    {/* ── Elite Header ── */}
+                    <div className="mb-6 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between px-2">
+                        <div className="flex items-center gap-5">
+                            <div className="h-14 w-14 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
+                                <ShoppingCart size={28} />
                             </div>
-                            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/50 rounded-full text-[14px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
-                                <span className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                System Live
+                            <div>
+                                <h1 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tight leading-none">New Sale</h1>
+                                <p className="text-[14px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    System Live
+                                </p>
                             </div>
                         </div>
+
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
                                 <label className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">Date & Time:</label>
@@ -616,27 +623,42 @@ export default function InvoiceForm() {
                                 {/* Totals Summary */}
                                 <div className="space-y-2 bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/50 dark:to-slate-800/20 p-3 rounded-xl border border-slate-100 dark:border-slate-800 shadow-inner">
                                     <div className="flex justify-between text-slate-500 font-bold text-[13px] uppercase tracking-wider">
-                                        <span>Subtotal</span>
+                                        <span>Subtotal (Excl. Tax)</span>
                                         <span className="text-slate-800 dark:text-white tabular-nums text-[14px]">{fmt(totals.subtotal)}</span>
                                     </div>
                                     <div className="flex justify-between text-slate-500 font-bold text-[13px] uppercase tracking-wider">
                                         <span>Tax Amount</span>
                                         <span className="text-emerald-600 dark:text-emerald-400 tabular-nums text-[14px]">+{fmt(totals.taxAmount)}</span>
                                     </div>
+                                    <div className="flex justify-between text-slate-500 font-bold text-[13px] uppercase tracking-wider">
+                                        <span>Subtotal (Incl. Tax)</span>
+                                        <span className="text-slate-800 dark:text-white tabular-nums text-[14px]">{fmt(totals.subtotal + totals.taxAmount)}</span>
+                                    </div>
                                     <div className="flex justify-between text-slate-500 font-bold text-[13px] uppercase tracking-wider items-center">
                                         <span>Shipping Amount</span>
-                                        <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-1.5 py-0.5">
+                                        <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-1.5 py-0.5 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-shadow">
                                             <span className="text-[12px] font-bold text-slate-300 dark:text-slate-600 mr-1">₹</span>
                                             <input type="number" value={form.shippingAmount} onChange={(e) => setForm(p => ({ ...p, shippingAmount: e.target.value }))} className="w-14 text-right font-bold text-[13px] outline-none bg-transparent dark:text-white" />
                                         </div>
                                     </div>
                                     <div className="pt-1.5 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                                        <span className="text-[13px] font-bold text-slate-500 uppercase tracking-wider">Discount Amount</span>
-                                        <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-1.5 py-0.5">
-                                            <span className="text-[12px] font-bold text-slate-300 dark:text-slate-600 mr-1">₹</span>
-                                            <input type="number" value={form.discountAmount} onChange={(e) => setForm(p => ({ ...p, discountAmount: e.target.value }))} className="w-14 text-right font-bold text-[13px] outline-none bg-transparent dark:text-white" />
+                                        <div className="flex flex-col">
+                                            <span className="text-[13px] font-bold text-slate-500 uppercase tracking-wider">Discount (%)</span>
+                                             <span className="text-[11px] font-bold text-slate-400">Amt: {fmt(totals.discountAmount)}</span>
+                                        </div>
+                                        <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-1.5 py-0.5 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-shadow">
+                                            <input type="number" value={form.discountPercent} onChange={(e) => setForm(p => ({ ...p, discountPercent: e.target.value }))} className="w-14 text-right font-bold text-[13px] outline-none bg-transparent dark:text-white" />
+                                            <span className="text-[12px] font-bold text-slate-300 dark:text-slate-600 ml-1">%</span>
                                         </div>
                                     </div>
+                                    {Math.abs(totals.roundOff) > 0.001 && (
+                                        <div className="flex justify-between text-slate-500 font-bold text-[13px] uppercase tracking-wider">
+                                            <span>Round Off</span>
+                                            <span className={totals.roundOff > 0 ? "text-emerald-600" : "text-rose-500"}>
+                                                {totals.roundOff > 0 ? "+" : ""}{fmt(totals.roundOff)}
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="pt-2 flex justify-between items-center border-t border-slate-100 dark:border-slate-700">
                                         <span className="text-[13px] font-bold text-slate-700 dark:text-white uppercase tracking-wider">Grand Total</span>
                                         <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight tabular-nums">{fmt(totals.grandTotal)}</span>

@@ -117,6 +117,10 @@ export default function InvoiceDetails() {
         <MainLayout title="Invoice Detail">
             {/* CSS for Thermal Print */}
             <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap');
+                .font-barcode {
+                    font-family: 'Libre Barcode 39', cursive;
+                }
                 @media print {
                     .thermal-print-mode .no-print,
                     .thermal-print-mode .invoice-container,
@@ -178,208 +182,183 @@ export default function InvoiceDetails() {
                 </div>
 
                 {/* Invoice Container (A4 / Screen View) */}
-                <div className="invoice-container bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden relative">
+                <div className="invoice-container bg-white dark:bg-slate-900 shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden relative" style={{ borderRadius: '24px' }}>
 
-                    {/* Top Accent Bar */}
-                    <div className="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+                    {/* Minimalist Top Accent */}
+                    <div className="h-1.5 bg-slate-900 dark:bg-white" />
 
-                    {/* Header */}
-                    <div className="p-8 sm:p-12 border-b border-slate-50 dark:border-slate-800">
-                        <div className="flex flex-col md:flex-row justify-between gap-8">
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <div className={`rounded-2xl flex items-center justify-center shadow-lg ${branding.logoUrl ? "" : "h-12 w-12 bg-primary text-white"}`}>
-                                        {branding.logoUrl ? (
-                                            <img
-                                                src={branding.logoUrl.startsWith('http') || branding.logoUrl.startsWith('blob:') || branding.logoUrl.startsWith('data:')
-                                                    ? branding.logoUrl
-                                                    : `${import.meta.env.VITE_API_URL}${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`}
-                                                alt="Logo"
-                                                className="h-14 w-auto object-contain max-w-[200px]"
-                                            />
-                                        ) : (
-                                            <Receipt size={24} />
-                                        )}
+                    <div className="p-10 sm:p-16 space-y-12">
+
+                        {/* Header Section */}
+                        <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+                            <div className="space-y-3">
+                                {branding.logoUrl ? (
+                                    <img src={branding.logoUrl} alt="Logo" className="h-12 w-auto" />
+                                ) : (
+                                    <div className="h-10 w-10 bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center text-xl font-bold rounded-lg">
+                                        {branding.brandName?.charAt(0) || 'B'}
                                     </div>
-                                    <div>
-                                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight uppercase">
-                                            {branding.companyName || localStorage.getItem('tenantName') || 'BIZFLOW'}
-                                        </h1>
-                                        <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-[0.2em] mt-0.5">Tax Invoice</p>
-                                    </div>
-                                </div>
-                                <div className="text-[14px] text-slate-500 space-y-1">
-                                    <p className="font-bold text-slate-700 dark:text-slate-300">Official Receipt</p>
-                                    <p>Thank you for your business!</p>
-                                </div>
-                            </div>
-
-                            <div className="text-left md:text-right space-y-4">
-                                <div className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[14px] font-semibold uppercase tracking-widest border border-emerald-100 dark:border-emerald-900/50">
-                                    <CheckCircle2 size={10} className="mr-1" /> {invoice.paymentStatus || 'PAID'}
-                                </div>
+                                )}
                                 <div>
-                                    <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">Invoice Number</p>
-                                    <p className="text-3xl font-semibold text-slate-900 dark:text-white font-mono tracking-tighter">#{invoice.invoiceNumber || invoice.id}</p>
+                                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                                        {branding.brandName || 'BIZFLOW'}
+                                    </h1>
+                                    {branding.companyAddress && (
+                                        <p className="text-sm text-slate-500 font-medium">{branding.companyAddress}</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="text-left md:text-right space-y-2">
+                                <h2 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight uppercase">INVOICE</h2>
+                                <div className="text-sm text-slate-500 font-medium space-y-0.5">
+                                    <p><span className="font-bold text-slate-700 dark:text-slate-300">Invoice No:</span> {invoice.invoiceNumber}</p>
+                                    <p><span className="font-bold text-slate-700 dark:text-slate-300">Date:</span> {formatDateOnly(invoice.invoiceDate || invoice.createdAt)}</p>
+                                    <p><span className="font-bold text-slate-700 dark:text-slate-300">Status:</span> {invoice.paymentStatus || 'PAID'}</p>
+                                    <p><span className="font-bold text-slate-700 dark:text-slate-300">Cashier:</span> {invoice.cashierName || invoice.createdBy || 'N/A'}</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Info Section */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 sm:p-12 bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-50 dark:border-slate-800">
-                        <div className="space-y-4">
+                        {/* Divider */}
+                        <div className="border-t border-slate-100 dark:border-slate-800" />
+
+                        {/* Billing Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
-                                <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
-                                    <User size={10} /> Billed To
-                                </p>
-                                <h3 className="text-base font-semibold text-slate-900 dark:text-white uppercase">
-                                    {invoice.customerName || invoice.customer?.name || 'Walk-in Customer'}
-                                </h3>
-                                {customer && (
-                                    <div className="mt-1 space-y-0.5 text-[11px] text-slate-500 font-medium">
-                                        {customer.address && <p>{customer.address}</p>}
-                                        {(customer.city || customer.state) && (
-                                            <p>{customer.city}{customer.city && customer.state ? ', ' : ''}{customer.state} {customer.pincode}</p>
-                                        )}
-                                        {customer.gstin && <p className="font-bold text-slate-700 dark:text-slate-300">GSTIN: {customer.gstin}</p>}
-                                    </div>
-                                )}
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Billed To</p>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{invoice.customerName || 'Walk-in Customer'}</h3>
+                                <div className="text-sm text-slate-500 space-y-0.5 mt-1">
+                                    {invoice.customerPhone && <p>{invoice.customerPhone}</p>}
+                                    {customer?.address && <p>{customer.address}</p>}
+                                </div>
                             </div>
-                            <div className="space-y-1 text-[14px] text-slate-600 dark:text-slate-400 font-bold">
-                                {invoice.customerPhone && (
-                                    <p className="flex items-center gap-1.5">
-                                        <Phone size={12} className="text-slate-400" /> {invoice.customerPhone}
-                                    </p>
-                                )}
-                                {customer?.email && (
-                                    <p className="flex items-center gap-1.5">
-                                        <Mail size={12} className="text-slate-400" /> {customer.email}
-                                    </p>
-                                )}
+                            <div className="md:text-right">
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Payment Details</p>
+                                <div className="text-sm text-slate-500 space-y-0.5">
+                                    <p><span className="font-bold text-slate-700 dark:text-slate-300">Method:</span> {invoice.payments?.map(p => p.paymentModeName).join(', ') || 'CASH'}</p>
+
+                                </div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 text-[14px]">
-                            <div>
-                                <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
-                                    <Calendar size={10} /> Issue Date
-                                </p>
-                                <p className="font-semibold text-slate-800 dark:text-white">
-                                    {formatDateOnly(invoice.invoiceDate || invoice.createdAt)}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
-                                    <CreditCard size={10} /> Payment Mode
-                                </p>
-                                <p className="font-semibold text-slate-800 dark:text-white">
-                                    {invoice.payments?.map(p => p.paymentModeName).join(', ') || 'CASH'}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Table */}
-                    <div className="p-8 sm:p-12">
+                        {/* Table */}
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
-                                    <tr className="border-b-2 border-slate-900 dark:border-slate-700 text-[14px] font-semibold uppercase tracking-widest text-slate-400">
-                                        <th className="pb-4">Item Detail</th>
-                                        <th className="pb-4 text-center">Qty</th>
-                                        <th className="pb-4 text-right">Unit Price</th>
-                                        <th className="pb-4 text-right">Subtotal</th>
+                                    <tr className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">
+                                        <th className="py-3 pr-4">Item</th>
+                                        <th className="py-3 px-4 text-center">Qty</th>
+                                        <th className="py-3 px-4 text-right">Price</th>
+                                        <th className="py-3 pl-4 text-right">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                                     {invoice.items?.map((item, i) => (
-                                        <tr key={i} className="group">
-                                            <td className="py-5">
-                                                <p className="text-sm font-bold text-slate-800 dark:text-white">{item.itemName || 'Product'}</p>
-                                                <div className="flex flex-wrap gap-x-2 text-[14px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">
-                                                    <span>SKU: {item.sku || 'N/A'}</span>
-                                                    {item.taxRate > 0 && <span>| Tax: {item.taxRate}% (₹{((item.subtotal * item.taxRate) / 100).toFixed(2)})</span>}
-                                                    {item.discountPct > 0 && <span>| Disc: {item.discountPct}%</span>}
-                                                    {item.batchNo && <span>| Batch: {item.batchNo}</span>}
-                                                    {item.expiryDate && <span>| Exp: {new Date(item.expiryDate).toLocaleDateString()}</span>}
-                                                </div>
+                                        <tr key={i} className="text-sm text-slate-700 dark:text-slate-300">
+                                            <td className="py-4 pr-4">
+                                                <p className="font-bold text-slate-900 dark:text-white">{item.itemName || 'Product'}</p>
+                                                {item.sku && <p className="text-xs text-slate-400 mt-0.5">SKU: {item.sku}</p>}
                                             </td>
-                                            <td className="py-5 text-center text-sm font-bold text-slate-600 dark:text-slate-300">{item.quantity}</td>
-                                            <td className="py-5 text-right text-sm font-bold text-slate-600 dark:text-slate-300">{fmt(item.unitPrice)}</td>
-                                            <td className="py-5 text-right text-sm font-semibold text-slate-900 dark:text-white">{fmt(item.subtotal || (item.quantity * item.unitPrice))}</td>
+                                            <td className="py-4 px-4 text-center font-medium">{item.quantity}</td>
+                                            <td className="py-4 px-4 text-right font-medium">{fmt(item.unitPrice)}</td>
+                                            <td className="py-4 pl-4 text-right font-bold text-slate-900 dark:text-white">{fmt(item.subtotal)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
 
-                        {/* Totals */}
-                        <div className="mt-8 flex flex-col md:flex-row justify-between gap-8 pt-8 border-t border-slate-50 dark:border-slate-800">
-                            <div className="max-w-[400px]">
-                                <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Internal Note</p>
-                                <p className="text-[14px] text-slate-500 dark:text-slate-400 leading-relaxed italic">
+                        {/* Divider */}
+                        <div className="border-t border-slate-100 dark:border-slate-800" />
+
+                        {/* Totals & Notes */}
+                        <div className="flex flex-col md:flex-row justify-between gap-8">
+                            <div className="max-w-md">
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Notes</p>
+                                <p className="text-sm text-slate-500 leading-relaxed">
                                     {invoice.notes || "No special instructions provided for this transaction."}
                                 </p>
+
+                                {/* Barcode here looks clean! */}
+                                <div className="mt-6 flex flex-col items-start gap-1">
+                                    <span className="font-barcode text-5xl text-slate-900 dark:text-white leading-none">
+                                        *{invoice.invoiceNumber}*
+                                    </span>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Scan to Search</span>
+                                </div>
                             </div>
 
-                            <div className="w-full md:w-80 space-y-3">
-                                <div className="space-y-2 text-[14px] font-bold text-slate-600 dark:text-slate-400">
-                                    <div className="flex justify-between">
-                                        <span>Subtotal</span>
-                                        <span className="text-slate-900 dark:text-white">{fmt(invoice.subtotal)}</span>
-                                    </div>
-                                    {invoice.taxAmount > 0 && (
-                                        <div className="flex justify-between text-indigo-600">
-                                            <span>Tax Amount</span>
-                                            <span>+{fmt(invoice.taxAmount)}</span>
-                                        </div>
-                                    )}
-                                    {invoice.discountAmount > 0 && (
-                                        <div className="flex justify-between text-rose-500">
-                                            <span>Discount</span>
-                                            <span>-{fmt(invoice.discountAmount)}</span>
-                                        </div>
-                                    )}
-                                    {invoice.shippingAmount > 0 && (
-                                        <div className="flex justify-between text-slate-600 dark:text-slate-300">
-                                            <span>Shipping Charges</span>
-                                            <span>+{fmt(invoice.shippingAmount)}</span>
-                                        </div>
-                                    )}
+                            <div className="w-full md:w-80 space-y-3 text-sm">
+                                <div className="flex justify-between text-slate-500">
+                                    <span className="font-medium">Subtotal (Excl. Tax)</span>
+                                    <span className="font-bold text-slate-900 dark:text-white">{fmt(invoice.subtotal)}</span>
                                 </div>
-                                <div className="border-t border-slate-100 dark:border-slate-800 pt-3 flex justify-between items-center">
-                                    <span className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest">Amount Payable</span>
-                                    <span className="text-2xl font-semibold text-indigo-600 dark:text-indigo-400 tracking-tighter">{fmt(invoice.grandTotal)}</span>
+                                {invoice.taxAmount > 0 && (
+                                    <>
+                                        <div className="flex justify-between text-slate-500">
+                                            <span className="font-medium">Tax</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">+{fmt(invoice.taxAmount)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-slate-500">
+                                            <span className="font-medium">Subtotal (Incl. Tax)</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">{fmt(invoice.subtotal + invoice.taxAmount)}</span>
+                                        </div>
+                                    </>
+                                )}
+                                {invoice.discountAmount > 0 && (
+                                    <div className="flex justify-between text-slate-500">
+                                        <span className="font-medium">Discount ({Math.round((invoice.discountAmount / invoice.subtotal) * 100)}%)</span>
+                                        <span className="font-bold text-slate-900 dark:text-white">-{fmt(invoice.discountAmount)}</span>
+                                    </div>
+                                )}
+                                {invoice.shippingAmount > 0 && (
+                                    <div className="flex justify-between text-slate-500">
+                                        <span className="font-medium">Shipping</span>
+                                        <span className="font-bold text-slate-900 dark:text-white">+{fmt(invoice.shippingAmount)}</span>
+                                    </div>
+                                )}
+
+                                {/* Round Off */}
+                                {Math.abs(invoice.grandTotal - (invoice.subtotal + invoice.taxAmount - invoice.discountAmount + invoice.shippingAmount)) > 0.01 && (
+                                    <div className="flex justify-between text-slate-500">
+                                        <span className="font-medium">Round Off</span>
+                                        <span className={`font-bold ${invoice.grandTotal > (invoice.subtotal + invoice.taxAmount - invoice.discountAmount + invoice.shippingAmount) ? "text-emerald-600" : "text-rose-500"}`}>
+                                            {invoice.grandTotal > (invoice.subtotal + invoice.taxAmount - invoice.discountAmount + invoice.shippingAmount) ? "+" : ""}{fmt(invoice.grandTotal - (invoice.subtotal + invoice.taxAmount - invoice.discountAmount + invoice.shippingAmount))}
+                                        </span>
+                                    </div>
+                                )}
+
+                                <div className="border-t border-slate-100 dark:border-slate-800 pt-3 flex justify-between items-center text-lg">
+                                    <span className="font-bold text-slate-900 dark:text-white">Total</span>
+                                    <span className="font-bold text-slate-900 dark:text-white">{fmt(invoice.grandTotal)}</span>
                                 </div>
 
-                                <div className="space-y-1 pt-2 border-t border-slate-50 dark:border-slate-800">
-                                    <div className="flex justify-between text-[14px] font-bold text-slate-500">
-                                        <span>Paid Amount</span>
-                                        <span className="text-slate-800 dark:text-white">{fmt(totalPaid)}</span>
-                                    </div>
-                                    {change > 0 && (
-                                        <div className="flex justify-between text-[14px] font-bold text-emerald-600">
-                                            <span>Change Returned</span>
-                                            <span>{fmt(change)}</span>
+                                {/* Paid & Change if different */}
+                                {Math.abs(totalPaid - invoice.grandTotal) > 0.01 && (
+                                    <div className="pt-2 border-t border-slate-50 dark:border-slate-800/50 space-y-1">
+                                        <div className="flex justify-between text-slate-500 text-xs">
+                                            <span>Paid Amount</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">{fmt(totalPaid)}</span>
                                         </div>
-                                    )}
-                                </div>
-
-                                <div className="p-4 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xl mt-4">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-[14px] font-semibold uppercase tracking-widest opacity-70">Final Total</span>
-                                        <span className="text-lg font-semibold">{fmt(invoice.grandTotal)}</span>
+                                        {change > 0 && (
+                                            <div className="flex justify-between text-emerald-600 text-xs">
+                                                <span>Change Returned</span>
+                                                <span className="font-bold">{fmt(change)}</span>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
+                                )}
                             </div>
                         </div>
+
                     </div>
 
                     {/* Footer */}
-                    <div className="p-6 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-50 dark:border-slate-800 text-center no-print">
-                        <p className="text-[14px] font-semibold uppercase tracking-[0.3em] text-slate-400">Authorized Digital Document</p>
+                    <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 text-center no-print">
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Authorized Digital Document</p>
                     </div>
+
                 </div>
 
                 {/* Thermal Receipt View (Hidden on screen, visible only during thermal print) */}
