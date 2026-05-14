@@ -74,7 +74,7 @@ export default function App() {
               </Route>
 
               {/* Operational & Billing Access (All Staff) */}
-              <Route element={<ProtectedRoute allowedRoles={['OWNER', 'MANAGER', 'CASHIER']} />}>
+              <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'OWNER', 'MANAGER', 'CASHIER']} />}>
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/invoices" element={<Invoices />} />
                 <Route path="/invoices/new" element={<InvoiceForm />} />

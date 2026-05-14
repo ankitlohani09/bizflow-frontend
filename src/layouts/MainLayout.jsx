@@ -21,7 +21,7 @@ export default function MainLayout({ children }) {
             {/* Sidebar with state control */}
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-            <div className="flex flex-1 flex-col h-screen overflow-hidden">
+            <div className="flex flex-1 flex-col h-[100dvh] overflow-hidden">
                 {/* Topbar with mobile menu toggle */}
                 <Topbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 

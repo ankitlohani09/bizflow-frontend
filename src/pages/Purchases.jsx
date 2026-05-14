@@ -192,7 +192,7 @@ export default function Purchases() {
                                             {fmt(p.totalAmount)}
                                         </TableCell>
                                         <TableCell className="text-right pr-8">
-                                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="flex justify-end gap-1 transition-opacity">
                                                 <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-full hover:bg-blue-50" onClick={(e) => { e.stopPropagation(); navigate(`/purchases/${p.id}`); }}>
                                                     <Eye size={16} className="text-slate-400" />
                                                 </Button>

@@ -179,7 +179,7 @@ export default function Dashboard() {
 
                     {/* AI Advisor Section - Solid Dark for Maximum Readability & Premium Feel */}
                     {insights.length > 0 && (
-                        <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[3rem] p-10 shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100/50 dark:border-slate-800/50 relative overflow-hidden group">
+                        <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[2rem] sm:rounded-[3rem] p-4 sm:p-10 shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100/50 dark:border-slate-800/50 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:scale-110 transition-transform duration-700">
                                 <Sparkles size={160} className="text-indigo-500 dark:text-indigo-400" />
                             </div>
@@ -211,7 +211,7 @@ export default function Dashboard() {
                                                 <motion.div
                                                     key={idx}
                                                     whileHover={{ x: 5 }}
-                                                    className="relative pl-16"
+                                                    className="relative pl-10 sm:pl-16"
                                                 >
                                                     {/* Timeline Node */}
                                                     {isHero ? (
@@ -256,9 +256,9 @@ export default function Dashboard() {
                                                                     )}
                                                                 </div>
                                                                 <div className="mt-4 flex items-center justify-between">
-                                                                    <div className="flex items-center gap-3">
+                                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                                                                         <span className="text-[14px] font-semibold text-indigo-600/60 dark:text-indigo-400/60 uppercase tracking-widest">{insight.category}</span>
-                                                                        <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                                                                        <div className="hidden sm:block h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700" />
                                                                         <span className="text-[14px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Confidence: {(insight.relevance * 100).toFixed(0)}%</span>
                                                                     </div>
                                                                     <div className="w-20 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">

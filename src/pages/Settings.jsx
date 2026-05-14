@@ -52,7 +52,7 @@ export default function Settings() {
     const location = useLocation();
     const { branding, updateBranding, setBrandingPreview, timezone, changeTimezone } = useTheme();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const isManagerOrOwner = user.roles?.includes('MANAGER') || user.roles?.includes('OWNER');
+    const isManagerOrOwner = user.roles?.includes('MANAGER') || user.roles?.includes('OWNER') || user.roles?.includes('ADMIN');
     const [activeTab, setActiveTab] = useState(isManagerOrOwner ? 'master' : 'account');
 
     // Handle tab switching from navigation state

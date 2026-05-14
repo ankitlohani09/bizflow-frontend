@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-    History, 
-    ArrowLeft, 
-    RefreshCw, 
-    ArrowUpCircle, 
-    ArrowDownCircle, 
+import {
+    History,
+    ArrowLeft,
+    RefreshCw,
+    ArrowUpCircle,
+    ArrowDownCircle,
     AlertCircle,
     Search,
     Eye
@@ -45,7 +45,7 @@ export default function StockMovements() {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
-    const filteredMovements = movements.filter(m => 
+    const filteredMovements = movements.filter(m =>
         (m.itemName || '').toLowerCase().includes(search.toLowerCase()) ||
         (m.notes || '').toLowerCase().includes(search.toLowerCase()) ||
         (m.movementType || '').toLowerCase().includes(search.toLowerCase())
@@ -55,9 +55,9 @@ export default function StockMovements() {
         <MainLayout title="Inventory Logs">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <Button variant="ghost" size="sm" onClick={() => navigate('/inventory')} className="mb-2 -ml-2 gap-2 text-slate-500">
+                    {/* <Button variant="ghost" size="sm" onClick={() => navigate('/inventory')} className="mb-2 -ml-2 gap-2 text-slate-500">
                         <ArrowLeft size={14} /> Back to Inventory
-                    </Button>
+                    </Button> */}
                     <div className="flex items-center gap-5 mt-2">
                         <div className="h-14 w-14 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
                             <History size={28} />
@@ -108,7 +108,7 @@ export default function StockMovements() {
 
                 <CardContent className="p-0">
                     {loading ? (
-                         <div className="p-6"><TableSkeleton rows={8} /></div>
+                        <div className="p-6"><TableSkeleton rows={8} /></div>
                     ) : filteredMovements.length === 0 ? (
                         <div className="flex flex-col items-center justify-center p-20 text-center opacity-30">
                             <AlertCircle size={48} className="mb-4" />
@@ -146,8 +146,8 @@ export default function StockMovements() {
                                         <TableCell>
                                             <span className={cn(
                                                 "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[14px] font-semibold uppercase tracking-widest border",
-                                                move.direction === 'IN' 
-                                                    ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+                                                move.direction === 'IN'
+                                                    ? "bg-emerald-50 text-emerald-600 border-emerald-100"
                                                     : "bg-rose-50 text-rose-600 border-rose-100"
                                             )}>
                                                 {move.direction === 'IN' ? <ArrowUpCircle size={10} /> : <ArrowDownCircle size={10} />}
@@ -166,9 +166,9 @@ export default function StockMovements() {
                                             </p>
                                         </TableCell>
                                         <TableCell className="pr-8 text-right">
-                                            <Button 
-                                                variant="ghost" 
-                                                size="sm" 
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
                                                 onClick={() => {
                                                     setSelectedMovement(move);
                                                     setIsModalOpen(true);
@@ -265,7 +265,7 @@ export default function StockMovements() {
                             </p>
                         </div>
 
-                        <Button 
+                        <Button
                             className="w-full h-12 rounded-2xl font-semibold uppercase tracking-widest text-[14px]"
                             onClick={() => setIsModalOpen(false)}
                         >

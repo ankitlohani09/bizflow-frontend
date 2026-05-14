@@ -300,7 +300,7 @@ export default function Inventory() {
                                             <StockBadge qty={Number(r.availableQty ?? 0)} threshold={r.lowStockThreshold} />
                                         </TableCell>
                                         <TableCell className="pr-10 text-right">
-                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                                            <div className="flex justify-end gap-2 transition-all">
                                                 <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-indigo-600 hover:text-white shadow-sm" onClick={() => navigate(`/inventory/${r.id}`)}>
                                                     <Eye size={16} />
                                                 </Button>

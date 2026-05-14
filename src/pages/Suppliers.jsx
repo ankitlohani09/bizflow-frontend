@@ -173,7 +173,7 @@ export default function Suppliers() {
                                             {s.taxId || 'UNREGISTERED'}
                                         </TableCell>
                                         <TableCell className="text-right pr-8">
-                                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="flex justify-end gap-1 transition-opacity">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"

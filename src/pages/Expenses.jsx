@@ -244,7 +244,7 @@ export default function Expenses() {
                                             <span className="text-lg font-semibold text-rose-600 tabular-nums">-{fmt(ex.amount)}</span>
                                         </TableCell>
                                         <TableCell className="text-right pr-8">
-                                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="flex justify-end gap-1 transition-opacity">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"

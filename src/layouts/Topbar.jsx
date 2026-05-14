@@ -87,7 +87,7 @@ export default function Topbar({ onToggleSidebar }) {
                 >
                     <Menu className="h-5 w-5" />
                 </motion.button>
-                <div className="flex-1 max-w-xl">
+                <div className="flex-1 max-w-xl hidden md:block">
                     <GlobalSearch />
                 </div>
             </div>

@@ -304,7 +304,7 @@ export default function PurchaseForm() {
                                         <TableRow key={idx} className="group hover:bg-blue-50/20 dark:hover:bg-blue-900/5 border-none transition-colors">
                                             <TableCell className="pl-6 py-3">
                                                 <div className="flex items-center gap-4">
-                                                    <button type="button" onClick={() => removeItem(idx)} className="h-8 w-8 rounded-lg bg-rose-50 text-rose-300 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100">
+                                                    <button type="button" onClick={() => removeItem(idx)} className="h-8 w-8 rounded-lg bg-rose-50 text-rose-300 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all">
                                                         <Trash2 size={14} />
                                                     </button>
                                                     <select

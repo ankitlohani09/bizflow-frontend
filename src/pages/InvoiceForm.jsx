@@ -362,7 +362,7 @@ export default function InvoiceForm() {
                 onSuccess={(c) => { setCustomers(p => [c, ...p]); selectCustomer(c); }}
             />
 
-            <div className="h-[calc(100vh-64px)] bg-slate-50/50 dark:bg-slate-950/50 overflow-hidden">
+            <div className="h-[calc(100vh-64px)] bg-slate-50/50 dark:bg-slate-950/50 overflow-auto lg:overflow-hidden">
                 <div className="max-w-[1700px] mx-auto h-full px-4 pt-4 flex flex-col">
 
                     {/* ── Header Area ── */}
@@ -403,7 +403,7 @@ export default function InvoiceForm() {
                         </div>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="flex-1 flex gap-4 min-h-0 pb-4">
+                    <form onSubmit={handleSubmit} className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0 pb-4">
 
                         {/* ── LEFT COLUMN (Cart & Search) ── */}
                         <div className="flex-[8] flex flex-col gap-4 min-w-0">
@@ -474,11 +474,61 @@ export default function InvoiceForm() {
                                     </div>
                                 </div>
                                 <div className="flex-1 overflow-auto custom-scrollbar">
-                                    <table className="w-full text-left text-[14px] border-collapse">
+                                    {/* Cards for Mobile */}
+                                    <div className="sm:hidden space-y-4 p-4">
+                                        <AnimatePresence>
+                                            {form.items.map((item, index) => (
+                                                <motion.div
+                                                    key={`${item.itemId}-${item.batchNo}`}
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, x: -20 }}
+                                                    className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3 shadow-sm"
+                                                >
+                                                    <div className="flex justify-between items-start">
+                                                        <div>
+                                                            <p className="font-bold text-slate-800 dark:text-white leading-tight">{item.itemName}</p>
+                                                            <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 font-semibold uppercase tracking-widest mt-0.5">
+                                                                <span>{item.sku}</span>
+                                                                {item.taxRate > 0 && (
+                                                                    <span className="text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 rounded-full">GST {item.taxRate}%</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" onClick={() => removeItem(index)} className="text-slate-300 hover:text-rose-500 transition-colors">
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </div>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-2">
+                                                            <button type="button" onClick={() => updateItemField(index, 'quantity', Math.max(1, Number(item.quantity) - 1))} className="h-7 w-7 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors"><Minus size={10} /></button>
+                                                            <input type="number" value={item.quantity} onChange={(e) => updateItemField(index, 'quantity', e.target.value)} className="w-8 text-center font-semibold text-[13px] bg-transparent outline-none dark:text-white" />
+                                                            <button type="button" onClick={() => updateItemField(index, 'quantity', Number(item.quantity) + 1)} className="h-7 w-7 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors"><Plus size={10} /></button>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <p className="text-sm font-bold text-slate-900 dark:text-white">{fmt(item.subtotal)}</p>
+                                                            <p className="text-[11px] text-slate-400 font-semibold">Unit: {fmt(item.unitPrice)}</p>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                        {form.items.length === 0 && (
+                                            <div className="px-4 py-10 text-center text-slate-300 dark:text-slate-600 font-semibold uppercase text-[13px] tracking-widest">
+                                                <div className="flex flex-col items-center gap-3">
+                                                    <ShoppingCart size={32} className="opacity-30" />
+                                                    Your cart is empty
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Table for Desktop */}
+                                    <table className="w-full text-left text-[14px] border-collapse hidden sm:table">
                                         <thead className="sticky top-0 bg-white dark:bg-slate-900 shadow-sm z-10 text-slate-400 font-semibold uppercase text-[13px] tracking-wider border-b border-slate-50 dark:border-slate-800">
                                             <tr>
                                                 <th className="px-6 py-3">Item Detail</th>
-                                                <th className="px-4 py-3 text-center">Stock</th>
+                                                <th className="px-4 py-3 text-center hidden sm:table-cell">Stock</th>
                                                 <th className="px-4 py-3 text-right">Unit Price</th>
                                                 <th className="px-4 py-3 text-right">Subtotal</th>
                                                 <th className="px-4 py-3 text-center">Quantity</th>
@@ -507,7 +557,7 @@ export default function InvoiceForm() {
                                                                 )}
                                                             </div>
                                                         </td>
-                                                        <td className="px-4 py-3 text-center">
+                                                        <td className="px-4 py-3 text-center hidden sm:table-cell">
                                                             <span className={cn("px-2 py-0.5 rounded-full text-[12px] font-semibold uppercase tracking-widest",
                                                                 item.stock < 10
                                                                     ? 'bg-rose-50 text-rose-500 dark:bg-rose-900/20 dark:text-rose-400'
@@ -526,7 +576,7 @@ export default function InvoiceForm() {
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-3 text-center">
-                                                            <button type="button" onClick={() => removeItem(index)} className="text-slate-300 hover:text-rose-500 dark:text-slate-600 dark:hover:text-rose-400 transition-colors opacity-0 group-hover:opacity-100">
+                                                            <button type="button" onClick={() => removeItem(index)} className="text-slate-300 hover:text-rose-500 dark:text-slate-600 dark:hover:text-rose-400 transition-colors">
                                                                 <Trash2 size={14} />
                                                             </button>
                                                         </td>
@@ -550,7 +600,7 @@ export default function InvoiceForm() {
                         </div>
 
                         {/* ── RIGHT COLUMN (Customer & Checkout) ── */}
-                        <div className="flex-[4] flex flex-col gap-4 min-w-[380px] min-h-0">
+                        <div className="flex-[4] flex flex-col gap-4 lg:min-w-[380px] min-h-0">
 
                             {/* Customer Section Card */}
                             <div className="enterprise-card p-5 space-y-4 shrink-0">

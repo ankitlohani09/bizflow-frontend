@@ -125,7 +125,10 @@ export default function Sidebar({ isOpen, onClose }) {
             {/* Mobile Close Button */}
             <button
                 onClick={onClose}
-                className="absolute right-[-3rem] top-4 flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-xl text-slate-900 lg:hidden dark:bg-slate-900 dark:text-white"
+                className={cn(
+                    "absolute right-[-3rem] top-4 flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-xl text-slate-900 lg:hidden dark:bg-slate-900 dark:text-white transition-opacity",
+                    isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                )}
             >
                 <X className="h-5 w-5" />
             </button>
@@ -177,7 +180,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
                         // 1. If user is ADMIN, only show 'Tenants' and 'Dashboard'
                         if (isAdmin) {
-                            return item.path === '/tenants' || item.path === '/dashboard';
+                            return item.path === '/tenants' || item.path === '/dashboard' || item.path === '/settings';
                         }
 
                         // 2. If user is NOT ADMIN, hide 'Tenants'
