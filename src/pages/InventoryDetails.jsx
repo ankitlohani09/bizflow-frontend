@@ -58,7 +58,7 @@ export default function InventoryDetails() {
         <MainLayout title="Loading Inventory...">
             <div className="flex flex-col items-center justify-center h-96 opacity-30">
                 <Clock className="w-12 h-12 animate-spin mb-4" />
-                <p className="font-black uppercase tracking-widest text-xs">Accessing Inventory Files</p>
+                <p className="font-semibold uppercase tracking-widest text-[14px]">Accessing Inventory Files</p>
             </div>
         </MainLayout>
     );
@@ -67,7 +67,7 @@ export default function InventoryDetails() {
         <MainLayout title="Error">
             <div className="flex flex-col items-center justify-center h-96 text-rose-500">
                 <AlertCircle className="w-12 h-12 mb-4" />
-                <p className="font-black uppercase tracking-widest text-xs">{error}</p>
+                <p className="font-semibold uppercase tracking-widest text-[14px]">{error}</p>
                 <Button variant="ghost" className="mt-6" onClick={() => navigate('/inventory')}>Back to Inventory</Button>
             </div>
         </MainLayout>
@@ -94,16 +94,16 @@ export default function InventoryDetails() {
                                 <Package size={120} className="text-blue-400" />
                             </div>
                             <div className="z-10 bg-white p-1 rounded-2xl shadow-xl -mb-12">
-                                <div className="h-20 w-20 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-400 text-3xl">
+                                <div className="h-20 w-20 rounded-xl bg-slate-100 flex items-center justify-center font-semibold text-slate-400 text-3xl">
                                     {inventory?.itemName?.charAt(0)}
                                 </div>
                             </div>
                         </div>
                         <CardContent className="pt-16 pb-8">
-                            <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
+                            <h2 className="text-2xl font-semibold text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
                                 {inventory?.itemName}
                             </h2>
-                            <p className="text-blue-500 font-black uppercase tracking-widest text-[10px] mt-2">
+                            <p className="text-blue-500 font-semibold uppercase tracking-widest text-[14px] mt-2">
                                 SKU: {inventory?.sku || inventory?.barcode || 'N/A'}
                             </p>
 
@@ -128,14 +128,14 @@ export default function InventoryDetails() {
 
                             <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-700 grid grid-cols-2 gap-4 text-center">
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">MRP</p>
-                                    <p className="text-lg font-black text-slate-900 dark:text-white mt-1">{fmt(inventory?.mrp)}</p>
+                                    <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest">MRP</p>
+                                    <p className="text-lg font-semibold text-slate-900 dark:text-white mt-1">{fmt(inventory?.mrp)}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Status</p>
+                                    <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest">Status</p>
                                     <div className="flex items-center justify-center gap-1.5 mt-2">
                                         <div className={cn("h-2 w-2 rounded-full", inventory?.availableQty > 0 ? "bg-emerald-500" : "bg-rose-500")} />
-                                        <span className={cn("text-xs font-black uppercase tracking-tighter", inventory?.availableQty > 0 ? "text-emerald-600" : "text-rose-400")}>
+                                        <span className={cn("text-[14px] font-semibold uppercase tracking-tighter", inventory?.availableQty > 0 ? "text-emerald-600" : "text-rose-400")}>
                                             {inventory?.availableQty > 0 ? "In Stock" : "Out of Stock"}
                                         </span>
                                     </div>
@@ -152,29 +152,29 @@ export default function InventoryDetails() {
                             <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
                                 <Box className="text-blue-400" size={20} />
                             </div>
-                            <h3 className="font-black uppercase tracking-widest text-[10px] text-slate-400">Stock Levels</h3>
+                            <h3 className="font-semibold uppercase tracking-widest text-[14px] text-slate-400">Stock Levels</h3>
                         </div>
 
                         <div className="space-y-6">
                             <div className="flex justify-between items-end border-b border-white/5 pb-4">
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Available</p>
-                                    <p className="text-xl font-black text-emerald-500 mt-1">{inventory?.availableQty || 0}</p>
+                                    <p className="text-[14px] font-semibold text-slate-500 uppercase tracking-widest">Available</p>
+                                    <p className="text-xl font-semibold text-emerald-500 mt-1">{inventory?.availableQty || 0}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Reserved</p>
-                                    <p className="text-xl font-black text-amber-400 mt-1">{inventory?.reservedQty || 0}</p>
+                                    <p className="text-[14px] font-semibold text-slate-500 uppercase tracking-widest">Reserved</p>
+                                    <p className="text-xl font-semibold text-amber-400 mt-1">{inventory?.reservedQty || 0}</p>
                                 </div>
                             </div>
 
                             <div className="flex justify-between items-end border-b border-white/5 pb-4">
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Damaged</p>
-                                    <p className="text-xl font-black text-rose-400 mt-1">{inventory?.damagedQty || 0}</p>
+                                    <p className="text-[14px] font-semibold text-slate-500 uppercase tracking-widest">Damaged</p>
+                                    <p className="text-xl font-semibold text-rose-400 mt-1">{inventory?.damagedQty || 0}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Expired</p>
-                                    <p className="text-xl font-black text-rose-400 mt-1">{inventory?.expiredQty || 0}</p>
+                                    <p className="text-[14px] font-semibold text-slate-500 uppercase tracking-widest">Expired</p>
+                                    <p className="text-xl font-semibold text-rose-400 mt-1">{inventory?.expiredQty || 0}</p>
                                 </div>
                             </div>
                         </div>
@@ -187,10 +187,10 @@ export default function InventoryDetails() {
                         <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 p-8">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <CardTitle className="text-slate-900 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                                    <CardTitle className="text-slate-900 flex items-center gap-2 text-[14px] font-semibold uppercase tracking-widest">
                                         <History size={20} className="text-blue-500" /> Stock Movements
                                     </CardTitle>
-                                    <CardDescription className="text-slate-400 text-xs mt-1 font-bold lowercase">History of stock IN and OUT transactions.</CardDescription>
+                                    <CardDescription className="text-slate-400 text-[14px] mt-1 font-bold lowercase">History of stock IN and OUT transactions.</CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
@@ -198,11 +198,11 @@ export default function InventoryDetails() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50 dark:bg-slate-800 border-none hover:bg-transparent">
-                                        <TableHead className="pl-8 py-4 text-[9px] font-black uppercase tracking-wider text-slate-500">Date</TableHead>
-                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Type</TableHead>
-                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Quantity</TableHead>
-                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500">Reference</TableHead>
-                                        <TableHead className="text-[9px] font-black uppercase tracking-wider text-slate-500 pr-8 text-right">Notes</TableHead>
+                                        <TableHead className="pl-8 py-4 text-[14px] font-semibold uppercase tracking-wider text-slate-500">Date</TableHead>
+                                        <TableHead className="text-[14px] font-semibold uppercase tracking-wider text-slate-500">Type</TableHead>
+                                        <TableHead className="text-[14px] font-semibold uppercase tracking-wider text-slate-500">Quantity</TableHead>
+                                        <TableHead className="text-[14px] font-semibold uppercase tracking-wider text-slate-500">Reference</TableHead>
+                                        <TableHead className="text-[14px] font-semibold uppercase tracking-wider text-slate-500 pr-8 text-right">Notes</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -213,12 +213,12 @@ export default function InventoryDetails() {
                                     ) : (
                                         movements.map((mov, i) => (
                                             <TableRow key={i} className="border-slate-50 dark:border-slate-800/20">
-                                                <TableCell className="pl-8 font-black text-slate-900 dark:text-white">
+                                                <TableCell className="pl-8 font-semibold text-slate-900 dark:text-white">
                                                     {mov.createdAt ? formatDateTime(mov.createdAt) : '—'}
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className={cn(
-                                                        "inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest",
+                                                        "inline-flex items-center gap-1 text-[14px] font-semibold uppercase tracking-widest",
                                                         mov.direction === 'IN' ? "text-emerald-500" : "text-rose-500"
                                                     )}>
                                                         {mov.direction === 'IN' ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
@@ -231,7 +231,7 @@ export default function InventoryDetails() {
                                                 <TableCell className="text-slate-500 dark:text-slate-400 font-bold">
                                                     {mov.referenceType} #{mov.referenceId || '—'}
                                                 </TableCell>
-                                                <TableCell className="pr-8 text-right text-slate-400 text-xs font-bold">
+                                                <TableCell className="pr-8 text-right text-slate-400 text-[14px] font-bold">
                                                     {mov.notes || '—'}
                                                 </TableCell>
                                             </TableRow>

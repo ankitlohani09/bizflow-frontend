@@ -100,7 +100,7 @@ export default function TenantDetails() {
                         <ArrowLeft size={24} />
                     </button>
                     <div>
-                        <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
+                        <h1 className="text-4xl font-semibold text-slate-900 dark:text-white tracking-tighter uppercase">
                             {tenant.name}
                         </h1>
                         <p className="text-[14px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2 italic">
@@ -111,7 +111,7 @@ export default function TenantDetails() {
                 <div className="flex gap-4">
                     <Button 
                         variant="outline" 
-                        className="rounded-2xl border-slate-200 h-14 px-8 text-sm font-black uppercase tracking-widest"
+                        className="rounded-2xl border-slate-200 h-14 px-8 text-sm font-semibold uppercase tracking-widest"
                         onClick={handleEditClick}
                     >
                         <Edit3 size={16} className="mr-2" /> Edit Business
@@ -131,11 +131,11 @@ export default function TenantDetails() {
                     <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden">
                         <div className="p-10 pb-0">
                             <div className="flex items-center gap-6">
-                                <div className="h-16 min-w-[4rem] w-auto px-2 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 font-black text-sm uppercase">
+                                <div className="h-16 min-w-[4rem] w-auto px-2 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 font-semibold text-sm uppercase">
                                     {tenant.code}
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{tenant.name}</h3>
+                                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">{tenant.name}</h3>
                                     <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mt-1">{tenant.businessType} Management</p>
                                 </div>
                             </div>
@@ -149,9 +149,9 @@ export default function TenantDetails() {
 
                             <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
                                 <div className="flex items-center justify-between">
-                                    <p className="text-[14px] font-black uppercase tracking-widest text-slate-400">Account Status</p>
+                                    <p className="text-[14px] font-semibold uppercase tracking-widest text-slate-400">Account Status</p>
                                     <span className={cn(
-                                        "px-3 py-1 rounded-full text-[14px] font-black uppercase tracking-widest",
+                                        "px-3 py-1 rounded-full text-[14px] font-semibold uppercase tracking-widest",
                                         tenant.isActive ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600"
                                     )}>
                                         {tenant.isActive ? 'Active' : 'Suspended'}
@@ -163,7 +163,7 @@ export default function TenantDetails() {
 
                     {/* Security Protocols */}
                     <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] p-10">
-                        <h4 className="text-[14px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-2">
+                        <h4 className="text-[14px] font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-2">
                             <ShieldCheck size={16} className="text-indigo-500" /> Security Protocols
                         </h4>
                         <div className="space-y-4">
@@ -182,14 +182,14 @@ export default function TenantDetails() {
                         </div>
                         <div className="relative z-10 space-y-8">
                             <div>
-                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-indigo-600">Service Plan</h3>
-                                <h2 className="text-3xl font-black tracking-tight mt-2 italic uppercase">{tenant.subscriptionPlan || 'TRIAL'}</h2>
+                                <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">Service Plan</h3>
+                                <h2 className="text-3xl font-semibold tracking-tight mt-2 italic uppercase">{tenant.subscriptionPlan || 'TRIAL'}</h2>
                             </div>
 
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                 <div>
-                                    <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest mb-1">Expires On</p>
-                                    <p className="text-xl font-black tracking-tight italic">
+                                    <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Expires On</p>
+                                    <p className="text-xl font-semibold tracking-tight italic">
                                         {tenant.expiryDate ? new Date(tenant.expiryDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'NEVER'}
                                     </p>
                                 </div>
@@ -212,41 +212,41 @@ export default function TenantDetails() {
                     <div className="grid gap-10 md:grid-cols-2">
                         <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] p-10">
                             <div className="flex items-center justify-between mb-6">
-                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">User Usage</p>
+                                <p className="text-[14px] font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">User Usage</p>
                                 <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl text-indigo-600">
                                     <Users size={20} />
                                 </div>
                             </div>
                             <div className="flex items-end gap-2">
-                                <h3 className="text-5xl font-black text-slate-900 dark:text-white tabular-nums">
+                                <h3 className="text-5xl font-semibold text-slate-900 dark:text-white tabular-nums">
                                     {String(stats?.activeUsers || 0).padStart(2, '0')}
                                 </h3>
                                 <p className="text-sm font-bold text-slate-400 mb-1">/ {tenant.maxUsers || 5} Limit</p>
                             </div>
                             <div className="mt-4">
                                 {stats?.activeUsers >= (tenant.maxUsers || 5) ? (
-                                    <span className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-500 text-[14px] font-black uppercase tracking-widest">Quota Exceeded</span>
+                                    <span className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-500 text-[14px] font-semibold uppercase tracking-widest">Quota Exceeded</span>
                                 ) : (
-                                    <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[14px] font-black uppercase tracking-widest">Within Limit</span>
+                                    <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[14px] font-semibold uppercase tracking-widest">Within Limit</span>
                                 )}
                             </div>
                         </Card>
 
                         <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] p-10">
                             <div className="flex items-center justify-between mb-6">
-                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Monthly Transactions</p>
+                                <p className="text-[14px] font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Monthly Transactions</p>
                                 <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl text-emerald-600">
                                     <TrendingUp size={20} />
                                 </div>
                             </div>
                             <div className="flex items-end gap-2">
-                                <h3 className="text-5xl font-black text-slate-900 dark:text-white tabular-nums">
+                                <h3 className="text-5xl font-semibold text-slate-900 dark:text-white tabular-nums">
                                     {stats?.monthlyInvoices?.toLocaleString() || 0}
                                 </h3>
                                 <p className="text-sm font-bold text-slate-400 mb-1">Invoices</p>
                             </div>
                             <div className="mt-4">
-                                <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[14px] font-black uppercase tracking-widest">Current Month</span>
+                                <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[14px] font-semibold uppercase tracking-widest">Current Month</span>
                             </div>
                         </Card>
                     </div>
@@ -257,8 +257,8 @@ export default function TenantDetails() {
                             <CreditCard size={24} />
                         </div>
                         <div>
-                            <h4 className="text-sm font-black text-amber-900 dark:text-amber-500 uppercase tracking-tight">Billing Notice</h4>
-                            <p className="text-xs font-medium text-amber-700 dark:text-amber-600/80 mt-1 leading-relaxed">
+                            <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-500 uppercase tracking-tight">Billing Notice</h4>
+                            <p className="text-[14px] font-medium text-amber-700 dark:text-amber-600/80 mt-1 leading-relaxed">
                                 This tenant is currently using more users than allowed by their plan. Consider upgrading them to Enterprise or increasing their quota manually.
                             </p>
                         </div>
@@ -272,7 +272,7 @@ export default function TenantDetails() {
                     <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
                         <div className="p-8 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center bg-gradient-to-r from-indigo-50/50 to-transparent">
                             <div>
-                                <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Edit Business Configuration</h2>
+                                <h2 className="text-xl font-semibold text-slate-900 dark:text-white uppercase tracking-tight">Edit Business Configuration</h2>
                                 <p className="text-[14px] text-slate-400 font-bold uppercase tracking-widest mt-1">Update platform-level settings for {tenant.name}</p>
                             </div>
                             <button onClick={() => setIsEditModalOpen(false)} className="h-10 w-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-400 transition-colors">
@@ -283,7 +283,7 @@ export default function TenantDetails() {
                         <form onSubmit={handleUpdate} className="p-8 space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-1.5">
-                                    <label className="text-[14px] font-black text-slate-400 uppercase tracking-widest ml-1">Business Name</label>
+                                    <label className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Business Name</label>
                                     <input 
                                         className="w-full h-12 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-4 text-sm font-bold focus:ring-2 focus:ring-indigo-500 transition-all"
                                         value={editForm.name}
@@ -292,7 +292,7 @@ export default function TenantDetails() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[14px] font-black text-slate-400 uppercase tracking-widest ml-1">Subscription Plan</label>
+                                    <label className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Subscription Plan</label>
                                     <select 
                                         className="w-full h-12 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-4 text-sm font-bold focus:ring-2 focus:ring-indigo-500 transition-all"
                                         value={editForm.subscriptionPlan}
@@ -304,7 +304,7 @@ export default function TenantDetails() {
                                     </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[14px] font-black text-slate-400 uppercase tracking-widest ml-1">Max User Quota</label>
+                                    <label className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Max User Quota</label>
                                     <input 
                                         type="number"
                                         className="w-full h-12 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-4 text-sm font-bold focus:ring-2 focus:ring-indigo-500 transition-all"
@@ -314,7 +314,7 @@ export default function TenantDetails() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[14px] font-black text-slate-400 uppercase tracking-widest ml-1">Expiry Date</label>
+                                    <label className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Expiry Date</label>
                                     <input 
                                         type="date"
                                         className="w-full h-12 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-4 text-sm font-bold focus:ring-2 focus:ring-indigo-500 transition-all"
@@ -328,7 +328,7 @@ export default function TenantDetails() {
                                 <Button 
                                     type="submit" 
                                     disabled={saving}
-                                    className="flex-1 bg-slate-900 text-white h-14 rounded-2xl font-black uppercase tracking-widest text-[14px]"
+                                    className="flex-1 bg-slate-900 text-white h-14 rounded-2xl font-semibold uppercase tracking-widest text-[14px]"
                                 >
                                     {saving ? <Loader2 className="animate-spin h-5 w-5" /> : 'Update Business Configuration'}
                                 </Button>
@@ -336,7 +336,7 @@ export default function TenantDetails() {
                                     type="button"
                                     variant="outline"
                                     onClick={() => setIsEditModalOpen(false)}
-                                    className="h-14 rounded-2xl px-8 border-slate-200 font-black uppercase tracking-widest text-[14px]"
+                                    className="h-14 rounded-2xl px-8 border-slate-200 font-semibold uppercase tracking-widest text-[14px]"
                                 >
                                     Cancel
                                 </Button>
@@ -356,7 +356,7 @@ function InfoItem({ icon: Icon, label, value }) {
                 <Icon size={16} />
             </div>
             <div>
-                <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+                <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
                 <p className="text-sm font-bold text-slate-700 dark:text-slate-300 break-words">{value}</p>
             </div>
         </div>
@@ -366,7 +366,7 @@ function InfoItem({ icon: Icon, label, value }) {
 function ProtocolItem({ label, active }) {
     return (
         <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-transparent">
-            <span className="text-[14px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-tight">{label}</span>
+            <span className="text-[14px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-tight">{label}</span>
             {active ? (
                 <CheckCircle2 size={18} className="text-emerald-500" />
             ) : (

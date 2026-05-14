@@ -69,7 +69,7 @@ export default function KitchenOrders() {
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                        <h1 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                             <UtensilsCrossed className="text-primary" size={32} />
                             {t('Kitchen Orders')}
                         </h1>
@@ -130,15 +130,15 @@ export default function KitchenOrders() {
                                     {/* Card Header */}
                                     <div className="p-5 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm">
+                                            <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-semibold text-sm">
                                                 #{order.id.toString().slice(-3)}
                                             </div>
                                             <div>
-                                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-400">Table</p>
+                                                <p className="text-[14px] font-semibold uppercase tracking-widest text-slate-400">Table</p>
                                                 <p className="font-bold text-slate-900 dark:text-white">{order.tableName || 'Takeaway'}</p>
                                             </div>
                                         </div>
-                                        <div className={cn("px-3 py-1 rounded-full text-[14px] font-black uppercase tracking-wider flex items-center gap-1.5", config.light, config.text)}>
+                                        <div className={cn("px-3 py-1 rounded-full text-[14px] font-semibold uppercase tracking-wider flex items-center gap-1.5", config.light, config.text)}>
                                             <Icon size={12} />
                                             {config.label}
                                         </div>
@@ -149,7 +149,7 @@ export default function KitchenOrders() {
                                         {(order.items || []).map((item, idx) => (
                                             <div key={idx} className="flex items-start justify-between gap-4">
                                                 <div className="flex items-center gap-3">
-                                                    <span className="h-6 w-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-[14px] font-black flex items-center justify-center text-slate-600">
+                                                    <span className="h-6 w-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold flex items-center justify-center text-slate-600">
                                                         {item.quantity}x
                                                     </span>
                                                     <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{item.itemName}</p>

@@ -70,10 +70,18 @@ export default function Suppliers() {
 
     return (
         <MainLayout title="Suppliers">
-            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Suppliers</h1>
-                    <p className="text-sm text-slate-500">Manage your business vendor relationships and tax information.</p>
+            <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between no-print">
+                <div className="flex items-center gap-5">
+                    <div className="h-14 w-14 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
+                        <Building2 size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">Suppliers</h1>
+                        <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Vendor Management
+                        </p>
+                    </div>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="ghost" onClick={fetchSuppliers} disabled={loading}>
@@ -128,12 +136,12 @@ export default function Suppliers() {
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
-                                    <TableHead className="pl-8 py-4 text-[14px] font-black uppercase tracking-wider text-slate-500">Company</TableHead>
-                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Contact Person</TableHead>
-                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Email / Phone</TableHead>
-                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Location</TableHead>
-                                    <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Tax ID</TableHead>
-                                    <TableHead className="text-right pr-8 text-[14px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
+                                    <TableHead className="pl-8 py-4 text-[14px] font-semibold uppercase tracking-wider text-slate-500">Company</TableHead>
+                                    <TableHead className="text-[14px] font-semibold uppercase tracking-wider text-slate-500">Contact Person</TableHead>
+                                    <TableHead className="text-[14px] font-semibold uppercase tracking-wider text-slate-500">Email / Phone</TableHead>
+                                    <TableHead className="text-[14px] font-semibold uppercase tracking-wider text-slate-500">Location</TableHead>
+                                    <TableHead className="text-[14px] font-semibold uppercase tracking-wider text-slate-500">Tax ID</TableHead>
+                                    <TableHead className="text-right pr-8 text-[14px] font-semibold uppercase tracking-wider text-slate-500">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -161,7 +169,7 @@ export default function Suppliers() {
                                                 <MapPin size={12} className="text-rose-500/70" /> {s.city || '—'}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="font-mono text-[14px] font-black text-slate-400 uppercase tracking-widest">
+                                        <TableCell className="font-mono text-[14px] font-semibold text-slate-400 uppercase tracking-widest">
                                             {s.taxId || 'UNREGISTERED'}
                                         </TableCell>
                                         <TableCell className="text-right pr-8">

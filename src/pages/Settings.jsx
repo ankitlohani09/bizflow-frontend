@@ -271,7 +271,7 @@ export default function Settings() {
                                                     <CreditCard size={22} />
                                                 </div>
                                                 <div>
-                                                    <CardTitle className="text-slate-900 dark:text-white border-none font-black text-lg p-0">Payment Modes</CardTitle>
+                                                    <CardTitle className="text-slate-900 dark:text-white border-none font-semibold text-lg p-0">Payment Modes</CardTitle>
                                                     <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configure accepted payment methods</p>
                                                 </div>
                                             </div>
@@ -285,7 +285,7 @@ export default function Settings() {
                                                 onChange={(e) => setNewModeName(e.target.value)}
                                                 className="flex-1 bg-slate-50 dark:bg-slate-800 border-none h-12 rounded-2xl font-bold dark:text-white"
                                             />
-                                            <Button type="submit" className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest text-[14px]">
+                                            <Button type="submit" className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold uppercase tracking-widest text-[14px]">
                                                 {editingPm ? 'Update' : 'Add'}
                                             </Button>
                                         </form>
@@ -297,7 +297,7 @@ export default function Settings() {
                                                         <div className="h-8 w-8 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center shadow-sm">
                                                             <Check size={14} className="text-blue-500" />
                                                         </div>
-                                                        <span className="text-sm font-black text-slate-700 dark:text-white">{mode.name}</span>
+                                                        <span className="text-sm font-semibold text-slate-700 dark:text-white">{mode.name}</span>
                                                     </div>
                                                     <div className="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
                                                         <button onClick={() => handleDeleteMode(mode.id)} className="p-2 text-slate-300 hover:text-rose-500"><Trash2 size={14} /></button>
@@ -316,7 +316,7 @@ export default function Settings() {
                                                 <Percent size={22} />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-slate-900 dark:text-white border-none font-black text-lg p-0">Tax Rules (GST/VAT)</CardTitle>
+                                                <CardTitle className="text-slate-900 dark:text-white border-none font-semibold text-lg p-0">Tax Rules (GST/VAT)</CardTitle>
                                                 <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage reusable tax configurations</p>
                                             </div>
                                         </div>
@@ -325,17 +325,17 @@ export default function Settings() {
                                         <form onSubmit={handleAddTaxRule} className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-8">
                                             <div className="md:col-span-5"><Input placeholder="Rule Label" value={newTaxRule.name} onChange={(e) => setNewTaxRule({ ...newTaxRule, name: e.target.value })} className="h-12 bg-slate-50 dark:bg-slate-800 border-none font-bold dark:text-white" /></div>
                                             <div className="md:col-span-4"><Input type="number" placeholder="Rate %" value={newTaxRule.rate} onChange={(e) => setNewTaxRule({ ...newTaxRule, rate: e.target.value })} className="h-12 bg-slate-50 dark:bg-slate-800 border-none font-bold dark:text-white" /></div>
-                                            <div className="md:col-span-3"><Button type="submit" className="h-12 w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black uppercase tracking-widest text-[14px]">Add Rule</Button></div>
+                                            <div className="md:col-span-3"><Button type="submit" className="h-12 w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-semibold uppercase tracking-widest text-[14px]">Add Rule</Button></div>
                                         </form>
 
                                         <div className="space-y-2">
                                             {taxRules.map((rule) => (
                                                 <div key={rule.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl hover:bg-emerald-50/50 transition-all">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="h-10 w-10 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center font-black text-emerald-600 shadow-sm">{rule.rate}%</div>
+                                                        <div className="h-10 w-10 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center font-semibold text-emerald-600 shadow-sm">{rule.rate}%</div>
                                                         <div>
-                                                            <p className="text-sm font-black text-slate-700 dark:text-white">{rule.name}</p>
-                                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Standard Rate</p>
+                                                            <p className="text-sm font-semibold text-slate-700 dark:text-white">{rule.name}</p>
+                                                            <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest">Standard Rate</p>
                                                         </div>
                                                     </div>
                                                     <button onClick={() => handleDeleteTaxRule(rule.id)} className="p-2 text-slate-300 hover:text-rose-500 transition-colors"><Trash2 size={16} /></button>
@@ -353,7 +353,7 @@ export default function Settings() {
                                                 <ChefHat size={22} />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-slate-900 dark:text-white border-none font-black text-lg p-0">App Modules</CardTitle>
+                                                <CardTitle className="text-slate-900 dark:text-white border-none font-semibold text-lg p-0">App Modules</CardTitle>
                                                 <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mt-1">Enable or disable features</p>
                                             </div>
                                         </div>
@@ -365,7 +365,7 @@ export default function Settings() {
                                                     <ChefHat size={24} />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Kitchen Module</p>
+                                                    <p className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">Kitchen Module</p>
                                                     <p className="text-[14px] text-slate-400 font-bold mt-1">Enable Kitchen Orders for Restaurant mode</p>
                                                 </div>
                                             </div>
@@ -390,7 +390,7 @@ export default function Settings() {
                                                     <Sparkles size={24} />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">AI Insights</p>
+                                                    <p className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">AI Insights</p>
                                                     <p className="text-[14px] text-slate-400 font-bold mt-1">Enable AI-powered business chat and predictions</p>
                                                 </div>
                                             </div>
@@ -428,7 +428,7 @@ export default function Settings() {
                                                 <ShieldCheck size={28} />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-slate-900 dark:text-white border-none font-black text-xl p-0">Attendance Rules</CardTitle>
+                                                <CardTitle className="text-slate-900 dark:text-white border-none font-semibold text-xl p-0">Attendance Rules</CardTitle>
                                                 <p className="text-[14px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Enforce security for staff check-ins</p>
                                             </div>
                                         </div>
@@ -441,7 +441,7 @@ export default function Settings() {
                                                         <Camera size={24} />
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">AI Face Verification</p>
+                                                        <p className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">AI Face Verification</p>
                                                         <p className="text-[14px] text-slate-400 font-bold mt-1">Enforce mandatory check-in selfie</p>
                                                     </div>
                                                 </div>
@@ -466,7 +466,7 @@ export default function Settings() {
                                                         <MapPin size={24} />
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">GPS Geofencing</p>
+                                                        <p className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">GPS Geofencing</p>
                                                         <p className="text-[14px] text-slate-400 font-bold mt-1">Validate physical store presence</p>
                                                     </div>
                                                 </div>
@@ -514,7 +514,7 @@ export default function Settings() {
                                     <Input label="Phone" defaultValue="+91 99999 88888" />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-700 uppercase">Registered Address</label>
+                                    <label className="text-[14px] font-bold text-slate-700 uppercase">Registered Address</label>
                                     <textarea
                                         className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all dark:text-white"
                                         rows={3}
@@ -542,7 +542,7 @@ export default function Settings() {
                             <CardContent className="space-y-10 p-8">
                                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                                     <div className="space-y-4">
-                                        <label className="text-[14px] font-black text-slate-400 uppercase tracking-widest">Primary Identity Color</label>
+                                        <label className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest">Primary Identity Color</label>
                                         <div className="flex items-center gap-4">
                                             <input
                                                 type="color"
@@ -580,7 +580,7 @@ export default function Settings() {
                                                     alt="Logo Preview"
                                                     className="h-full object-contain"
                                                 />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-2xl text-white text-[14px] font-black uppercase tracking-widest">Click to Change</div>
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-2xl text-white text-[14px] font-semibold uppercase tracking-widest">Click to Change</div>
                                             </div>
                                             
                                             {/* Premium Remove Button inside the card */}
@@ -615,7 +615,7 @@ export default function Settings() {
                                             <div className="h-20 w-20 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
                                                 <ImageIcon size={36} />
                                             </div>
-                                            <p className="mt-6 text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Upload Company Logo</p>
+                                            <p className="mt-6 text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">Upload Company Logo</p>
                                             <p className="text-[11px] text-slate-400 font-bold mt-2 tracking-wide">PNG or SVG, max 500kb</p>
                                         </>
                                     )}
@@ -650,7 +650,7 @@ export default function Settings() {
 
                                 <div className="pt-6 border-t border-slate-100 flex justify-end">
                                     <Button
-                                        className="bg-slate-900 dark:bg-slate-800 hover:bg-black dark:hover:bg-slate-700 text-white px-10 font-black uppercase tracking-widest text-[14px] h-12 rounded-xl shadow-xl shadow-slate-200 dark:shadow-none"
+                                        className="bg-slate-900 dark:bg-slate-800 hover:bg-black dark:hover:bg-slate-700 text-white px-10 font-semibold uppercase tracking-widest text-[14px] h-12 rounded-xl shadow-xl shadow-slate-200 dark:shadow-none"
                                         onClick={async () => {
                                             // Final safety check: if it's a blob, don't save it
                                             if (localBranding.logoUrl && localBranding.logoUrl.startsWith('blob:')) {
@@ -726,8 +726,8 @@ export default function Settings() {
                                         />
                                     </div>
                                     <div className="space-y-2 text-center md:text-left">
-                                        <h3 className="text-lg font-black text-slate-900 dark:text-white">Your Avatar</h3>
-                                        <p className="text-xs font-medium text-slate-500 max-w-xs leading-relaxed">
+                                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Your Avatar</h3>
+                                        <p className="text-[14px] font-medium text-slate-500 max-w-xs leading-relaxed">
                                             Click on the image to upload a new profile picture. Recommended size is 256x256px. Max size: 1MB.
                                         </p>
                                         <Button
@@ -813,7 +813,7 @@ export default function Settings() {
                                         <CreditCard size={28} />
                                     </div>
                                     <div>
-                                        <CardTitle className="text-slate-900 dark:text-white border-none font-black text-xl p-0">Current Subscription</CardTitle>
+                                        <CardTitle className="text-slate-900 dark:text-white border-none font-semibold text-xl p-0">Current Subscription</CardTitle>
                                         <p className="text-[14px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Manage your service plan and usage limits</p>
                                     </div>
                                 </div>
@@ -821,20 +821,20 @@ export default function Settings() {
                             <CardContent className="p-10 space-y-10">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest mb-2">Active Plan</p>
-                                        <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase">{tenant?.subscriptionPlan || 'TRIAL'}</h4>
-                                        <span className="inline-flex mt-3 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 text-[14px] font-black uppercase">Active Now</span>
+                                        <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Active Plan</p>
+                                        <h4 className="text-2xl font-semibold text-slate-900 dark:text-white uppercase">{tenant?.subscriptionPlan || 'TRIAL'}</h4>
+                                        <span className="inline-flex mt-3 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 text-[14px] font-semibold uppercase">Active Now</span>
                                     </div>
                                     <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest mb-2">Valid Until</p>
-                                        <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase">
+                                        <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Valid Until</p>
+                                        <h4 className="text-2xl font-semibold text-slate-900 dark:text-white uppercase">
                                             {tenant?.expiryDate ? new Date(tenant.expiryDate).toLocaleDateString() : 'N/A'}
                                         </h4>
                                         <p className="text-[14px] font-bold text-slate-400 uppercase mt-2">Auto-renewal: Disabled</p>
                                     </div>
                                     <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest mb-2">User Quota</p>
-                                        <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase">{tenant?.maxUsers || 5} Staff</h4>
+                                        <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mb-2">User Quota</p>
+                                        <h4 className="text-2xl font-semibold text-slate-900 dark:text-white uppercase">{tenant?.maxUsers || 5} Staff</h4>
                                         <div className="w-full h-1.5 bg-slate-200 rounded-full mt-4 overflow-hidden">
                                             <div className="h-full bg-amber-500 w-[60%]" />
                                         </div>
@@ -843,9 +843,9 @@ export default function Settings() {
 
                                 <div className="p-8 rounded-[2rem] bg-slate-900 text-white relative overflow-hidden group">
                                     <div className="relative z-10">
-                                        <h3 className="text-xl font-black uppercase tracking-tight">Upgrade your plan</h3>
+                                        <h3 className="text-xl font-semibold uppercase tracking-tight">Upgrade your plan</h3>
                                         <p className="text-slate-400 text-sm mt-2 max-w-md font-medium">Unlock advanced AI insights, unlimited staff accounts, and custom invoice templates with our Enterprise plan.</p>
-                                        <Button className="mt-8 bg-white text-slate-900 hover:bg-slate-100 px-8 font-black uppercase tracking-widest text-[14px] h-12 rounded-xl">
+                                        <Button className="mt-8 bg-white text-slate-900 hover:bg-slate-100 px-8 font-semibold uppercase tracking-widest text-[14px] h-12 rounded-xl">
                                             View Pricing Models
                                         </Button>
                                     </div>
@@ -957,7 +957,7 @@ function MasterDataCard({ title, icon: Icon, color }) {
                 <MoreVertical size={16} className="text-slate-300 group-hover:text-slate-500" />
             </div>
             <div className="mt-4">
-                <p className="text-xs text-slate-500 font-medium">Manage definitions and standards for your catalog.</p>
+                <p className="text-[14px] text-slate-500 font-medium">Manage definitions and standards for your catalog.</p>
             </div>
         </Card>
     );

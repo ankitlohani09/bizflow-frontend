@@ -52,7 +52,7 @@ export default function ForgotPassword() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
             <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl shadow-blue-500/10 border border-slate-100">
-                <Link to="/login" className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors mb-8">
+                <Link to="/login" className="inline-flex items-center gap-2 text-[14px] font-bold text-slate-400 hover:text-slate-600 transition-colors mb-8">
                     <ArrowLeft className="h-4 w-4" />
                     BACK TO LOGIN
                 </Link>
@@ -74,7 +74,7 @@ export default function ForgotPassword() {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                        <label className="text-[14px] font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
                         <input
                             type="email"
                             required

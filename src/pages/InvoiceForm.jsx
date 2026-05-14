@@ -62,14 +62,14 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 dark:border-slate-800">
                 <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
-                    <h3 className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-widest">Register Customer</h3>
+                    <h3 className="text-[14px] font-semibold text-slate-700 dark:text-white uppercase tracking-widest">Register Customer</h3>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"><X size={18} /></button>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
-                    {error && <div className="p-3 bg-rose-50 text-rose-600 text-xs font-bold rounded-lg">{error}</div>}
+                    {error && <div className="p-3 bg-rose-50 text-rose-600 text-[14px] font-bold rounded-lg">{error}</div>}
 
                     <div className="space-y-1">
-                        <label className="text-[15px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name *</label>
+                        <label className="text-[15px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Full Name *</label>
                         <div className="relative">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                             <input
@@ -79,11 +79,11 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
                                 placeholder="Customer Name"
                             />
                         </div>
-                        {errors.name && <p className="text-rose-500 text-[10px] font-bold mt-0.5 ml-1">{errors.name.message}</p>}
+                        {errors.name && <p className="text-rose-500 text-[14px] font-bold mt-0.5 ml-1">{errors.name.message}</p>}
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-[15px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number *</label>
+                        <label className="text-[15px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Mobile Number *</label>
                         <div className="relative">
                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                             <input
@@ -94,11 +94,11 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
                                 placeholder="10-digit Mobile"
                             />
                         </div>
-                        {errors.phone && <p className="text-rose-500 text-[10px] font-bold mt-0.5 ml-1">{errors.phone.message}</p>}
+                        {errors.phone && <p className="text-rose-500 text-[14px] font-bold mt-0.5 ml-1">{errors.phone.message}</p>}
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-[15px] font-black text-slate-400 uppercase tracking-widest ml-1">Shipping Address</label>
+                        <label className="text-[15px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Shipping Address</label>
                         <div className="relative">
                             <MapPin className="absolute left-3 top-3 text-slate-400" size={14} />
                             <textarea
@@ -108,10 +108,10 @@ function QuickAddCustomerModal({ isOpen, onClose, onSuccess }) {
                                 placeholder="Enter full address"
                             />
                         </div>
-                        {errors.address && <p className="text-rose-500 text-[10px] font-bold mt-0.5 ml-1">{errors.address.message}</p>}
+                        {errors.address && <p className="text-rose-500 text-[14px] font-bold mt-0.5 ml-1">{errors.address.message}</p>}
                     </div>
 
-                    <button disabled={loading} type="submit" className="w-full h-12 bg-indigo-600 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button disabled={loading} type="submit" className="w-full h-12 bg-indigo-600 text-white rounded-xl font-semibold uppercase tracking-widest text-[14px] hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed">
                         {loading ? <Loader2 className="animate-spin" size={16} /> : <>Register & Select</>}
                     </button>
                 </form>
@@ -337,7 +337,7 @@ export default function InvoiceForm() {
         return (
             <div className="flex h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 gap-3">
                 <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading Terminal...</p>
+                <p className="text-[14px] font-semibold uppercase tracking-widest text-slate-400">Loading Terminal...</p>
             </div>
         );
     }
@@ -357,10 +357,10 @@ export default function InvoiceForm() {
                     <div className="flex items-center justify-between mb-4 px-2">
                         <div className="flex items-center gap-4">
                             <div>
-                                <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Billing Terminal</h1>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Fast & Secure Checkout</p>
+                                <h1 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight uppercase">Billing Terminal</h1>
+                                <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Fast & Secure Checkout</p>
                             </div>
-                            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/50 rounded-full text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
+                            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/50 rounded-full text-[14px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
                                 <span className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                                 System Live
                             </div>
@@ -371,7 +371,7 @@ export default function InvoiceForm() {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="px-4 py-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-900/50 rounded-xl text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-2 shadow-lg shadow-rose-100/50 dark:shadow-none"
+                                    className="px-4 py-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-900/50 rounded-xl text-rose-600 dark:text-rose-400 text-[14px] font-bold flex items-center gap-2 shadow-lg shadow-rose-100/50 dark:shadow-none"
                                 >
                                     <AlertCircle size={14} /> {error}
                                 </motion.div>
@@ -385,7 +385,7 @@ export default function InvoiceForm() {
                         <div className="flex-[8] flex flex-col gap-4 min-w-0">
 
                             {/* Search & Barcode Card */}
-                            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-4 transition-all">
+                            <div className="enterprise-card p-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div id="item-search-box" className="relative">
                                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -410,16 +410,16 @@ export default function InvoiceForm() {
                                                         <button key={p.itemId} type="button" onClick={() => addItemToCart(p)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 border-b border-slate-50 dark:border-slate-800 last:border-0 group transition-colors">
                                                             <div className="text-left">
                                                                 <p className="text-sm font-bold text-slate-800 dark:text-white group-hover:text-indigo-600 transition-colors">{p.itemName}</p>
-                                                                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{p.sku}</p>
+                                                                <p className="text-[14px] text-slate-400 font-semibold uppercase tracking-widest mt-0.5">{p.sku}</p>
                                                             </div>
                                                             <div className="flex items-center gap-4">
-                                                                <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2.5 py-1 rounded-full uppercase tracking-widest">Stock: {p.availableQty}</span>
-                                                                <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">{fmt(p.sellingPrice)}</span>
+                                                                <span className="text-[14px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2.5 py-1 rounded-full uppercase tracking-widest">Stock: {p.availableQty}</span>
+                                                                <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">{fmt(p.sellingPrice)}</span>
                                                             </div>
                                                         </button>
                                                     ))}
                                                     {filteredInventory.length === 0 && (
-                                                        <div className="px-4 py-6 text-center text-xs font-black text-slate-400 uppercase tracking-widest">No products found</div>
+                                                        <div className="px-4 py-6 text-center text-[14px] font-semibold text-slate-400 uppercase tracking-widest">No products found</div>
                                                     )}
                                                 </motion.div>
                                             )}
@@ -440,15 +440,15 @@ export default function InvoiceForm() {
                             </div>
 
                             {/* Cart Table Card */}
-                            <div className="flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 flex flex-col min-h-0 overflow-hidden transition-all">
+                             <div className="flex-1 enterprise-card flex flex-col min-h-0 overflow-hidden">
                                 <div className="px-6 py-4 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
-                                    <div className="flex items-center gap-2 text-[15px] font-black text-slate-700 dark:text-white uppercase tracking-widest">
+                                    <div className="flex items-center gap-2 text-[15px] font-semibold text-slate-700 dark:text-white uppercase tracking-widest">
                                         <ShoppingCart size={14} className="text-slate-400" /> Current Cart ({form.items.length})
                                     </div>
                                 </div>
                                 <div className="flex-1 overflow-auto custom-scrollbar">
-                                    <table className="w-full text-left text-xs border-collapse">
-                                        <thead className="sticky top-0 bg-white dark:bg-slate-900 shadow-sm z-10 text-slate-400 font-black uppercase text-[15px] tracking-widest border-b border-slate-50 dark:border-slate-800">
+                                    <table className="w-full text-left text-[14px] border-collapse">
+                                        <thead className="sticky top-0 bg-white dark:bg-slate-900 shadow-sm z-10 text-slate-400 font-semibold uppercase text-[15px] tracking-widest border-b border-slate-50 dark:border-slate-800">
                                             <tr>
                                                 <th className="px-6 py-4">Item Detail</th>
                                                 <th className="px-4 py-4 text-center">Stock</th>
@@ -470,15 +470,15 @@ export default function InvoiceForm() {
                                                     >
                                                         <td className="px-6 py-4">
                                                             <p className="font-bold text-slate-800 dark:text-white leading-tight truncate max-w-[200px]">{item.itemName}</p>
-                                                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">
+                                                            <div className="flex items-center gap-2 text-[14px] text-slate-400 font-semibold uppercase tracking-widest mt-0.5">
                                                                 <span>{item.sku}</span>
                                                                 {item.taxRate > 0 && (
-                                                                    <span className="text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 rounded-full text-[9px]">GST {item.taxRate}%</span>
+                                                                    <span className="text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 rounded-full text-[14px]">GST {item.taxRate}%</span>
                                                                 )}
                                                             </div>
                                                         </td>
                                                         <td className="px-4 py-4 text-center">
-                                                            <span className={cn("px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                                                            <span className={cn("px-2.5 py-1 rounded-full text-[14px] font-semibold uppercase tracking-widest",
                                                                 item.stock < 10
                                                                     ? 'bg-rose-50 text-rose-500 dark:bg-rose-900/20 dark:text-rose-400'
                                                                     : 'bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
@@ -487,11 +487,11 @@ export default function InvoiceForm() {
                                                             </span>
                                                         </td>
                                                         <td className="px-4 py-4 text-right font-bold text-slate-600 dark:text-slate-300 tabular-nums">{fmt(item.unitPrice)}</td>
-                                                        <td className="px-4 py-4 text-right font-black text-slate-900 dark:text-white tabular-nums">{fmt(item.subtotal)}</td>
+                                                        <td className="px-4 py-4 text-right font-semibold text-slate-900 dark:text-white tabular-nums">{fmt(item.subtotal)}</td>
                                                         <td className="px-4 py-4">
                                                             <div className="flex items-center justify-center gap-2">
                                                                 <button type="button" onClick={() => updateItemField(index, 'quantity', Math.max(1, Number(item.quantity) - 1))} className="h-7 w-7 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-700 transition-colors"><Minus size={12} /></button>
-                                                                <input type="number" value={item.quantity} onChange={(e) => updateItemField(index, 'quantity', e.target.value)} className="w-10 text-center font-black text-xs bg-transparent outline-none dark:text-white" />
+                                                                <input type="number" value={item.quantity} onChange={(e) => updateItemField(index, 'quantity', e.target.value)} className="w-10 text-center font-semibold text-[14px] bg-transparent outline-none dark:text-white" />
                                                                 <button type="button" onClick={() => updateItemField(index, 'quantity', Number(item.quantity) + 1)} className="h-7 w-7 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-700 transition-colors"><Plus size={12} /></button>
                                                             </div>
                                                         </td>
@@ -505,7 +505,7 @@ export default function InvoiceForm() {
                                             </AnimatePresence>
                                             {form.items.length === 0 && (
                                                 <tr>
-                                                    <td colSpan="6" className="px-4 py-20 text-center text-slate-300 dark:text-slate-600 font-black uppercase text-[10px] tracking-widest">
+                                                    <td colSpan="6" className="px-4 py-20 text-center text-slate-300 dark:text-slate-600 font-semibold uppercase text-[14px] tracking-widest">
                                                         <div className="flex flex-col items-center gap-3">
                                                             <ShoppingCart size={32} className="opacity-30" />
                                                             Your cart is empty
@@ -523,10 +523,10 @@ export default function InvoiceForm() {
                         <div className="flex-[4] flex flex-col gap-4 min-w-[380px] min-h-0">
 
                             {/* Customer Section Card */}
-                            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-5 space-y-4 transition-all shrink-0">
+                            <div className="enterprise-card p-5 space-y-4 shrink-0">
                                 <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-2 text-[10px] font-black text-slate-700 dark:text-white uppercase tracking-widest"><Users size={14} className="text-indigo-600" /> Customer</div>
-                                    <button type="button" onClick={() => setIsQuickAddOpen(true)} className="flex items-center gap-1 text-[9px] font-black text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400 px-2.5 py-1 rounded-full hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-all uppercase tracking-widest"><Plus size={12} /> New</button>
+                                    <div className="flex items-center gap-2 text-[14px] font-semibold text-slate-700 dark:text-white uppercase tracking-widest"><Users size={14} className="text-indigo-600" /> Customer</div>
+                                    <button type="button" onClick={() => setIsQuickAddOpen(true)} className="flex items-center gap-1 text-[14px] font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400 px-2.5 py-1 rounded-full hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-all uppercase tracking-widest"><Plus size={12} /> New</button>
                                 </div>
                                 <div id="customer-search-box" className="space-y-3 relative">
                                     <div className="relative">
@@ -537,7 +537,7 @@ export default function InvoiceForm() {
                                             value={customerSearch}
                                             onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); }}
                                             onFocus={() => setShowCustomerDropdown(true)}
-                                            className="w-full h-10 pl-9 pr-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 outline-none text-xs font-bold text-slate-700 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 transition-all focus:ring-2 focus:ring-indigo-500/10"
+                                            className="w-full h-10 pl-9 pr-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 outline-none text-[14px] font-bold text-slate-700 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 transition-all focus:ring-2 focus:ring-indigo-500/10"
                                         />
                                         <AnimatePresence>
                                             {showCustomerDropdown && (
@@ -550,14 +550,14 @@ export default function InvoiceForm() {
                                                     <button type="button" onClick={() => selectCustomer('walk-in')} className="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 border-b border-slate-50 dark:border-slate-800 flex items-center gap-2 group transition-colors">
                                                         <Users size={14} className="text-indigo-600 group-hover:scale-110 transition-transform" />
                                                         <div>
-                                                            <span className="text-xs font-bold text-slate-800 dark:text-white">Walk-in Customer</span>
-                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Default Account</p>
+                                                            <span className="text-[14px] font-bold text-slate-800 dark:text-white">Walk-in Customer</span>
+                                                            <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest">Default Account</p>
                                                         </div>
                                                     </button>
                                                     {filteredCustomers.map(c => (
                                                         <button key={c.id} type="button" onClick={() => selectCustomer(c)} className="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 border-b border-slate-50 dark:border-slate-800 last:border-0 transition-colors">
-                                                            <p className="text-xs font-bold text-slate-800 dark:text-white">{c.name}</p>
-                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{c.phone}</p>
+                                                            <p className="text-[14px] font-bold text-slate-800 dark:text-white">{c.name}</p>
+                                                            <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">{c.phone}</p>
                                                         </button>
                                                     ))}
                                                 </motion.div>
@@ -573,9 +573,9 @@ export default function InvoiceForm() {
                                                 exit={{ opacity: 0, height: 0 }}
                                                 className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-1.5 overflow-hidden"
                                             >
-                                                <div className="flex items-center gap-2 text-[10px] font-black text-slate-600 dark:text-slate-300"><Phone size={10} className="text-indigo-500" /> {form.customerPhone}</div>
+                                                <div className="flex items-center gap-2 text-[14px] font-semibold text-slate-600 dark:text-slate-300"><Phone size={10} className="text-indigo-500" /> {form.customerPhone}</div>
                                                 {form.customerAddress && (
-                                                    <div className="flex items-start gap-2 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                                    <div className="flex items-start gap-2 text-[14px] font-bold text-slate-500 dark:text-slate-400">
                                                         <MapPin size={10} className="text-indigo-500 mt-0.5 shrink-0" />
                                                         <span className="leading-relaxed">{form.customerAddress}</span>
                                                     </div>
@@ -585,42 +585,42 @@ export default function InvoiceForm() {
                                     </AnimatePresence>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Billing Date</label>
-                                    <input type="date" value={form.invoiceDate} onChange={(e) => setForm(p => ({ ...p, invoiceDate: e.target.value }))} className="w-full h-9 px-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 outline-none text-xs font-bold text-slate-700 dark:text-white focus:bg-white dark:focus:bg-slate-800 transition-all" />
+                                    <label className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest">Billing Date</label>
+                                    <input type="date" value={form.invoiceDate} onChange={(e) => setForm(p => ({ ...p, invoiceDate: e.target.value }))} className="w-full h-9 px-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 outline-none text-[14px] font-bold text-slate-700 dark:text-white focus:bg-white dark:focus:bg-slate-800 transition-all" />
                                 </div>
                             </div>
 
                             {/* Checkout Card */}
-                            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-5 flex flex-col gap-4 transition-all">
+                            <div className="enterprise-card p-5 flex flex-col gap-4">
 
                                 {/* Totals Summary */}
                                 <div className="space-y-2.5 bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/50 dark:to-slate-800/20 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-inner">
-                                    <div className="flex justify-between text-slate-500 font-black text-[15px] uppercase tracking-widest">
+                                    <div className="flex justify-between text-slate-500 font-semibold text-[15px] uppercase tracking-widest">
                                         <span>Subtotal</span>
                                         <span className="text-slate-800 dark:text-white tabular-nums">{fmt(totals.subtotal)}</span>
                                     </div>
-                                    <div className="flex justify-between text-slate-500 font-black text-[15px] uppercase tracking-widest">
+                                    <div className="flex justify-between text-slate-500 font-semibold text-[15px] uppercase tracking-widest">
                                         <span>Tax (GST)</span>
                                         <span className="text-emerald-600 dark:text-emerald-400 tabular-nums">+{fmt(totals.taxAmount)}</span>
                                     </div>
                                     <div className="pt-2 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                                        <span className="text-[15px] font-black text-slate-400 uppercase tracking-widest">Discount</span>
+                                        <span className="text-[15px] font-semibold text-slate-400 uppercase tracking-widest">Discount</span>
                                         <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-0.5">
-                                            <span className="text-[9px] font-bold text-slate-300 dark:text-slate-600 mr-1">₹</span>
-                                            <input type="number" value={form.discountAmount} onChange={(e) => setForm(p => ({ ...p, discountAmount: e.target.value }))} className="w-16 text-right font-bold text-xs outline-none bg-transparent dark:text-white" />
+                                            <span className="text-[14px] font-bold text-slate-300 dark:text-slate-600 mr-1">₹</span>
+                                            <input type="number" value={form.discountAmount} onChange={(e) => setForm(p => ({ ...p, discountAmount: e.target.value }))} className="w-16 text-right font-bold text-[14px] outline-none bg-transparent dark:text-white" />
                                         </div>
                                     </div>
                                     <div className="pt-3 flex justify-between items-center border-t border-slate-100 dark:border-slate-700">
-                                        <span className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-tight">Net Payable</span>
-                                        <span className="text-3xl font-black text-indigo-600 dark:text-indigo-400 tracking-tighter tabular-nums">{fmt(totals.grandTotal)}</span>
+                                        <span className="text-[14px] font-semibold text-slate-700 dark:text-white uppercase tracking-tight">Net Payable</span>
+                                        <span className="text-3xl font-semibold text-indigo-600 dark:text-indigo-400 tracking-tighter tabular-nums">{fmt(totals.grandTotal)}</span>
                                     </div>
                                 </div>
 
                                 {/* Payment Modes */}
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Payment Method</label>
-                                        <button type="button" onClick={() => setForm(p => ({ ...p, splitPayments: p.splitPayments.length > 0 ? [] : paymentModes.map(m => ({ paymentModeId: m.id, name: m.name, amount: 0 })) }))} className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline">
+                                        <label className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest">Payment Method</label>
+                                        <button type="button" onClick={() => setForm(p => ({ ...p, splitPayments: p.splitPayments.length > 0 ? [] : paymentModes.map(m => ({ paymentModeId: m.id, name: m.name, amount: 0 })) }))} className="text-[14px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline">
                                             {form.splitPayments.length > 0 ? 'Single Mode' : 'Split Pay'}
                                         </button>
                                     </div>
@@ -632,7 +632,7 @@ export default function InvoiceForm() {
                                                     key={mode.id}
                                                     type="button"
                                                     onClick={() => setForm(p => ({ ...p, selectedPaymentModeId: mode.id }))}
-                                                    className={cn("px-4 py-3 rounded-xl border text-[15px] font-black uppercase tracking-widest transition-all flex flex-col items-center gap-1.5 justify-center",
+                                                    className={cn("px-4 py-3 rounded-xl border text-[15px] font-semibold uppercase tracking-widest transition-all flex flex-col items-center gap-1.5 justify-center",
                                                         form.selectedPaymentModeId === mode.id
                                                             ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-600/20"
                                                             : "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 dark:hover:border-slate-600"
@@ -646,7 +646,7 @@ export default function InvoiceForm() {
                                     ) : (
                                         <div className="space-y-2">
                                             {form.splitPayments.map((sp, idx) => (
-                                                <div key={sp.paymentModeId} className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-50 dark:border-slate-700 text-[10px] font-bold">
+                                                <div key={sp.paymentModeId} className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-50 dark:border-slate-700 text-[14px] font-bold">
                                                     <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                                                         {getPaymentIcon(sp.name)}
                                                         {sp.name}
@@ -670,7 +670,7 @@ export default function InvoiceForm() {
                                 <button
                                     disabled={submitting || form.items.length === 0}
                                     type="submit"
-                                    className={cn("w-full h-14 rounded-xl flex items-center justify-center gap-3 text-xs font-black uppercase tracking-widest transition-all",
+                                    className={cn("w-full h-14 rounded-xl flex items-center justify-center gap-3 text-[14px] font-semibold uppercase tracking-widest transition-all",
                                         submitting || form.items.length === 0
                                             ? "bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed"
                                             : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-600/30 hover:scale-[1.02]"

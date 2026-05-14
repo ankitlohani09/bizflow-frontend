@@ -78,7 +78,7 @@ export default function ResetPassword() {
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">New Password</label>
+                        <label className="text-[14px] font-bold text-slate-500 uppercase tracking-widest ml-1">New Password</label>
                         <div className="relative">
                             <input
                                 type={showPassword ? 'text' : 'password'}
@@ -98,7 +98,7 @@ export default function ResetPassword() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Confirm Password</label>
+                        <label className="text-[14px] font-bold text-slate-500 uppercase tracking-widest ml-1">Confirm Password</label>
                         <input
                             type={showPassword ? 'text' : 'password'}
                             required

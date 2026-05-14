@@ -181,11 +181,11 @@ export default function PublicCheckIn() {
                     <div className="h-24 w-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 animate-bounce">
                         <CheckCircle2 size={48} />
                     </div>
-                    <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Attendance Logged!</h1>
+                    <h1 className="text-3xl font-semibold text-slate-900 uppercase tracking-tighter">Attendance Logged!</h1>
                     <p className="text-slate-500 font-bold">Have a great work day. You can now close this tab.</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest mt-8"
+                        className="w-full py-4 bg-slate-900 text-white rounded-2xl font-semibold uppercase tracking-widest mt-8"
                     >
                         Back to Check-in
                     </button>
@@ -201,13 +201,13 @@ export default function PublicCheckIn() {
                     <div className="absolute top-0 right-0 p-8 opacity-10">
                         <ShieldCheck size={120} />
                     </div>
-                    <h1 className="text-2xl font-black uppercase tracking-tighter relative z-10">Secure Check-In</h1>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mt-2 relative z-10">BizFlow Attendance Hub</p>
+                    <h1 className="text-2xl font-semibold uppercase tracking-tighter relative z-10">Secure Check-In</h1>
+                    <p className="text-[14px] font-semibold uppercase tracking-[0.3em] text-slate-400 mt-2 relative z-10">BizFlow Attendance Hub</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Identity Selection</label>
+                        <label className="text-[14px] font-semibold text-slate-500 uppercase tracking-widest ml-1">Identity Selection</label>
                         <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                             <select
@@ -226,11 +226,11 @@ export default function PublicCheckIn() {
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between ml-1">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Verification (PIN or Thumb)</label>
+                            <label className="text-[14px] font-semibold text-slate-500 uppercase tracking-widest">Verification (PIN or Thumb)</label>
                             <button
                                 type="button"
                                 onClick={handleBiometric}
-                                className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-blue-100 transition-colors"
+                                className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[14px] font-semibold uppercase tracking-wider hover:bg-blue-100 transition-colors"
                             >
                                 <Fingerprint size={12} />
                                 Scan Thumb
@@ -243,7 +243,7 @@ export default function PublicCheckIn() {
                                 maxLength={4}
                                 required
                                 placeholder="••••"
-                                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-black text-lg tracking-[1em]"
+                                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-semibold text-lg tracking-[1em]"
                                 value={pin}
                                 onChange={(e) => setPin(e.target.value)}
                             />
@@ -252,8 +252,8 @@ export default function PublicCheckIn() {
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between ml-1">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Visual Verification (Selfie)</label>
-                            {settings.isSelfieMandatory && <span className="text-[8px] font-black bg-rose-500 text-white px-2 py-0.5 rounded-full uppercase tracking-widest animate-pulse">Required</span>}
+                            <label className="text-[14px] font-semibold text-slate-500 uppercase tracking-widest">Visual Verification (Selfie)</label>
+                            {settings.isSelfieMandatory && <span className="text-[14px] font-semibold bg-rose-500 text-white px-2 py-0.5 rounded-full uppercase tracking-widest animate-pulse">Required</span>}
                         </div>
                         {!photo ? (
                             <div className="relative h-64 w-full bg-slate-100 rounded-3xl overflow-hidden border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-4">
@@ -276,7 +276,7 @@ export default function PublicCheckIn() {
                                         <button
                                             type="button"
                                             onClick={startCamera}
-                                            className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline"
+                                            className="text-[14px] font-semibold text-blue-600 uppercase tracking-widest hover:underline"
                                         >
                                             Activate Camera
                                         </button>
@@ -292,7 +292,7 @@ export default function PublicCheckIn() {
                                     className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white"
                                 >
                                     <RefreshCw className="mb-2" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">Retake Photo</span>
+                                    <span className="text-[14px] font-semibold uppercase tracking-widest">Retake Photo</span>
                                 </button>
                             </div>
                         )}
@@ -302,18 +302,18 @@ export default function PublicCheckIn() {
                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
                         <div className="flex items-center gap-2">
                             <MapPin size={16} className={location ? "text-emerald-500" : "text-amber-500 animate-pulse"} />
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                            <span className="text-[14px] font-semibold text-slate-500 uppercase tracking-widest">
                                 {location ? "GPS Locked" : "Acquiring GPS Signal..."}
                             </span>
                         </div>
                         {settings.isGpsMandatory && !location && (
-                            <span className="text-[8px] font-black text-rose-500 uppercase tracking-widest">Required</span>
+                            <span className="text-[14px] font-semibold text-rose-500 uppercase tracking-widest">Required</span>
                         )}
                     </div>
 
                     <button
                         disabled={loading}
-                        className="w-full py-5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-3"
+                        className="w-full py-5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-2xl font-semibold uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-3"
                     >
                         {loading ? <RefreshCw className="animate-spin" size={20} /> : "Submit Attendance"}
                     </button>

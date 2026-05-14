@@ -99,7 +99,7 @@ export default function Login() {
                             </label>
                             <Link
                                 to="/forgot-password"
-                                className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                                className="text-[14px] font-bold text-blue-600 hover:text-blue-700 transition-colors"
                             >
                                 Forgot password?
                             </Link>
@@ -146,7 +146,7 @@ export default function Login() {
                     </button>
                 </form>
 
-                <p className="mt-6 text-center text-xs text-slate-400">
+                <p className="mt-6 text-center text-[14px] text-slate-400">
                     &copy; {new Date().getFullYear()} BizFlow Enterprise. All rights reserved.
                 </p>
             </div>

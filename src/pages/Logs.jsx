@@ -120,7 +120,7 @@ export default function Logs() {
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                        <h1 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                             <Terminal className="text-primary" size={32} />
                             {t('System Logs')}
                         </h1>
@@ -133,7 +133,7 @@ export default function Logs() {
                         <button
                             onClick={() => setActiveTab('ACTIVITY')}
                             className={cn(
-                                "px-6 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2",
+                                "px-6 py-2.5 rounded-xl text-[14px] font-bold transition-all flex items-center gap-2",
                                 activeTab === 'ACTIVITY'
                                     ? "bg-primary text-white shadow-lg shadow-primary/20"
                                     : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
@@ -145,7 +145,7 @@ export default function Logs() {
                         <button
                             onClick={() => setActiveTab('AI')}
                             className={cn(
-                                "px-6 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2",
+                                "px-6 py-2.5 rounded-xl text-[14px] font-bold transition-all flex items-center gap-2",
                                 activeTab === 'AI'
                                     ? "bg-primary text-white shadow-lg shadow-primary/20"
                                     : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
@@ -174,7 +174,7 @@ export default function Logs() {
                     <select 
                         value={filterAction}
                         onChange={(e) => setFilterAction(e.target.value)}
-                        className="flex-1 md:flex-none h-12 px-6 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-xs border border-slate-100 dark:border-slate-800 hover:bg-slate-100 transition-all outline-none focus:ring-2 focus:ring-primary/20"
+                        className="flex-1 md:flex-none h-12 px-6 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-[14px] border border-slate-100 dark:border-slate-800 hover:bg-slate-100 transition-all outline-none focus:ring-2 focus:ring-primary/20"
                     >
                         <option value="">All Actions</option>
                         <option value="LOGIN">Login</option>
@@ -183,7 +183,7 @@ export default function Logs() {
                     </select>
                     <button 
                         onClick={handleExport}
-                        className="flex-1 md:flex-none h-12 px-6 bg-slate-900 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20"
+                        className="flex-1 md:flex-none h-12 px-6 bg-slate-900 text-white rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20"
                     >
                         <Download size={16} />
                         Export
@@ -197,12 +197,12 @@ export default function Logs() {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Timestamp</th>
-                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">User</th>
-                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                <th className="px-8 py-5 text-[14px] font-semibold uppercase tracking-widest text-slate-400">Timestamp</th>
+                                <th className="px-8 py-5 text-[14px] font-semibold uppercase tracking-widest text-slate-400">User</th>
+                                <th className="px-8 py-5 text-[14px] font-semibold uppercase tracking-widest text-slate-400">
                                     {activeTab === 'ACTIVITY' ? 'Action & Entity' : 'AI Query'}
                                 </th>
-                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Details</th>
+                                <th className="px-8 py-5 text-[14px] font-semibold uppercase tracking-widest text-slate-400 text-right">Details</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -240,13 +240,13 @@ export default function Logs() {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[14px]">
                                                     {log.userName ? log.userName.charAt(0) : (log.userId ? 'U' : <User size={14} />)}
                                                 </div>
                                                 <span className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                                                     {log.userName || (log.userId ? `User #${log.userId}` : 'System')}
                                                     {log.userRole && (
-                                                        <span className="text-[10px] font-black uppercase tracking-wider text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded-md">
+                                                        <span className="text-[14px] font-semibold uppercase tracking-wider text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded-md">
                                                               {log.userRole}
                                                         </span>
                                                     )}
@@ -259,7 +259,7 @@ export default function Logs() {
                                                     <p className="text-sm font-bold text-slate-900 dark:text-white">
                                                         {formatAction(log.action)} <span className="text-slate-400 font-medium">on</span> {formatEntity(log.entityType)}
                                                     </p>
-                                                    <p className="text-xs font-medium text-slate-500">ID: {log.entityId || 'N/A'}</p>
+                                                    <p className="text-[14px] font-medium text-slate-500">ID: {log.entityId || 'N/A'}</p>
                                                 </div>
                                             ) : (
                                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-400 line-clamp-1 italic">
@@ -297,7 +297,7 @@ export default function Logs() {
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999]">
                     <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 w-full max-w-lg shadow-2xl border border-slate-100 dark:border-slate-800 m-4">
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white">Log Details</h3>
+                            <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Log Details</h3>
                             <button 
                                 onClick={() => setSelectedLog(null)}
                                 className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-rose-500 transition-all"
@@ -307,36 +307,36 @@ export default function Logs() {
                         </div>
                         <div className="space-y-4">
                             <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                                <span className="text-xs font-black uppercase text-slate-400">User</span>
+                                <span className="text-[14px] font-semibold uppercase text-slate-400">User</span>
                                 <span className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                                     {selectedLog.userName || (selectedLog.userId ? `User #${selectedLog.userId}` : 'System')}
                                     {selectedLog.userRole && (
-                                        <span className="text-[10px] font-black uppercase tracking-wider text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded-md">
+                                        <span className="text-[14px] font-semibold uppercase tracking-wider text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded-md">
                                             {selectedLog.userRole}
                                         </span>
                                     )}
                                 </span>
                             </div>
                             <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                                <span className="text-xs font-black uppercase text-slate-400">Action</span>
+                                <span className="text-[14px] font-semibold uppercase text-slate-400">Action</span>
                                 <span className="text-sm font-bold text-slate-900 dark:text-white">{formatAction(selectedLog.action)}</span>
                             </div>
                             <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                                <span className="text-xs font-black uppercase text-slate-400">Entity</span>
+                                <span className="text-[14px] font-semibold uppercase text-slate-400">Entity</span>
                                 <span className="text-sm font-bold text-slate-900 dark:text-white">{formatEntity(selectedLog.entityType)}</span>
                             </div>
                             <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                                <span className="text-xs font-black uppercase text-slate-400">Entity ID</span>
+                                <span className="text-[14px] font-semibold uppercase text-slate-400">Entity ID</span>
                                 <span className="text-sm font-bold text-slate-900 dark:text-white">{selectedLog.entityId || 'N/A'}</span>
                             </div>
                             <div className="space-y-1">
-                                <span className="text-xs font-black uppercase text-slate-400">Description</span>
+                                <span className="text-[14px] font-semibold uppercase text-slate-400">Description</span>
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
                                     {selectedLog.description || 'No description'}
                                 </p>
                             </div>
                             <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2 pt-2">
-                                <span className="text-xs font-black uppercase text-slate-400">IP Address</span>
+                                <span className="text-[14px] font-semibold uppercase text-slate-400">IP Address</span>
                                 <span className="text-sm font-bold text-slate-900 dark:text-white">{selectedLog.ipAddress || 'N/A'}</span>
                             </div>
                         </div>

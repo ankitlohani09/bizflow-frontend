@@ -40,17 +40,17 @@ import Pagination from '../components/ui/Pagination';
 
 function StockBadge({ qty, threshold = 5 }) {
     if (qty <= 0) return (
-        <span className="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-rose-700 border border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50">
+        <span className="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[14px] font-semibold uppercase tracking-wider text-rose-700 border border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50">
             Out of Stock
         </span>
     );
     if (qty <= threshold) return (
-        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-700 border border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50">
+        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[14px] font-semibold uppercase tracking-wider text-amber-700 border border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50">
             Low Stock
         </span>
     );
     return (
-        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50">
+        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[14px] font-semibold uppercase tracking-wider text-emerald-700 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50">
             In Stock
         </span>
     );
@@ -136,8 +136,8 @@ export default function Inventory() {
                         <Package size={28} />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none">Inventory</h1>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                        <h1 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tight leading-none">Inventory</h1>
+                        <p className="text-[14px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             Stock Management
                         </p>
@@ -146,16 +146,16 @@ export default function Inventory() {
 
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center bg-white dark:bg-slate-900 rounded-2xl p-1 shadow-sm border border-slate-100 dark:border-slate-800">
-                        <Button variant="ghost" size="sm" className="h-10 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 gap-2 text-xs font-bold text-slate-500" onClick={handleExport}>
+                        <Button variant="ghost" size="sm" className="h-10 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 gap-2 text-[14px] font-bold text-slate-500" onClick={handleExport}>
                             <FileDown size={14} /> Export
                         </Button>
                         <div className="w-px h-4 bg-slate-100 dark:bg-slate-800 mx-1" />
-                        <Button variant="ghost" size="sm" className="h-10 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 gap-2 text-xs font-bold text-slate-500" onClick={() => setIsImportModalOpen(true)}>
+                        <Button variant="ghost" size="sm" className="h-10 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 gap-2 text-[14px] font-bold text-slate-500" onClick={() => setIsImportModalOpen(true)}>
                             <Upload size={14} /> Import
                         </Button>
                     </div>
 
-                    <Button onClick={() => { setSelectedItem(null); setIsItemModalOpen(true); }} className="h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/25 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 transition-all hover:scale-[1.02] active:scale-95">
+                    <Button onClick={() => { setSelectedItem(null); setIsItemModalOpen(true); }} className="h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/25 px-8 rounded-2xl font-semibold uppercase tracking-widest text-[14px] gap-2 transition-all hover:scale-[1.02] active:scale-95">
                         <Plus size={18} /> New Item
                     </Button>
                 </div>
@@ -196,12 +196,12 @@ export default function Inventory() {
             {error && <Alert variant="error" message={error} className="mb-8 border-none bg-rose-50/50 backdrop-blur-md" onClose={() => setError(null)} />}
 
             {/* ── Main Availability Table ────────────────────────────────────── */}
-            <Card className="border-none bg-white dark:bg-slate-900 shadow-2xl shadow-slate-200/50 dark:shadow-none rounded-[2.5rem] overflow-hidden">
+            <Card className="enterprise-card overflow-hidden">
                 <CardHeader className="p-10 border-b border-slate-50 dark:border-slate-800">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <CardTitle className="text-xl font-black text-slate-900 dark:text-white tracking-tight border-none p-0">Stock Availability</CardTitle>
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Current Inventory Levels</p>
+                            <CardTitle className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight border-none p-0">Stock Availability</CardTitle>
+                            <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mt-1">Current Inventory Levels</p>
                         </div>
 
                         <div className="relative w-full lg:w-96 group">
@@ -226,21 +226,21 @@ export default function Inventory() {
                         <Table className="border-separate border-spacing-0">
                             <TableHeader>
                                 <TableRow className="bg-slate-50/30 dark:bg-slate-800/30 hover:bg-transparent border-none">
-                                    <TableHead className="pl-10 py-5 text-[15px] font-black uppercase tracking-widest text-slate-400 cursor-pointer" onClick={() => handleSort('itemName')}>Product Name</TableHead>
-                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400">SKU / Batch</TableHead>
-                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400">Expiry</TableHead>
-                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400">Category</TableHead>
-                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400 text-center cursor-pointer" onClick={() => handleSort('availableQty')}>Available</TableHead>
-                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400 text-right">Price</TableHead>
-                                    <TableHead className="py-5 text-[15px] font-black uppercase tracking-widest text-slate-400">Status</TableHead>
-                                    <TableHead className="pr-10 py-5 text-[15px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</TableHead>
+                                    <TableHead className="pl-10 py-5 text-[15px] font-semibold uppercase tracking-widest text-slate-400 cursor-pointer" onClick={() => handleSort('itemName')}>Product Name</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-semibold uppercase tracking-widest text-slate-400">SKU / Batch</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-semibold uppercase tracking-widest text-slate-400">Expiry</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-semibold uppercase tracking-widest text-slate-400">Category</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-semibold uppercase tracking-widest text-slate-400 text-center cursor-pointer" onClick={() => handleSort('availableQty')}>Available</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-semibold uppercase tracking-widest text-slate-400 text-right">Price</TableHead>
+                                    <TableHead className="py-5 text-[15px] font-semibold uppercase tracking-widest text-slate-400">Status</TableHead>
+                                    <TableHead className="pr-10 py-5 text-[15px] font-semibold uppercase tracking-widest text-slate-400 text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {paginatedRecords.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={8} className="py-24 text-center">
-                                            <p className="text-[15px] font-black text-slate-300 uppercase tracking-[0.3em]">No Assets Found in Matrix</p>
+                                            <p className="text-[15px] font-semibold text-slate-300 uppercase tracking-[0.3em]">No Assets Found in Matrix</p>
                                         </TableCell>
                                     </TableRow>
                                 ) : paginatedRecords.map((r) => (
@@ -250,18 +250,18 @@ export default function Inventory() {
                                                 <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 shadow-sm group-hover:scale-110 transition-transform">
                                                     <Package size={20} />
                                                 </div>
-                                                <span className="text-base font-black text-slate-900 dark:text-white tracking-tight leading-none group-hover:text-blue-600 transition-colors">
+                                                <span className="text-base font-semibold text-slate-900 dark:text-white tracking-tight leading-none group-hover:text-blue-600 transition-colors">
                                                     {r.itemName || r.name || 'UNNAMED'}
                                                 </span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col">
-                                                <span className="text-[15px] font-black text-slate-900 dark:text-white uppercase tracking-widest font-mono leading-none">
+                                                <span className="text-[15px] font-semibold text-slate-900 dark:text-white uppercase tracking-widest font-mono leading-none">
                                                     {r.sku || r.barcode || r.itemId || '—'}
                                                 </span>
                                                 {r.batchNo && (
-                                                    <span className="text-[15px] font-black text-slate-400 uppercase tracking-tighter mt-1">
+                                                    <span className="text-[15px] font-semibold text-slate-400 uppercase tracking-tighter mt-1">
                                                         Batch: {r.batchNo}
                                                     </span>
                                                 )}
@@ -269,7 +269,7 @@ export default function Inventory() {
                                         </TableCell>
                                         <TableCell>
                                             <span className={cn(
-                                                "text-[15px] font-black uppercase tracking-widest",
+                                                "text-[15px] font-semibold uppercase tracking-widest",
                                                 r.expiryDate && new Date(r.expiryDate) < new Date() ? "text-rose-500" : "text-slate-400"
                                             )}>
                                                 {r.expiryDate ? new Date(r.expiryDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—'}
@@ -282,18 +282,18 @@ export default function Inventory() {
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <div className="flex flex-col items-center">
-                                                <span className="text-lg font-black text-slate-900 dark:text-white tabular-nums">
+                                                <span className="text-lg font-semibold text-slate-900 dark:text-white tabular-nums">
                                                     {Number(r.availableQty ?? 0).toLocaleString()}
                                                 </span>
-                                                <span className="text-[15px] font-black text-emerald-500 uppercase tracking-widest">Sellable</span>
+                                                <span className="text-[15px] font-semibold text-emerald-500 uppercase tracking-widest">Sellable</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-base font-black text-slate-900 dark:text-white tracking-tighter tabular-nums">
+                                                <span className="text-base font-semibold text-slate-900 dark:text-white tracking-tighter tabular-nums">
                                                     {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(r.sellingPrice || 0)}
                                                 </span>
-                                                <span className="text-[15px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Unit Rate</span>
+                                                <span className="text-[15px] font-semibold text-slate-400 uppercase tracking-widest leading-none mt-1">Unit Rate</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -353,9 +353,9 @@ function StatusCard({ title, value, icon: Icon, colorClass, subtitle }) {
                     <Icon size={32} />
                 </div>
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">{title}</p>
-                    <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mb-2 tracking-tighter tabular-nums">{value}</p>
-                    <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-tight flex items-center gap-1.5">
+                    <p className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 mb-2">{title}</p>
+                    <p className="text-3xl font-semibold text-slate-900 dark:text-white leading-none mb-2 tracking-tighter tabular-nums">{value}</p>
+                    <p className="text-[14px] font-bold text-slate-400 dark:text-slate-500 tracking-tight flex items-center gap-1.5">
                         <span className="h-1 w-1 rounded-full bg-slate-200 dark:bg-slate-700" />
                         {subtitle}
                     </p>

@@ -59,7 +59,7 @@ function RoleBadge({ role }) {
 function StatusBadge({ active }) {
     return (
         <span className={cn(
-            'inline-flex items-center gap-1.5 text-xs font-bold leading-none',
+            'inline-flex items-center gap-1.5 text-[14px] font-bold leading-none',
             active ? 'text-emerald-600' : 'text-slate-400'
         )}>
             <div className={cn('h-2 w-2 rounded-full', active ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300')} />
@@ -156,10 +156,18 @@ export default function Staff() {
 
     return (
         <MainLayout title="Human Resources">
-            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Staff</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Manage permissions, compensation, and active personnel.</p>
+                        <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between no-print">
+                <div className="flex items-center gap-5">
+                    <div className="h-14 w-14 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
+                        <Users size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">Staff</h1>
+                        <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Manage permissions, compensation, and active personnel.
+                        </p>
+                    </div>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="ghost" onClick={fetchStaff} disabled={loading}>
@@ -189,8 +197,8 @@ export default function Staff() {
                             <Users size={28} />
                         </div>
                         <div>
-                            <p className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400">Total Count</p>
-                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.total}</p>
+                            <p className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400">Total Count</p>
+                            <p className="text-3xl font-semibold text-slate-900 dark:text-white leading-none mt-1">{stats.total}</p>
                         </div>
                     </div>
                 </Card>
@@ -200,8 +208,8 @@ export default function Staff() {
                             <UserCheck size={28} />
                         </div>
                         <div>
-                            <p className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400">Active Duty</p>
-                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.active}</p>
+                            <p className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400">Active Duty</p>
+                            <p className="text-3xl font-semibold text-slate-900 dark:text-white leading-none mt-1">{stats.active}</p>
                         </div>
                     </div>
                 </Card>
@@ -211,8 +219,8 @@ export default function Staff() {
                             <Shield size={28} />
                         </div>
                         <div>
-                            <p className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400">Unique Roles</p>
-                            <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{stats.roles}</p>
+                            <p className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400">Unique Roles</p>
+                            <p className="text-3xl font-semibold text-slate-900 dark:text-white leading-none mt-1">{stats.roles}</p>
                         </div>
                     </div>
                 </Card>
@@ -252,17 +260,17 @@ export default function Staff() {
                     ) : filteredStaff.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 text-center opacity-30">
                             <Users size={64} className="mb-4" />
-                            <p className="font-black text-xl uppercase tracking-widest">No Matches</p>
+                            <p className="font-semibold text-xl uppercase tracking-widest">No Matches</p>
                         </div>
                     ) : (
                         <div className="min-w-[800px]">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
-                                        <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[14px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('name')}>Name</TableHead>
-                                        <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[14px] font-black uppercase tracking-wider text-slate-500" onClick={() => handleSort('role')}>Role</TableHead>
-                                        <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Contact</TableHead>
-                                        <TableHead className="text-right pr-8 text-[14px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
+                                        <TableHead className="pl-8 py-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[14px] font-semibold uppercase tracking-wider text-slate-500" onClick={() => handleSort('name')}>Name</TableHead>
+                                        <TableHead className="cursor-pointer hover:text-slate-900 dark:hover:text-slate-200 text-[14px] font-semibold uppercase tracking-wider text-slate-500" onClick={() => handleSort('role')}>Role</TableHead>
+                                        <TableHead className="text-[14px] font-semibold uppercase tracking-wider text-slate-500">Contact</TableHead>
+                                        <TableHead className="text-right pr-8 text-[14px] font-semibold uppercase tracking-wider text-slate-500">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -279,12 +287,12 @@ export default function Staff() {
                                                     className="flex items-center gap-4 group cursor-pointer"
                                                     onClick={() => navigate(`/staff/${staffMember.id}`)}
                                                 >
-                                                    <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-slate-400 dark:text-slate-500 text-xl group-hover:bg-blue-50 group-hover:text-blue-500 transition-all shadow-sm">
+                                                    <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-semibold text-slate-400 dark:text-slate-500 text-xl group-hover:bg-blue-50 group-hover:text-blue-500 transition-all shadow-sm">
                                                         {staffMember.name?.charAt(0)}
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tighter leading-none group-hover:text-blue-600 transition-colors">{staffMember.name}</span>
-                                                        <span className="text-[14px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1.5 font-mono">{staffMember.employeeId || `ID_${staffMember.id.toString().padStart(4, '0')}`}</span>
+                                                        <span className="text-[14px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1.5 font-mono">{staffMember.employeeId || `ID_${staffMember.id.toString().padStart(4, '0')}`}</span>
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -347,8 +355,8 @@ export default function Staff() {
                     <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2.5rem] shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-100 dark:border-slate-800">
                         <div className="bg-amber-500 p-8 text-white flex justify-between items-center">
                             <div>
-                                <h2 className="text-xl font-black uppercase tracking-tighter">Business QR</h2>
-                                <p className="text-[14px] font-black uppercase tracking-widest text-amber-100">Attendance Scan Point</p>
+                                <h2 className="text-xl font-semibold uppercase tracking-tighter">Business QR</h2>
+                                <p className="text-[14px] font-semibold uppercase tracking-widest text-amber-100">Attendance Scan Point</p>
                             </div>
                             <button onClick={() => setIsQRModalOpen(false)} className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
                                 <X size={20} />
@@ -382,7 +390,7 @@ export default function Staff() {
                                 </div>
 
                                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
-                                    <label className="text-[14px] font-black text-slate-400 uppercase tracking-widest block mb-2">Network Server IP (for Mobile)</label>
+                                    <label className="text-[14px] font-semibold text-slate-400 uppercase tracking-widest block mb-2">Network Server IP (for Mobile)</label>
                                     <input
                                         type="text"
                                         value={serverIp}
@@ -396,7 +404,7 @@ export default function Staff() {
 
                             <div className="w-full flex gap-2">
                                 <Button
-                                    className="flex-1 gap-2 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest"
+                                    className="flex-1 gap-2 bg-slate-900 text-white rounded-2xl font-semibold uppercase tracking-widest"
                                     onClick={() => window.print()}
                                 >
                                     <Download size={16} /> Print QR

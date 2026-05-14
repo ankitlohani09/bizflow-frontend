@@ -113,12 +113,17 @@ export default function AiInsights() {
                     >
                         <ArrowLeft size={20} />
                     </button>
-                    <div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-                            <Sparkles className="text-primary animate-pulse" size={32} />
-                            {t('AI Insights')}
-                        </h1>
-                        <p className="text-slate-500 font-medium mt-1">Chat with your business data and get smart predictions.</p>
+                    <div className="flex items-center gap-5 mt-2">
+                        <div className="h-14 w-14 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
+                            <Sparkles size={28} />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">AI Insights</h1>
+                            <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                Chat with your business data and get smart predictions.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -133,7 +138,7 @@ export default function AiInsights() {
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Online</span>
+                            <span className="text-[14px] font-semibold uppercase tracking-widest text-slate-400">Online</span>
                         </div>
                     </div>
 
@@ -211,8 +216,8 @@ export default function AiInsights() {
                             <ShoppingCart size={24} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-black text-slate-900 dark:text-white">Smart Reorder</h2>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Predictive Inventory</p>
+                            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Smart Reorder</h2>
+                            <p className="text-[14px] font-semibold uppercase tracking-widest text-slate-400">Predictive Inventory</p>
                         </div>
                     </div>
 
@@ -223,7 +228,7 @@ export default function AiInsights() {
                             <div key={idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-center justify-between group cursor-pointer hover:border-amber-200 transition-all">
                                 <div>
                                     <p className="font-bold text-slate-900 dark:text-white">{item.itemName}</p>
-                                    <p className="text-xs text-slate-500">Predicted out in {item.predictedDays || '3'} days</p>
+                                    <p className="text-[14px] text-slate-500">Predicted out in {item.predictedDays || '3'} days</p>
                                 </div>
                                 <ArrowUpRight size={18} className="text-slate-400 group-hover:text-amber-500 transition-colors" />
                             </div>
@@ -243,8 +248,8 @@ export default function AiInsights() {
                                 <TrendingUp size={24} className="text-indigo-400" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-black">Market Trends</h2>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Growth Insights</p>
+                                <h2 className="text-xl font-semibold">Market Trends</h2>
+                                <p className="text-[14px] font-semibold uppercase tracking-widest text-white/40">Growth Insights</p>
                             </div>
                         </div>
 
@@ -253,7 +258,7 @@ export default function AiInsights() {
                                 <div className="p-6 rounded-3xl bg-white/5 border border-white/10">
                                     <div className="flex items-center gap-3 mb-2">
                                         <Lightbulb size={18} className="text-indigo-400" />
-                                        <span className="text-xs font-bold uppercase tracking-wider">AI Insight</span>
+                                        <span className="text-[14px] font-bold uppercase tracking-wider">AI Insight</span>
                                     </div>
                                     <p className="text-sm text-white/70 leading-relaxed">
                                         &quot;Seasonal analysis shows increased demand for cold beverages expected next week as temperatures rise.&quot;

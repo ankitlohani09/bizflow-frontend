@@ -64,15 +64,15 @@ export default function AdminDashboard() {
         <MainLayout>
             <div className="mb-12 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Platform Control</h1>
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.3em] mt-2 italic">Neural Ecosystem Overview</p>
+                    <h1 className="text-4xl font-semibold text-slate-900 dark:text-white tracking-tighter uppercase">Platform Control</h1>
+                    <p className="text-[14px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2 italic">Neural Ecosystem Overview</p>
                 </div>
                 <div className="flex gap-4">
                     <Button variant="outline" onClick={fetchData} disabled={loading} className="rounded-2xl border-slate-200 h-14 w-14 p-0">
                         <RefreshCw className={cn('h-6 w-6', loading && 'animate-spin')} />
                     </Button>
                     <Button
-                        className="gap-3 bg-slate-900 hover:bg-black text-white shadow-2xl rounded-2xl px-8 h-14 text-sm font-black uppercase tracking-widest transition-transform hover:scale-105 active:scale-95"
+                        className="gap-3 bg-slate-900 hover:bg-black text-white shadow-2xl rounded-2xl px-8 h-14 text-sm font-semibold uppercase tracking-widest transition-transform hover:scale-105 active:scale-95"
                         onClick={() => navigate('/tenants')}
                     >
                         <Plus className="h-5 w-5" /> Onboard Business
@@ -123,8 +123,8 @@ export default function AdminDashboard() {
                     <Card className="lg:col-span-2 border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden">
                         <CardHeader className="p-10 border-b border-slate-50 dark:border-slate-800/50 flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-slate-900 dark:text-white border-none p-0 text-xl font-black uppercase tracking-tight">Business Growth</CardTitle>
-                                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Tenant onboarding trend analysis</p>
+                                <CardTitle className="text-slate-900 dark:text-white border-none p-0 text-xl font-semibold uppercase tracking-tight">Business Growth</CardTitle>
+                                <p className="text-[14px] text-slate-400 font-bold uppercase tracking-widest mt-1">Tenant onboarding trend analysis</p>
                             </div>
                             <div className="p-4 bg-emerald-500/10 rounded-2xl text-emerald-600">
                                 <TrendingIcon size={24} />
@@ -158,8 +158,8 @@ export default function AdminDashboard() {
                         </div>
                         <div className="relative z-10 space-y-8">
                             <div>
-                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-indigo-600">Growth Insights</h3>
-                                <h2 className="text-2xl font-black tracking-tight mt-2 italic uppercase">Plan Distribution</h2>
+                                <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">Growth Insights</h3>
+                                <h2 className="text-2xl font-semibold tracking-tight mt-2 italic uppercase">Plan Distribution</h2>
                             </div>
 
                             <div className="space-y-6">
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
                             </div>
 
                             <div className="pt-8 border-t border-slate-100 dark:border-white/10">
-                                <p className="text-xs text-slate-400 font-bold leading-relaxed uppercase tracking-widest">
+                                <p className="text-[14px] text-slate-400 font-bold leading-relaxed uppercase tracking-widest">
                                     Platform is running on latest enterprise version. Neural core verified.
                                 </p>
                             </div>
@@ -182,8 +182,8 @@ export default function AdminDashboard() {
                     <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden">
                         <CardHeader className="p-10 border-b border-slate-50 dark:border-slate-800/50 flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-slate-900 dark:text-white border-none p-0 text-xl font-black uppercase tracking-tight">Revenue Trends</CardTitle>
-                                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Monthly platform financial output</p>
+                                <CardTitle className="text-slate-900 dark:text-white border-none p-0 text-xl font-semibold uppercase tracking-tight">Revenue Trends</CardTitle>
+                                <p className="text-[14px] text-slate-400 font-bold uppercase tracking-widest mt-1">Monthly platform financial output</p>
                             </div>
                             <div className="p-4 bg-rose-500/10 rounded-2xl text-rose-600">
                                 <TrendingIcon size={24} />
@@ -214,14 +214,14 @@ export default function AdminDashboard() {
                     <Card className="border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden">
                         <CardHeader className="p-10 border-b border-slate-50 dark:border-slate-800/50 flex flex-row items-center justify-between">
                             <div>
-                                <CardTitle className="text-slate-900 dark:text-white border-none p-0 text-xl font-black uppercase">Recent Tenants</CardTitle>
-                                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Latest businesses joined the ecosystem</p>
+                                <CardTitle className="text-slate-900 dark:text-white border-none p-0 text-xl font-semibold uppercase">Recent Tenants</CardTitle>
+                                <p className="text-[14px] text-slate-400 font-bold uppercase tracking-widest mt-1">Latest businesses joined the ecosystem</p>
                             </div>
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => navigate('/tenants')}
-                                className="text-indigo-600 font-black tracking-widest uppercase text-[10px]"
+                                className="text-indigo-600 font-semibold tracking-widest uppercase text-[14px]"
                             >
                                 View All
                             </Button>
@@ -231,10 +231,10 @@ export default function AdminDashboard() {
                                 <table className="w-full">
                                     <thead>
                                         <tr className="bg-slate-50/50 dark:bg-slate-800/20 border-none">
-                                            <th className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 pl-10 py-6 text-left">Business</th>
-                                            <th className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 py-6 text-left">Plan</th>
-                                            <th className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 py-6 text-left">Status</th>
-                                            <th className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 pr-10 py-6 text-right">Action</th>
+                                            <th className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 pl-10 py-6 text-left">Business</th>
+                                            <th className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 py-6 text-left">Plan</th>
+                                            <th className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 py-6 text-left">Status</th>
+                                            <th className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 pr-10 py-6 text-right">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
@@ -242,15 +242,15 @@ export default function AdminDashboard() {
                                             <tr key={tenant.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all">
                                                 <td className="pl-10 py-6">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="h-10 min-w-[2.5rem] w-auto px-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 font-black text-[10px] uppercase">
+                                                        <div className="h-10 min-w-[2.5rem] w-auto px-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 font-semibold text-[14px] uppercase">
                                                             {tenant.code}
                                                         </div>
-                                                        <span className="text-sm font-black text-slate-700 dark:text-slate-200 uppercase truncate max-w-[150px]">{tenant.name}</span>
+                                                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 uppercase truncate max-w-[150px]">{tenant.name}</span>
                                                     </div>
                                                 </td>
                                                 <td className="py-6">
                                                     <span className={cn(
-                                                        "px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest",
+                                                        "px-3 py-1 rounded-lg text-[14px] font-semibold uppercase tracking-widest",
                                                         tenant.subscriptionPlan === 'ENTERPRISE' ? "bg-amber-500/10 text-amber-600" :
                                                             tenant.subscriptionPlan === 'PRO' ? "bg-indigo-500/10 text-indigo-600" :
                                                                 "bg-slate-500/10 text-slate-500"
@@ -261,7 +261,7 @@ export default function AdminDashboard() {
                                                 <td className="py-6">
                                                     <div className="flex items-center gap-2">
                                                         <div className={cn("h-2 w-2 rounded-full", tenant.isActive ? "bg-emerald-500" : "bg-rose-500")} />
-                                                        <span className="text-xs font-bold text-slate-500 uppercase">{tenant.isActive ? 'Active' : 'Offline'}</span>
+                                                        <span className="text-[14px] font-bold text-slate-500 uppercase">{tenant.isActive ? 'Active' : 'Offline'}</span>
                                                     </div>
                                                 </td>
                                                 <td className="pr-10 py-6 text-right">
@@ -294,9 +294,9 @@ function MetricCard({ title, value, subtitle, icon: Icon, color }) {
                         <Icon size={32} />
                     </div>
                     <div>
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-2">{title}</p>
-                        <h3 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter tabular-nums leading-none">{value}</h3>
-                        <p className="text-xs font-black uppercase tracking-widest text-indigo-500 mt-2 opacity-60">{subtitle}</p>
+                        <p className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-2">{title}</p>
+                        <h3 className="text-4xl font-semibold text-slate-900 dark:text-white tracking-tighter tabular-nums leading-none">{value}</h3>
+                        <p className="text-[14px] font-semibold uppercase tracking-widest text-indigo-500 mt-2 opacity-60">{subtitle}</p>
                     </div>
                 </div>
             </Card>
@@ -308,7 +308,7 @@ function DistributionBar({ label, count, total, color }) {
     const percentage = (count / total) * 100;
     return (
         <div className="space-y-3">
-            <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest">
+            <div className="flex justify-between items-center text-[14px] font-semibold uppercase tracking-widest">
                 <span>{label}</span>
                 <span className="text-slate-500 dark:text-slate-400">{count}</span>
             </div>

@@ -7,6 +7,7 @@ import {
     PieChart, Pie, Cell
 } from 'recharts';
 import {
+    LayoutDashboard,
     RefreshCw,
     ReceiptText,
     TrendingUp,
@@ -42,7 +43,7 @@ function StatusBadge({ status }) {
     };
     return (
         <span className={cn(
-            'inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest',
+            'inline-flex items-center rounded-full border px-2.5 py-0.5 text-[14px] font-semibold uppercase tracking-widest',
             styles[s] ?? 'bg-slate-500/10 text-slate-500 border-slate-500/20'
         )}>
             {status || 'Unknown'}
@@ -102,10 +103,18 @@ export default function Dashboard() {
 
     return (
         <MainLayout>
-            <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Store Dashboard</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">Daily Sales & Stock Summary</p>
+            <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between no-print">
+                <div className="flex items-center gap-5">
+                    <div className="h-14 w-14 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
+                        <LayoutDashboard size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">Store Dashboard</h1>
+                        <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Daily Sales & Stock Summary
+                        </p>
+                    </div>
                 </div>
                 <div className="flex gap-3">
                     <Button variant="outline" onClick={fetchData} disabled={loading} className="rounded-2xl border-slate-200">
@@ -127,7 +136,7 @@ export default function Dashboard() {
             ) : error ? (
                 <div className="rounded-[2.5rem] border border-rose-100 bg-rose-50/50 p-12 text-center backdrop-blur-xl dark:bg-rose-950/10 dark:border-rose-900/20">
                     <AlertCircle className="mx-auto h-16 w-16 text-rose-500 opacity-20" />
-                    <h3 className="mt-6 text-xl font-black text-rose-900 dark:text-rose-400 tracking-tight uppercase">Intelligence Failure</h3>
+                    <h3 className="mt-6 text-xl font-semibold text-rose-900 dark:text-rose-400 tracking-tight uppercase">Intelligence Failure</h3>
                     <p className="mt-2 text-sm text-rose-600 dark:text-rose-500 font-bold uppercase tracking-wider">{error}</p>
                     <Button variant="primary" onClick={fetchData} className="mt-8 bg-rose-600 hover:bg-rose-700 shadow-rose-500/20">
                         Reconnect to Network
@@ -182,12 +191,12 @@ export default function Dashboard() {
                                             <Lightbulb className="text-indigo-600 dark:text-indigo-400" size={32} />
                                         </div>
                                         <div>
-                                            <h3 className="text-slate-900 dark:text-white font-black uppercase tracking-[0.2em] text-sm leading-tight">{t("Smart Business Tips")}</h3>
-                                            <p className="text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mt-1">{t("AI Powered Advice")}</p>
+                                            <h3 className="text-slate-900 dark:text-white font-semibold uppercase tracking-[0.2em] text-sm leading-tight">{t("Smart Business Tips")}</h3>
+                                            <p className="text-indigo-600 dark:text-indigo-400 text-[14px] font-semibold uppercase tracking-[0.3em] mt-1">{t("AI Powered Advice")}</p>
                                         </div>
                                     </div>
                                     <div className="hidden sm:flex px-5 py-2 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-full">
-                                        <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest animate-pulse">Neural Analysis Live</span>
+                                        <span className="text-[14px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest animate-pulse">Neural Analysis Live</span>
                                     </div>
                                 </div>
 
@@ -243,14 +252,14 @@ export default function Dashboard() {
                                                                         {t(insight.textKey, insight.params)}
                                                                     </p>
                                                                     {isHero && (
-                                                                        <span className="text-[9px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded-full uppercase tracking-widest ml-2 shrink-0">Top Tip</span>
+                                                                        <span className="text-[14px] font-semibold bg-indigo-500 text-white px-2 py-0.5 rounded-full uppercase tracking-widest ml-2 shrink-0">Top Tip</span>
                                                                     )}
                                                                 </div>
                                                                 <div className="mt-4 flex items-center justify-between">
                                                                     <div className="flex items-center gap-3">
-                                                                        <span className="text-[9px] font-black text-indigo-600/60 dark:text-indigo-400/60 uppercase tracking-widest">{insight.category}</span>
+                                                                        <span className="text-[14px] font-semibold text-indigo-600/60 dark:text-indigo-400/60 uppercase tracking-widest">{insight.category}</span>
                                                                         <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-                                                                        <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Confidence: {(insight.relevance * 100).toFixed(0)}%</span>
+                                                                        <span className="text-[14px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Confidence: {(insight.relevance * 100).toFixed(0)}%</span>
                                                                     </div>
                                                                     <div className="w-20 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                                         <div className={cn(
@@ -386,9 +395,9 @@ export default function Dashboard() {
                                             <div className="flex justify-between items-center mb-3">
                                                 <div className="flex items-center gap-2">
                                                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
-                                                    <span className="text-sm font-black text-slate-800 dark:text-slate-200 truncate w-40">{item.name}</span>
+                                                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate w-40">{item.name}</span>
                                                 </div>
-                                                <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{item.quantity} Units</span>
+                                                <span className="text-[14px] font-semibold text-indigo-500 uppercase tracking-widest">{item.quantity} Units</span>
                                             </div>
                                             <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                 <motion.div
@@ -412,26 +421,26 @@ export default function Dashboard() {
                                 <CardTitle className="text-indigo-600 dark:text-indigo-400">Recent Bills</CardTitle>
                                 <CardDescription>Latest sales activities</CardDescription>
                             </div>
-                            <Button variant="ghost" size="sm" onClick={() => navigate('/invoices')} className="text-indigo-600 font-black tracking-widest uppercase text-[10px]">View History</Button>
+                            <Button variant="ghost" size="sm" onClick={() => navigate('/invoices')} className="text-indigo-600 font-semibold tracking-widest uppercase text-[14px]">View History</Button>
                         </CardHeader>
                         <CardContent className="p-0 overflow-x-auto">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50/50 dark:bg-slate-800/20 hover:bg-transparent border-none">
-                                        <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-8 h-12">Bill No.</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 h-12">Customer</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 h-12">Amount</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pr-8 h-12 text-right">Status</TableHead>
+                                        <TableHead className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 pl-8 h-12">Bill No.</TableHead>
+                                        <TableHead className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 h-12">Customer</TableHead>
+                                        <TableHead className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 h-12">Amount</TableHead>
+                                        <TableHead className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 pr-8 h-12 text-right">Status</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {recentInvoices.map((invoice) => (
                                         <TableRow key={invoice.id} className="dark:hover:bg-indigo-500/5 border-slate-50 dark:border-slate-800/50 group h-16 transition-colors duration-300">
-                                            <TableCell className="font-black text-slate-900 dark:text-slate-200 pl-8">
+                                            <TableCell className="font-semibold text-slate-900 dark:text-slate-200 pl-8">
                                                 {invoice.invoiceNumber || (`#INV-${invoice.id}`)}
                                             </TableCell>
                                             <TableCell className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[11px] tracking-tight">{invoice.customerName || 'Walk-In Customer'}</TableCell>
-                                            <TableCell className="font-black text-slate-900 dark:text-white tabular-nums">{fmt(invoice.grandTotal || invoice.totalAmount || 0)}</TableCell>
+                                            <TableCell className="font-semibold text-slate-900 dark:text-white tabular-nums">{fmt(invoice.grandTotal || invoice.totalAmount || 0)}</TableCell>
                                             <TableCell className="pr-8 text-right"><StatusBadge status={invoice.paymentStatus || invoice.status} /></TableCell>
                                         </TableRow>
                                     ))}
@@ -460,9 +469,9 @@ function MetricCard({ title, value, subtitle, icon: Icon }) {
                         <Icon size={24} />
                     </div>
                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{title}</p>
-                        <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter tabular-nums">{value}</h3>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500">{subtitle}</p>
+                        <p className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 mb-1">{title}</p>
+                        <h3 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tighter tabular-nums">{value}</h3>
+                        <p className="text-[14px] font-semibold uppercase tracking-widest text-indigo-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500">{subtitle}</p>
                     </div>
                 </div>
             </Card>

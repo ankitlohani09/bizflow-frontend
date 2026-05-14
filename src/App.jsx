@@ -23,6 +23,7 @@ const StaffDetails = lazy(() => import('./pages/StaffDetails'));
 const Suppliers = lazy(() => import('./pages/Suppliers'));
 const Purchases = lazy(() => import('./pages/Purchases'));
 const PurchaseForm = lazy(() => import('./pages/PurchaseForm'));
+const PurchaseDetails = lazy(() => import('./pages/PurchaseDetails'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const Returns = lazy(() => import('./pages/Returns'));
 const ReturnDetails = lazy(() => import('./pages/ReturnDetails'));
@@ -94,6 +95,7 @@ export default function App() {
                 <Route path="/suppliers" element={<Suppliers />} />
                 <Route path="/purchases" element={<Purchases />} />
                 <Route path="/purchases/new" element={<PurchaseForm />} />
+                <Route path="/purchases/:id" element={<PurchaseDetails />} />
                 <Route path="/analytics" element={<Analytics />} />
               </Route>
 

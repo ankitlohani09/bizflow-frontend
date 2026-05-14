@@ -69,7 +69,7 @@ export default function Returns() {
             <MainLayout title="Auditing Returns...">
                 <div className="flex h-96 flex-col items-center justify-center gap-4">
                     <Loader2 className="h-12 w-12 animate-spin text-blue-500 opacity-20" />
-                    <p className="text-[14px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Scanning Return Ledger...</p>
+                    <p className="text-[14px] font-semibold uppercase tracking-widest text-slate-400 animate-pulse">Scanning Return Ledger...</p>
                 </div>
             </MainLayout>
         );
@@ -77,10 +77,18 @@ export default function Returns() {
 
     return (
         <MainLayout title="Returns">
-            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Returns</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">Track every refund and inventory restoration in real-time.</p>
+                        <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between no-print">
+                <div className="flex items-center gap-5">
+                    <div className="h-14 w-14 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
+                        <RotateCcw size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">Returns</h1>
+                        <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Track every refund and inventory restoration in real-time.
+                        </p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="relative">
@@ -101,7 +109,7 @@ export default function Returns() {
             {error && (
                 <Card className="mb-8 border-none bg-rose-50 dark:bg-rose-500/10 p-4 flex items-center gap-3">
                     <AlertCircle className="text-rose-500" size={18} />
-                    <p className="text-xs font-bold text-rose-700 dark:text-rose-400">{error}</p>
+                    <p className="text-[14px] font-bold text-rose-700 dark:text-rose-400">{error}</p>
                 </Card>
             )}
 
@@ -110,12 +118,12 @@ export default function Returns() {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
-                                <TableHead className="pl-8 py-5 text-[14px] font-black uppercase tracking-wider text-slate-500">Transaction Info</TableHead>
-                                <TableHead className="text-[14px] font-black uppercase tracking-wider text-slate-500">Item Detail</TableHead>
-                                <TableHead className="text-center text-[14px] font-black uppercase tracking-wider text-slate-500">Condition</TableHead>
-                                <TableHead className="text-center text-[14px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
-                                <TableHead className="text-right text-[14px] font-black uppercase tracking-wider text-slate-500">Qty</TableHead>
-                                <TableHead className="text-right pr-8 text-[14px] font-black uppercase tracking-wider text-slate-500">Timestamp</TableHead>
+                                <TableHead className="pl-8 py-5 text-[14px] font-semibold uppercase tracking-wider text-slate-500">Transaction Info</TableHead>
+                                <TableHead className="text-[14px] font-semibold uppercase tracking-wider text-slate-500">Item Detail</TableHead>
+                                <TableHead className="text-center text-[14px] font-semibold uppercase tracking-wider text-slate-500">Condition</TableHead>
+                                <TableHead className="text-center text-[14px] font-semibold uppercase tracking-wider text-slate-500">Status</TableHead>
+                                <TableHead className="text-right text-[14px] font-semibold uppercase tracking-wider text-slate-500">Qty</TableHead>
+                                <TableHead className="text-right pr-8 text-[14px] font-semibold uppercase tracking-wider text-slate-500">Timestamp</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -124,7 +132,7 @@ export default function Returns() {
                                     <TableCell colSpan={6} className="h-64 text-center">
                                         <div className="flex flex-col items-center gap-2 opacity-20">
                                             <RotateCcw size={48} />
-                                            <p className="text-[14px] font-black uppercase tracking-widest">No returns found in ledger</p>
+                                            <p className="text-[14px] font-semibold uppercase tracking-widest">No returns found in ledger</p>
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -137,7 +145,7 @@ export default function Returns() {
                                     >
                                         <TableCell className="pl-8 py-6">
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-black text-slate-900 dark:text-white leading-tight">INV #{r.invoiceId}</span>
+                                                <span className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">INV #{r.invoiceId}</span>
                                                 <span className="text-[14px] font-bold text-slate-400 flex items-center gap-1 mt-0.5">
                                                     <User size={10} /> {r.customerName || 'Direct Client'}
                                                 </span>
@@ -149,13 +157,13 @@ export default function Returns() {
                                                     <Package size={20} />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[14px] font-black text-slate-700 dark:text-slate-300">{r.itemName}</span>
+                                                    <span className="text-[14px] font-semibold text-slate-700 dark:text-slate-300">{r.itemName}</span>
                                                     <span className="text-[14px] font-bold text-slate-500 uppercase tracking-tight">{r.reason || 'No reason provided'}</span>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <span className={`inline-flex px-2.5 py-1 rounded-full text-[14px] font-black uppercase tracking-widest ${r.condition === 'GOOD'
+                                            <span className={`inline-flex px-2.5 py-1 rounded-full text-[14px] font-semibold uppercase tracking-widest ${r.condition === 'GOOD'
                                                     ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
                                                     : r.condition === 'DAMAGED'
                                                         ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400'
@@ -165,7 +173,7 @@ export default function Returns() {
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <span className={`inline-flex px-2.5 py-1 rounded-full text-[14px] font-black uppercase tracking-widest ${r.status === 'APPROVED'
+                                            <span className={`inline-flex px-2.5 py-1 rounded-full text-[14px] font-semibold uppercase tracking-widest ${r.status === 'APPROVED'
                                                     ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
                                                     : r.status === 'PENDING' || !r.status
                                                         ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400'
@@ -174,7 +182,7 @@ export default function Returns() {
                                                 {r.status || 'PENDING'}
                                             </span>
                                         </TableCell>
-                                        <TableCell className="text-right font-black text-slate-900 dark:text-white tabular-nums">
+                                        <TableCell className="text-right font-semibold text-slate-900 dark:text-white tabular-nums">
                                             {r.quantity}
                                         </TableCell>
                                         <TableCell className="text-right pr-8">

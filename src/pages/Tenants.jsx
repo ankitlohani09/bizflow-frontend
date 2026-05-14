@@ -141,7 +141,7 @@ export default function Tenants() {
         <MainLayout>
             <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Business Onboarding</h1>
+                    <h1 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tight uppercase">Business Onboarding</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">Manage & Register New Businesses</p>
                 </div>
                 <div className="flex gap-3">
@@ -197,11 +197,11 @@ export default function Tenants() {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50/50 dark:bg-slate-800/20 hover:bg-transparent border-none">
-                                <TableHead className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 pl-8 h-14">Business Name</TableHead>
-                                <TableHead className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 h-14">Plan & Quota</TableHead>
-                                <TableHead className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 h-14 text-center">Expiry</TableHead>
-                                <TableHead className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 h-14 text-center">Status</TableHead>
-                                <TableHead className="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 pr-8 h-14 text-right">Actions</TableHead>
+                                <TableHead className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 pl-8 h-14">Business Name</TableHead>
+                                <TableHead className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 h-14">Plan & Quota</TableHead>
+                                <TableHead className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 h-14 text-center">Expiry</TableHead>
+                                <TableHead className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 h-14 text-center">Status</TableHead>
+                                <TableHead className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 pr-8 h-14 text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -216,7 +216,7 @@ export default function Tenants() {
                                     <TableCell colSpan={5} className="h-64 text-center">
                                         <div className="flex flex-col items-center gap-2 opacity-30">
                                             <Building2 size={48} />
-                                            <p className="font-black uppercase tracking-widest text-xs">No businesses found</p>
+                                            <p className="font-semibold uppercase tracking-widest text-[14px]">No businesses found</p>
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -229,11 +229,11 @@ export default function Tenants() {
                                     >
                                         <TableCell className="pl-8">
                                             <div className="flex items-center gap-4">
-                                                <div className="h-10 w-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black">
+                                                <div className="h-10 w-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-semibold">
                                                     {tenant.code}
                                                 </div>
                                                 <div>
-                                                    <p className="font-black text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 transition-colors">{tenant.name}</p>
+                                                    <p className="font-semibold text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 transition-colors">{tenant.name}</p>
                                                     <p className="text-[14px] text-slate-400 font-bold uppercase tracking-widest">{tenant.businessType}</p>
                                                 </div>
                                             </div>
@@ -241,7 +241,7 @@ export default function Tenants() {
                                         <TableCell>
                                             <div className="space-y-1">
                                                 <span className={cn(
-                                                    "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[14px] font-black uppercase tracking-widest",
+                                                    "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[14px] font-semibold uppercase tracking-widest",
                                                     tenant.subscriptionPlan === 'ENTERPRISE' ? "bg-amber-500/10 text-amber-600 border border-amber-500/20" :
                                                     tenant.subscriptionPlan === 'PRO' ? "bg-indigo-500/10 text-indigo-600 border border-indigo-500/20" :
                                                     "bg-slate-500/10 text-slate-600 border border-slate-500/20"
@@ -255,17 +255,17 @@ export default function Tenants() {
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <div className="flex flex-col items-center">
-                                                <p className="text-[14px] font-black text-slate-700 dark:text-slate-300">
+                                                <p className="text-[14px] font-semibold text-slate-700 dark:text-slate-300">
                                                     {tenant.expiryDate ? new Date(tenant.expiryDate).toLocaleDateString() : 'N/A'}
                                                 </p>
                                                 {tenant.expiryDate && new Date(tenant.expiryDate) < new Date() && (
-                                                    <span className="text-[14px] font-black text-rose-500 uppercase tracking-widest">Expired</span>
+                                                    <span className="text-[14px] font-semibold text-rose-500 uppercase tracking-widest">Expired</span>
                                                 )}
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <span className={cn(
-                                                "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[14px] font-black uppercase tracking-widest",
+                                                "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[14px] font-semibold uppercase tracking-widest",
                                                 tenant.isActive 
                                                     ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" 
                                                     : "bg-rose-500/10 text-rose-600 border border-rose-500/20"
@@ -279,7 +279,7 @@ export default function Tenants() {
                                                     e.stopPropagation();
                                                     navigate(`/tenants/${tenant.id}`);
                                                 }}
-                                                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-500 font-black text-[14px] uppercase tracking-widest flex items-center gap-2 ml-auto"
+                                                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-500 font-semibold text-[14px] uppercase tracking-widest flex items-center gap-2 ml-auto"
                                             >
                                                 View <ArrowUpRight size={14} />
                                             </button>
@@ -312,8 +312,8 @@ export default function Tenants() {
                             <div className="p-10">
                                 <div className="flex items-center justify-between mb-8">
                                     <div>
-                                        <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Onboard New Business</h2>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">Setup tenant and owner account</p>
+                                        <h2 className="text-2xl font-semibold text-slate-900 dark:text-white uppercase tracking-tight">Onboard New Business</h2>
+                                        <p className="text-[14px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">Setup tenant and owner account</p>
                                     </div>
                                     <div className="p-4 bg-indigo-500/10 rounded-2xl">
                                         <Building2 className="text-indigo-600" />
@@ -362,7 +362,7 @@ export default function Tenants() {
 
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Subscription Plan</label>
+                                            <label className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 ml-4">Subscription Plan</label>
                                             <select 
                                                 name="subscriptionPlan"
                                                 value={formData.subscriptionPlan}
@@ -394,7 +394,7 @@ export default function Tenants() {
                                             required
                                         />
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Business Type</label>
+                                            <label className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 ml-4">Business Type</label>
                                             <select 
                                                 name="businessType"
                                                 value={formData.businessType}
@@ -430,14 +430,14 @@ export default function Tenants() {
                                             type="button"
                                             variant="ghost" 
                                             onClick={() => setIsModalOpen(false)}
-                                            className="flex-1 rounded-2xl h-14 font-black uppercase tracking-widest text-slate-500"
+                                            className="flex-1 rounded-2xl h-14 font-semibold uppercase tracking-widest text-slate-500"
                                         >
                                             Cancel
                                         </Button>
                                         <Button 
                                             type="submit"
                                             disabled={submitting}
-                                            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl h-14 font-black uppercase tracking-widest shadow-xl shadow-indigo-500/20"
+                                            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl h-14 font-semibold uppercase tracking-widest shadow-xl shadow-indigo-500/20"
                                         >
                                             {submitting ? <Loader2 className="animate-spin h-5 w-5 mx-auto" /> : 'Complete Onboarding'}
                                         </Button>
@@ -466,8 +466,8 @@ function StatCard({ title, value, icon: Icon, color }) {
                     <Icon size={24} />
                 </div>
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{title}</p>
-                    <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{value}</h3>
+                    <p className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 mb-1">{title}</p>
+                    <h3 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tighter">{value}</h3>
                 </div>
             </div>
         </Card>
@@ -477,7 +477,7 @@ function StatCard({ title, value, icon: Icon, color }) {
 function InputField({ label, ...props }) {
     return (
         <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">{label}</label>
+            <label className="text-[14px] font-semibold uppercase tracking-[0.2em] text-slate-400 ml-4">{label}</label>
             <input 
                 {...props}
                 className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 font-bold text-slate-900 dark:text-white placeholder:text-slate-400 placeholder:font-bold"

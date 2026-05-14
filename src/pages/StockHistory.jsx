@@ -28,17 +28,17 @@ import { formatDateTime } from '../utils/formatDate';
 function MovementBadge({ type }) {
     const t = (type || '').toUpperCase();
     if (t === 'IN') return (
-        <span className="inline-flex items-center gap-1 text-emerald-600 font-bold text-xs">
+        <span className="inline-flex items-center gap-1 text-emerald-600 font-bold text-[14px]">
             <ArrowUpCircle size={14} /> Stock In
         </span>
     );
     if (t === 'OUT') return (
-        <span className="inline-flex items-center gap-1 text-rose-600 font-bold text-xs">
+        <span className="inline-flex items-center gap-1 text-rose-600 font-bold text-[14px]">
             <ArrowDownCircle size={14} /> Stock Out
         </span>
     );
     return (
-        <span className="inline-flex items-center gap-1 text-blue-600 font-bold text-xs">
+        <span className="inline-flex items-center gap-1 text-blue-600 font-bold text-[14px]">
             <RotateCw size={14} /> Adjustment
         </span>
     );
@@ -128,7 +128,7 @@ export default function StockHistory() {
                                             <MovementBadge type={m.movementType} />
                                         </TableCell>
                                         <TableCell className={cn(
-                                            "text-right font-black",
+                                            "text-right font-semibold",
                                             m.movementType === 'OUT' ? "text-rose-600" : "text-emerald-600"
                                         )}>
                                             {m.movementType === 'OUT' ? '-' : '+'}{m.quantity}

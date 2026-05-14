@@ -95,10 +95,18 @@ export default function Expenses() {
 
     return (
         <MainLayout title="Expenses">
-            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Expenses</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Track operational costs and categorize business outflows.</p>
+                        <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between no-print">
+                <div className="flex items-center gap-5">
+                    <div className="h-14 w-14 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
+                        <Wallet size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">Expenses</h1>
+                        <p className="text-[14px] font-semibold text-slate-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Cost Management
+                        </p>
+                    </div>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="ghost" onClick={fetchExpenses} disabled={loading} className="dark:text-slate-400">
@@ -121,8 +129,8 @@ export default function Expenses() {
                     </div>
                     <div className="relative z-10 flex flex-col justify-between h-full">
                         <div>
-                            <span className="text-[14px] font-black uppercase tracking-[0.2em] text-rose-500">Global Burn Rate</span>
-                            <h2 className="text-5xl font-black tracking-tighter tabular-nums mt-4">{fmt(totalSpending)}</h2>
+                            <span className="text-[14px] font-semibold uppercase tracking-[0.2em] text-rose-500">Global Burn Rate</span>
+                            <h2 className="text-5xl font-semibold tracking-tighter tabular-nums mt-4">{fmt(totalSpending)}</h2>
                             <p className="mt-2 text-slate-400 text-[14px] font-bold uppercase tracking-widest">
                                 Processing {filteredExpenses.length} verified expenditures
                             </p>
@@ -130,7 +138,7 @@ export default function Expenses() {
                         <div className="mt-8 flex gap-4">
                             <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
                                 <div className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
-                                <span className="text-[14px] font-black uppercase tracking-widest">Live Monitoring</span>
+                                <span className="text-[14px] font-semibold uppercase tracking-widest">Live Monitoring</span>
                             </div>
                         </div>
                     </div>
@@ -142,8 +150,8 @@ export default function Expenses() {
                                 <TrendingUp size={24} />
                             </div>
                             <div>
-                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-400">Avg. Per Entry</p>
-                                <p className="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">
+                                <p className="text-[14px] font-semibold uppercase tracking-widest text-slate-400">Avg. Per Entry</p>
+                                <p className="text-xl font-semibold text-slate-900 dark:text-white leading-none mt-1">
                                     {fmt(filteredExpenses.length > 0 ? totalSpending / filteredExpenses.length : 0)}
                                 </p>
                             </div>
@@ -155,8 +163,8 @@ export default function Expenses() {
                                 <Receipt size={24} />
                             </div>
                             <div>
-                                <p className="text-[14px] font-black uppercase tracking-widest text-slate-400">Total Entries</p>
-                                <p className="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">
+                                <p className="text-[14px] font-semibold uppercase tracking-widest text-slate-400">Total Entries</p>
+                                <p className="text-xl font-semibold text-slate-900 dark:text-white leading-none mt-1">
                                     {filteredExpenses.length}
                                 </p>
                             </div>
@@ -196,7 +204,7 @@ export default function Expenses() {
                     ) : filteredExpenses.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 text-center opacity-30">
                             <Receipt size={64} className="mb-4" />
-                            <p className="font-black text-xl uppercase tracking-widest">No Outflows Found</p>
+                            <p className="font-semibold text-xl uppercase tracking-widest">No Outflows Found</p>
                         </div>
                     ) : (
                         <Table>
@@ -217,7 +225,7 @@ export default function Expenses() {
                                                     <Tag size={16} />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="font-black text-slate-900 dark:text-slate-200 uppercase tracking-tighter leading-none">{ex.categoryName || ex.category?.name || 'GEN_EXPENSE'}</span>
+                                                    <span className="font-semibold text-slate-900 dark:text-slate-200 uppercase tracking-tighter leading-none">{ex.categoryName || ex.category?.name || 'GEN_EXPENSE'}</span>
                                                     <span className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 truncate max-w-[200px]">{ex.description || 'REF_NOT_STATED'}</span>
                                                 </div>
                                             </div>
@@ -227,13 +235,13 @@ export default function Expenses() {
                                                 <div className="flex items-center gap-2 text-[14px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
                                                     <Calendar size={12} className="text-blue-500" /> {formatDateOnly(ex.expenseDate || ex.createdAt)}
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-[14px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                                <div className="flex items-center gap-1.5 text-[14px] font-semibold text-slate-400 uppercase tracking-widest mt-1">
                                                     VIA {ex.paymentMethod || 'CASH_DISBURSEMENT'}
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right py-6">
-                                            <span className="text-lg font-black text-rose-600 tabular-nums">-{fmt(ex.amount)}</span>
+                                            <span className="text-lg font-semibold text-rose-600 tabular-nums">-{fmt(ex.amount)}</span>
                                         </TableCell>
                                         <TableCell className="text-right pr-8">
                                             <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
