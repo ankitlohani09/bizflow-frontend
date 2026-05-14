@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Store, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import authService from '../services/authService';
+import { useTheme } from '../context/ThemeContext';
 
 /**
  * Login Page
@@ -15,6 +16,7 @@ import authService from '../services/authService';
  */
 export default function Login() {
     const navigate = useNavigate();
+    const { refreshBranding } = useTheme();
 
     const [form, setForm] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
@@ -39,6 +41,7 @@ export default function Login() {
 
         try {
             const user = await authService.login(form.email, form.password);
+            await refreshBranding();
             navigate('/dashboard', { replace: true });
         } catch (err) {
             // err.message is already human-readable (set in api.js interceptor)

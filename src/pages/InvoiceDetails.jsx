@@ -363,12 +363,27 @@ export default function InvoiceDetails() {
 
                 {/* Thermal Receipt View (Hidden on screen, visible only during thermal print) */}
                 <div className="thermal-receipt">
-                    <div className="text-center font-bold text-lg uppercase">{localStorage.getItem('tenantName') || 'BIZFLOW'}</div>
+                    {branding.logoUrl && (
+                        <div className="text-center mb-2">
+                            <img 
+                                src={branding.logoUrl.startsWith('blob:') || branding.logoUrl.startsWith('data:') || branding.logoUrl.startsWith('http')
+                                    ? branding.logoUrl
+                                    : `${import.meta.env.VITE_API_URL}${branding.logoUrl.startsWith('/') ? '' : '/'}${branding.logoUrl}`}
+                                alt="Logo" 
+                                className="h-10 w-auto mx-auto object-contain" 
+                            />
+                        </div>
+                    )}
+                    <div className="text-center font-bold text-lg uppercase">{branding.brandName || 'BIZFLOW'}</div>
+                    {branding.companyAddress && (
+                        <div className="text-center text-xs text-slate-600 mb-1">{branding.companyAddress}</div>
+                    )}
                     <div className="text-center text-[14px]">TAX INVOICE</div>
                     <hr />
                     <div className="text-[14px]">
                         <p>Inv No  : {invoice.invoiceNumber || invoice.id}</p>
                         <p>Date    : {formatDateOnly(invoice.invoiceDate || invoice.createdAt)}</p>
+                        <p>Cashier : {invoice.cashierName || invoice.createdBy || 'N/A'}</p>
                         <p>Cust    : {invoice.customerName || 'Walk-in Customer'}</p>
                         {invoice.customerPhone && <p>Phone   : {invoice.customerPhone}</p>}
                     </div>
@@ -394,17 +409,37 @@ export default function InvoiceDetails() {
                     <hr />
                     <div className="text-[14px] space-y-1">
                         <div className="flex justify-between">
-                            <span>Sub Total:</span>
+                            <span>Subtotal (Excl. Tax):</span>
                             <span>{fmt(invoice.subtotal)}</span>
                         </div>
                         <div className="flex justify-between">
                             <span>Tax Amount:</span>
                             <span>+{fmt(invoice.taxAmount)}</span>
                         </div>
+                        <div className="flex justify-between">
+                            <span>Subtotal (Incl. Tax):</span>
+                            <span>{fmt(invoice.subtotal + invoice.taxAmount)}</span>
+                        </div>
                         {invoice.discountAmount > 0 && (
                             <div className="flex justify-between">
                                 <span>Discount:</span>
                                 <span>-{fmt(invoice.discountAmount)}</span>
+                            </div>
+                        )}
+                        {invoice.shippingAmount > 0 && (
+                            <div className="flex justify-between">
+                                <span>Shipping:</span>
+                                <span>+{fmt(invoice.shippingAmount)}</span>
+                            </div>
+                        )}
+                        {/* Round Off */}
+                        {Math.abs(invoice.grandTotal - (invoice.subtotal + invoice.taxAmount - invoice.discountAmount + invoice.shippingAmount)) > 0.01 && (
+                            <div className="flex justify-between">
+                                <span>Round Off:</span>
+                                <span>
+                                    {invoice.grandTotal > (invoice.subtotal + invoice.taxAmount - invoice.discountAmount + invoice.shippingAmount) ? "+" : ""}
+                                    {fmt(invoice.grandTotal - (invoice.subtotal + invoice.taxAmount - invoice.discountAmount + invoice.shippingAmount))}
+                                </span>
                             </div>
                         )}
                         <hr />
@@ -425,9 +460,16 @@ export default function InvoiceDetails() {
                         )}
                     </div>
                     <hr />
+                    <div className="text-center my-2 flex flex-col items-center">
+                        <span className="font-barcode text-4xl text-black leading-none">
+                            *{invoice.invoiceNumber}*
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Scan to Search</span>
+                    </div>
+                    <hr />
                     <div className="text-center text-[14px] mt-4">
                         <p>Thank You! Visit Again.</p>
-                        <p className="text-[14px] text-slate-500">Powered by BizFlow</p>
+                        <p className="text-[14px] text-slate-500">Powered by {branding.brandName || 'BizFlow'}</p>
                     </div>
                 </div>
 

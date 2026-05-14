@@ -561,8 +561,8 @@ export default function Settings() {
                                     </div>
                                     <Input
                                         label="Public Product Name"
-                                        value={localBranding.companyName}
-                                        onChange={(e) => setLocalBranding(prev => ({ ...prev, companyName: e.target.value }))}
+                                        value={localBranding.brandName}
+                                        onChange={(e) => setLocalBranding(prev => ({ ...prev, brandName: e.target.value }))}
                                     />
                                 </div>
 

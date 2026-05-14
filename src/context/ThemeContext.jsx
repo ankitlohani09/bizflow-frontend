@@ -103,7 +103,7 @@ export function ThemeProvider({ children }) {
         setBranding(prev => ({ ...prev, ...newBranding }));
         try {
             await brandingService.updateSettings({
-                brandName: newBranding.companyName,
+                brandName: newBranding.brandName,
                 primaryColor: newBranding.primaryColor,
                 logoUrl: newBranding.logoUrl
             });
