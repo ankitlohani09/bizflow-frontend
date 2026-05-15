@@ -88,6 +88,14 @@ const authService = {
    */
   async resetPassword(token, newPassword) {
     return await api.post('/auth/reset-password', { token, newPassword });
+  },
+
+  /**
+   * Verify a reset token.
+   * @param {string} token
+   */
+  async verifyResetToken(token) {
+    return await api.get(`/auth/verify-reset-token?token=${encodeURIComponent(token)}`);
   }
 };
 

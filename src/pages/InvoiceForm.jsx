@@ -600,7 +600,7 @@ export default function InvoiceForm() {
                         </div>
 
                         {/* ── RIGHT COLUMN (Customer & Checkout) ── */}
-                        <div className="flex-[4] flex flex-col gap-4 lg:min-w-[380px] min-h-0">
+                        <div className="flex-[4] flex flex-col gap-4 lg:min-w-[380px] min-h-0 overflow-y-auto custom-scrollbar pr-1 pb-4">
 
                             {/* Customer Section Card */}
                             <div className="enterprise-card p-5 space-y-4 shrink-0">

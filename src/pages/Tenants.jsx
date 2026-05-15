@@ -274,15 +274,31 @@ export default function Tenants() {
                                             </span>
                                         </TableCell>
                                         <TableCell className="pr-8 text-right">
-                                            <button 
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    navigate(`/tenants/${tenant.id}`);
-                                                }}
-                                                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-500 font-semibold text-[14px] uppercase tracking-widest flex items-center gap-2 ml-auto"
-                                            >
-                                                View <ArrowUpRight size={14} />
-                                            </button>
+                                            <div className="flex justify-end gap-2">
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`/tenants/${tenant.id}`);
+                                                    }}
+                                                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-500 font-semibold text-[14px] uppercase tracking-widest flex items-center gap-2"
+                                                >
+                                                    View <ArrowUpRight size={14} />
+                                                </button>
+                                                <button 
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        try {
+                                                            await tenantService.regenerateLink(tenant.id);
+                                                            toast.success('Reset link sent successfully!');
+                                                        } catch (err) {
+                                                            toast.error('Failed to send reset link');
+                                                        }
+                                                    }}
+                                                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-emerald-500 font-semibold text-[14px] uppercase tracking-widest flex items-center gap-2"
+                                                >
+                                                    Regenerate <RefreshCw size={14} />
+                                                </button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))

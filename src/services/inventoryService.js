@@ -13,13 +13,28 @@ import api from './api';
  * Inventory record shape (InventoryDto):
  *   { id, itemId, availableQty, damagedQty, expiredQty, lowStockThreshold, ... }
  */
+const cache = {
+  all: null,
+  byId: {}
+};
+
 const inventoryService = {
   /**
    * Fetch all inventory records
    * @returns {Promise<Array>}
    */
   getAll() {
-    return api.get('/inventory');
+    if (cache.all) {
+      return cache.all;
+    }
+    const promise = api.get('/inventory');
+    cache.all = promise;
+    
+    promise.catch(() => {
+      cache.all = null;
+    });
+    
+    return promise;
   },
 
   /**
@@ -28,7 +43,17 @@ const inventoryService = {
    * @returns {Promise<object>}
    */
   getById(id) {
-    return api.get(`/inventory/${id}`);
+    if (cache.byId[id]) {
+      return cache.byId[id];
+    }
+    const promise = api.get(`/inventory/${id}`);
+    cache.byId[id] = promise;
+    
+    promise.catch(() => {
+      delete cache.byId[id];
+    });
+    
+    return promise;
   },
 
   /**
@@ -38,6 +63,8 @@ const inventoryService = {
    * @returns {Promise<object>}
    */
   updateThreshold(id, threshold) {
+    delete cache.byId[id]; // Invalidate detail cache
+    cache.all = null; // Invalidate list cache
     return api.patch(`/inventory/${id}/threshold`, { threshold });
   },
 
@@ -55,6 +82,7 @@ const inventoryService = {
    * @returns {Promise<object>}
    */
   createStockMovement(adjustmentDto) {
+    cache.all = null; // Invalidate list cache as stock changes
     return api.post('/stock-movements', adjustmentDto);
   },
 

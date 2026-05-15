@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -51,6 +52,7 @@ const profileSchema = z.object({
 export default function Settings() {
     const location = useLocation();
     const { branding, updateBranding, setBrandingPreview, timezone, changeTimezone } = useTheme();
+    const queryClient = useQueryClient();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const isManagerOrOwner = user.roles?.includes('MANAGER') || user.roles?.includes('OWNER') || user.roles?.includes('ADMIN');
     const [activeTab, setActiveTab] = useState(isManagerOrOwner ? 'master' : 'account');
@@ -75,20 +77,32 @@ export default function Settings() {
         return () => clearInterval(timer);
     }, []);
 
-    // â”€â”€ Tax Rules state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    const [taxRules, setTaxRules] = useState([]);
+    // Tax Rules state
+    const { data: taxRules = [] } = useQuery({
+        queryKey: ['taxRules'],
+        queryFn: taxRuleService.getAll,
+        enabled: activeTab === 'master',
+    });
     const [newTaxRule, setNewTaxRule] = useState({ name: '', rate: '', taxType: 'GST' });
 
-    // â”€â”€ Payment Modes state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    const [paymentModes, setPaymentModes] = useState([]);
+    // Payment Modes state
+    const { data: paymentModes = [] } = useQuery({
+        queryKey: ['paymentModes'],
+        queryFn: paymentModeService.getAll,
+        enabled: activeTab === 'master',
+    });
     const [newModeName, setNewModeName] = useState('');
     const [editingPm, setEditingPm] = useState(null); // Track mode being edited
 
-    // â”€â”€ Tenant Attendance Settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    const [tenant, setTenant] = useState(null);
+    // Tenant Attendance Settings
+    const { data: tenant } = useQuery({
+        queryKey: ['tenantSettings', user.tenantId],
+        queryFn: () => tenantService.getById(user.tenantId),
+        enabled: activeTab === 'master' && !!user.tenantId,
+    });
     const [tenantSaving, setTenantSaving] = useState(false);
 
-    // â”€â”€ Profile State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Profile State
     const { register: registerProfile, handleSubmit: handleSubmitProfile, reset: resetProfile, formState: { errors: profileErrors } } = useForm({
         resolver: zodResolver(profileSchema),
         defaultValues: {
@@ -99,7 +113,7 @@ export default function Settings() {
     });
     const [profilePictureUrl, setProfilePictureUrl] = useState(JSON.parse(localStorage.getItem('user') || '{}').profilePictureUrl || '');
 
-    // â”€â”€ Security State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Security State
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -107,49 +121,24 @@ export default function Settings() {
     useEffect(() => {
         setSuccessMsg(null);
         setErrorMsg(null);
-        if (activeTab === 'master') {
-            loadPaymentModes();
-            loadTaxRules();
-            loadTenantSettings();
-        }
     }, [activeTab]);
-
-    async function loadTenantSettings() {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (!user.tenantId) return;
-        try {
-            const data = await tenantService.getById(user.tenantId);
-            setTenant(data);
-        } catch (err) {
-            console.error('Failed to load tenant settings', err);
-        }
-    }
 
     async function handleUpdateTenantSetting(field, value) {
         if (!tenant) return;
         setTenantSaving(true);
         try {
             const updated = { ...tenant, [field]: value };
-            const data = await tenantService.update(tenant.id, {
+            await tenantService.update(tenant.id, {
                 ...updated,
                 ownerName: JSON.parse(localStorage.getItem('user') || '{}').name
             });
-            setTenant(data);
+            queryClient.invalidateQueries(['tenantSettings']);
             window.dispatchEvent(new Event('tenant-updated'));
             setSuccessMsg('Attendance security updated.');
         } catch {
             setSuccessMsg('Failed to update attendance settings.');
         } finally {
             setTenantSaving(false);
-        }
-    }
-
-    async function loadPaymentModes() {
-        try {
-            const data = await paymentModeService.getAll();
-            setPaymentModes(Array.isArray(data) ? data : []);
-        } catch {
-            console.error('Failed to load payment modes.');
         }
     }
 
@@ -166,7 +155,7 @@ export default function Settings() {
             }
             setNewModeName('');
             setEditingPm(null);
-            await loadPaymentModes();
+            queryClient.invalidateQueries(['paymentModes']);
         } catch {
             setSuccessMsg(editingPm ? 'Failed to update payment mode.' : 'Failed to add payment mode.');
         }
@@ -176,18 +165,9 @@ export default function Settings() {
     async function handleDeleteMode(id) {
         try {
             await paymentModeService.delete(id);
-            await loadPaymentModes();
+            queryClient.invalidateQueries(['paymentModes']);
         } catch {
             console.error('Failed to delete mode.');
-        }
-    }
-
-    async function loadTaxRules() {
-        try {
-            const data = await taxRuleService.getAll();
-            setTaxRules(Array.isArray(data) ? data : []);
-        } catch {
-            console.error('Failed to load tax rules.');
         }
     }
 
@@ -197,7 +177,7 @@ export default function Settings() {
         try {
             await taxRuleService.create({ ...newTaxRule, rate: parseFloat(newTaxRule.rate) });
             setNewTaxRule({ name: '', rate: '', taxType: 'GST' });
-            await loadTaxRules();
+            queryClient.invalidateQueries(['taxRules']);
             setSuccessMsg('Tax rule added.');
         } catch {
             setSuccessMsg('Failed to add tax rule.');
@@ -207,7 +187,7 @@ export default function Settings() {
     async function handleDeleteTaxRule(id) {
         try {
             await taxRuleService.delete(id);
-            await loadTaxRules();
+            queryClient.invalidateQueries(['taxRules']);
         } catch {
             console.error('Failed to delete tax rule.');
         }
@@ -222,7 +202,7 @@ export default function Settings() {
             </div>
 
             <div className="flex flex-col gap-8 lg:flex-row">
-                {/* â”€â”€ Sidebar Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                {/* Sidebar Navigation */}
                 <div className="w-full lg:w-64 flex flex-col gap-2">
                     {[
                         { id: 'master', label: 'Business Settings', icon: SettingsIcon },
@@ -253,7 +233,7 @@ export default function Settings() {
                     ))}
                 </div>
 
-                {/* â”€â”€ Content Area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                {/* Content Area */}
                 <div className="flex-1 space-y-6">
                     {successMsg && <Alert variant="success" message={successMsg} className="mb-4" onClose={() => setSuccessMsg(null)} />}
                     {errorMsg && <Alert variant="error" message={errorMsg} className="mb-4" onClose={() => setErrorMsg(null)} />}
@@ -582,7 +562,7 @@ export default function Settings() {
                                                 />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-2xl text-white text-[14px] font-semibold uppercase tracking-widest">Click to Change</div>
                                             </div>
-                                            
+
                                             {/* Premium Remove Button inside the card */}
                                             <button
                                                 className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/90 dark:bg-slate-800/90 shadow-lg flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all transform hover:scale-110 z-10"
@@ -591,13 +571,13 @@ export default function Settings() {
                                                     try {
                                                         await brandingService.deleteLogo();
                                                         setLocalBranding(prev => ({ ...prev, logoUrl: null }));
-                                                        
+
                                                         // Live preview in sidebar
                                                         setBrandingPreview({ logoUrl: null });
-                                                        
+
                                                         setSuccessMsg('Logo removed successfully!');
                                                         window.dispatchEvent(new Event('theme-updated'));
-                                                        
+
                                                         // Reset file input value so the same file can be selected again
                                                         const fileInput = document.getElementById('logo-upload');
                                                         if (fileInput) fileInput.value = '';
@@ -629,7 +609,7 @@ export default function Settings() {
                                             if (file) {
                                                 const previewUrl = URL.createObjectURL(file);
                                                 setLocalBranding(p => ({ ...p, logoUrl: previewUrl }));
-                                                
+
                                                 // Live preview in sidebar
                                                 setBrandingPreview({ logoUrl: previewUrl });
 
@@ -772,20 +752,20 @@ export default function Settings() {
                                 })}>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <Input 
-                                                label="Display Name" 
-                                                {...registerProfile('displayName')} 
+                                            <Input
+                                                label="Display Name"
+                                                {...registerProfile('displayName')}
                                                 className={profileErrors.displayName ? 'border-rose-500' : ''}
                                             />
                                             {profileErrors.displayName && <p className="text-rose-500 text-[14px] font-bold mt-0.5 ml-1">{profileErrors.displayName.message}</p>}
                                         </div>
                                         <Input label="Email Address" defaultValue={JSON.parse(localStorage.getItem('user') || '{}').email} disabled />
                                         <div>
-                                            <Input 
-                                                label="Phone Number" 
-                                                {...registerProfile('phoneNumber')} 
+                                            <Input
+                                                label="Phone Number"
+                                                {...registerProfile('phoneNumber')}
                                                 maxLength={10}
-                                                placeholder="Enter phone number" 
+                                                placeholder="Enter phone number"
                                                 className={profileErrors.phoneNumber ? 'border-rose-500' : ''}
                                             />
                                             {profileErrors.phoneNumber && <p className="text-rose-500 text-[14px] font-bold mt-0.5 ml-1">{profileErrors.phoneNumber.message}</p>}
@@ -867,7 +847,7 @@ export default function Settings() {
                                         <Input
                                             label="Current Password"
                                             type="password"
-                                            placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                                            placeholder="********"
                                             autoComplete="current-password"
                                             value={currentPassword}
                                             onChange={(e) => setCurrentPassword(e.target.value)}
@@ -876,7 +856,7 @@ export default function Settings() {
                                     <Input
                                         label="New Password"
                                         type="password"
-                                        placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                                        placeholder="********"
                                         autoComplete="new-password"
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
@@ -884,7 +864,7 @@ export default function Settings() {
                                     <Input
                                         label="Confirm New Password"
                                         type="password"
-                                        placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                                        placeholder="********"
                                         autoComplete="new-password"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}

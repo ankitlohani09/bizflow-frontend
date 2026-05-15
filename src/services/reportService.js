@@ -2,6 +2,7 @@ import invoiceService from './invoiceService';
 import expenseService from './expenseService';
 import purchaseService from './purchaseService';
 import inventoryService from './inventoryService';
+import api from './api';
 
 /**
  * reportService – Client-side BI Engine for aggregating financial data
@@ -52,20 +53,133 @@ const reportService = {
     },
 
     /**
-     * Get a comprehensive financial summary for the current month
+     * Get dashboard data from backend API
      */
-    async getFinancialSummary() {
+    async getDashboardData(filter = { type: 'ALL' }) {
+        this._dashboardCache = this._dashboardCache || {};
+        
+        let fromDate = null;
+        let toDate = null;
+        
+        const now = new Date();
+        const formatDate = (d) => d.toISOString().split('T')[0];
+        
+        if (filter.type === 'ALL') {
+            fromDate = null;
+            toDate = null;
+        } else if (filter.type === 'TODAY') {
+            fromDate = formatDate(now);
+            toDate = formatDate(now);
+        } else if (filter.type === 'WEEK') {
+            const start = new Date(now);
+            start.setDate(now.getDate() - now.getDay());
+            fromDate = formatDate(start);
+            toDate = formatDate(now);
+        } else if (filter.type === 'MONTH') {
+            const start = new Date(now.getFullYear(), now.getMonth(), 1);
+            fromDate = formatDate(start);
+            toDate = formatDate(now);
+        } else if (filter.type === 'YEAR') {
+            const start = new Date(now.getFullYear(), 0, 1);
+            fromDate = formatDate(start);
+            toDate = formatDate(now);
+        } else if (filter.type === 'CUSTOM') {
+            fromDate = filter.startDate;
+            toDate = filter.endDate;
+        }
+        
+        const cacheKey = `${fromDate}_${toDate}`;
+        if (this._dashboardCache[cacheKey]) {
+            return this._dashboardCache[cacheKey];
+        }
+        
+        const promise = (async () => {
+            const params = {};
+            if (fromDate) params.fromDate = fromDate;
+            if (toDate) params.toDate = toDate;
+            
+            const data = await api.get('/reports/dashboard', { params });
+            
+            // Map backend keys to frontend expected keys
+            return {
+                revenue: data.todaySales,
+                costs: data.todayExpenses,
+                netProfit: data.todayProfit,
+                lowStockCount: data.lowStockItems,
+                totalItems: data.totalItems,
+                topItems: data.topSellingItems.map(item => ({
+                    name: item.itemName,
+                    quantity: item.totalQuantity,
+                    revenue: item.totalRevenue
+                })),
+                monthlyData: data.salesChart.map(point => ({
+                    name: point.date, // Backend returns daily dates
+                    sales: point.sales,
+                    expenses: point.expenses,
+                    profit: point.profit
+                })),
+                raw: data // Keep raw data just in case
+            };
+        })();
+        
+        this._dashboardCache[cacheKey] = promise;
+        
+        promise.catch(() => {
+            delete this._dashboardCache[cacheKey];
+        });
+        
+        return promise;
+    },
+
+    _isWithinRange(dateStr, filter) {
+        if (!filter || filter.type === 'ALL') return true;
+        const date = new Date(dateStr);
+        const now = new Date();
+        const resetTime = (d) => {
+            const nd = new Date(d);
+            nd.setHours(0, 0, 0, 0);
+            return nd;
+        };
+        const target = resetTime(date);
+        const today = resetTime(now);
+        
+        if (filter.type === 'TODAY') return target.getTime() === today.getTime();
+        if (filter.type === 'WEEK') {
+            const start = new Date(today);
+            start.setDate(today.getDate() - today.getDay());
+            return target >= start;
+        }
+        if (filter.type === 'MONTH') return target.getMonth() === today.getMonth() && target.getFullYear() === today.getFullYear();
+        if (filter.type === 'YEAR') return target.getFullYear() === today.getFullYear();
+        if (filter.type === 'CUSTOM') {
+            const start = filter.startDate ? resetTime(new Date(filter.startDate)) : null;
+            const end = filter.endDate ? resetTime(new Date(filter.endDate)) : null;
+            if (start && end) return target >= start && target <= end;
+            if (start) return target >= start;
+            if (end) return target <= end;
+            return true;
+        }
+        return true;
+    },
+
+    /**
+     * Get a comprehensive financial summary
+     */
+    async getFinancialSummary(filter = { type: 'ALL' }) {
         try {
             const { invoices, purchases, expenses, inventory } = await this._getRawData();
 
             const revenue = invoices
                 .filter(inv => (inv.paymentStatus || inv.status) === 'PAID')
+                .filter(inv => this._isWithinRange(inv.issueDate || inv.createdAt, filter))
                 .reduce((acc, inv) => acc + (inv.grandTotal || inv.totalAmount || 0), 0);
 
             const purchaseCosts = purchases
+                .filter(p => this._isWithinRange(p.purchaseDate || p.createdAt, filter))
                 .reduce((acc, p) => acc + (p.grandTotal || p.totalAmount || 0), 0);
 
             const directExpenses = expenses
+                .filter(e => this._isWithinRange(e.date || e.createdAt, filter))
                 .reduce((acc, e) => acc + (e.amount || 0), 0);
 
             const totalCosts = purchaseCosts + directExpenses;
@@ -82,9 +196,9 @@ const reportService = {
                 lowStockCount,
                 totalItems,
                 breakdown: {
-                    invoices: invoices.length,
-                    purchases: purchases.length,
-                    expenses: expenses.length
+                    invoices: invoices.filter(inv => this._isWithinRange(inv.issueDate || inv.createdAt, filter)).length,
+                    purchases: purchases.filter(p => this._isWithinRange(p.purchaseDate || p.createdAt, filter)).length,
+                    expenses: expenses.filter(e => this._isWithinRange(e.date || e.createdAt, filter)).length
                 }
             };
         } catch (error) {
@@ -96,7 +210,7 @@ const reportService = {
     /**
      * Get historical monthly data for charts and item performance ranking
      */
-    async getEnhancedAnalytics() {
+    async getEnhancedAnalytics(filter = { type: 'ALL' }) {
         try {
             const { invoices, purchases, expenses } = await this._getRawData();
 
@@ -143,6 +257,7 @@ const reportService = {
             // 2. Top Selling Items
             const itemMap = {};
             invoices.forEach(inv => {
+                if (!this._isWithinRange(inv.issueDate || inv.createdAt, filter)) return;
                 if (inv.items && Array.isArray(inv.items)) {
                     inv.items.forEach(item => {
                         const id = item.itemId;
@@ -175,47 +290,43 @@ const reportService = {
         }
     },
 
-    /**
-     * Generate Smart AI Insights (Phase 1)
-     */
-    async getSmartInsights() {
+    getSmartInsights(data) {
         try {
-            const summary = await this.getFinancialSummary();
-            const analytics = await this.getEnhancedAnalytics();
             const insights = [];
+            const margin = data.revenue > 0 ? ((data.netProfit / data.revenue) * 100).toFixed(2) : 0;
 
             // 1. Revenue Insight
-            if (summary.revenue > 0) {
+            if (data.revenue > 0) {
                 insights.push({
                     type: 'POSITIVE',
                     category: 'SALES',
                     textKey: 'sales_insight',
-                    params: { amount: new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(summary.revenue) },
+                    params: { amount: new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(data.revenue) },
                     relevance: 0.9
                 });
             }
 
             // 2. Profitability Insight
-            if (parseFloat(summary.margin) > 20) {
+            if (parseFloat(margin) > 20) {
                 insights.push({
                     type: 'POSITIVE',
                     category: 'PROFIT',
                     textKey: 'profit_good_insight',
-                    params: { margin: summary.margin },
+                    params: { margin: margin },
                     relevance: 0.85
                 });
-            } else if (parseFloat(summary.margin) < 5 && summary.revenue > 0) {
+            } else if (parseFloat(margin) < 5 && data.revenue > 0) {
                 insights.push({
                     type: 'WARNING',
                     category: 'PROFIT',
                     textKey: 'profit_low_insight',
-                    params: { margin: summary.margin },
+                    params: { margin: margin },
                     relevance: 0.95
                 });
             }
 
             // 3. Inventory Insight
-            const topItem = analytics.topItems[0];
+            const topItem = data.topItems ? data.topItems[0] : null;
             if (topItem) {
                 insights.push({
                     type: 'POSITIVE',
@@ -227,7 +338,7 @@ const reportService = {
             }
 
             // 4. Expense Insight
-            if (summary.costs > summary.revenue * 0.5) {
+            if (data.costs > data.revenue * 0.5) {
                 insights.push({
                     type: 'WARNING',
                     category: 'EXPENSES',

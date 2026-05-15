@@ -9,6 +9,11 @@ import api from './api';
  *   GET  /invoices/{id}    → get single invoice
  *   POST /invoices/{id}/payments → add payment to invoice
  */
+const cache = {
+  all: null,
+  byId: {}
+};
+
 const invoiceService = {
   /**
    * Fetch all invoices.
@@ -16,7 +21,17 @@ const invoiceService = {
    * @returns {Promise<Array>}
    */
   getAll() {
-    return api.get('/invoices');
+    if (cache.all) {
+      return cache.all;
+    }
+    const promise = api.get('/invoices');
+    cache.all = promise;
+    
+    promise.catch(() => {
+      cache.all = null;
+    });
+    
+    return promise;
   },
 
   /**
@@ -25,7 +40,17 @@ const invoiceService = {
    * @returns {Promise<object>}
    */
   getById(id) {
-    return api.get(`/invoices/${id}`);
+    if (cache.byId[id]) {
+      return cache.byId[id];
+    }
+    const promise = api.get(`/invoices/${id}`);
+    cache.byId[id] = promise;
+    
+    promise.catch(() => {
+      delete cache.byId[id];
+    });
+    
+    return promise;
   },
 
   /**
@@ -34,6 +59,7 @@ const invoiceService = {
    * @returns {Promise<object>}
    */
   create(invoiceDto) {
+    cache.all = null; // Invalidate list cache
     return api.post('/invoices', invoiceDto);
   },
 
@@ -44,6 +70,8 @@ const invoiceService = {
    * @returns {Promise<object>}
    */
   addPayment(id, paymentDto) {
+    delete cache.byId[id]; // Invalidate detail cache
+    cache.all = null; // Invalidate list cache as payment status changes
     return api.post(`/invoices/${id}/payments`, paymentDto);
   },
 };

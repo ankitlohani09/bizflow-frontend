@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -71,35 +72,37 @@ const item = {
 export default function Dashboard() {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [summary, setSummary] = useState(null);
-    const [analytics, setAnalytics] = useState(null);
-    const [recentInvoices, setRecentInvoices] = useState([]);
-    const [insights, setInsights] = useState([]);
+    const [filterType, setFilterType] = useState('ALL');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const [sum, enh, invs, ai] = await Promise.all([
-                reportService.getFinancialSummary(),
-                reportService.getEnhancedAnalytics(),
-                invoiceService.getAll(),
-                reportService.getSmartInsights()
-            ]);
-            setSummary(sum);
-            setAnalytics(enh);
-            setRecentInvoices(invs.slice(0, 5));
-            setInsights(ai);
-        } catch {
-            setError('Failed to load store summary.');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    // Fetch dashboard data using React Query
+    const { data: dashboardData, isLoading: loading, error: queryError, refetch: fetchData } = useQuery({
+        queryKey: ['dashboardData', filterType, startDate, endDate],
+        queryFn: () => reportService.getDashboardData({ type: filterType, startDate, endDate }),
+        staleTime: 5 * 60 * 1000, // 5 minutes
+    });
 
-    useEffect(() => { fetchData(); }, [fetchData]);
+    const summary = dashboardData;
+    const analytics = dashboardData;
+
+    // Fetch recent invoices using React Query
+    const { data: recentInvoices = [] } = useQuery({
+        queryKey: ['recentInvoices', filterType, startDate, endDate],
+        queryFn: async () => {
+            const invs = await invoiceService.getAll();
+            const filter = { type: filterType, startDate, endDate };
+            return invs.filter(inv => 
+                reportService._isWithinRange(inv.issueDate || inv.createdAt, filter)
+            ).slice(0, 5);
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+
+    // Generate AI insights derived from dashboard data
+    const insights = dashboardData ? reportService.getSmartInsights(dashboardData) : [];
+
+    const error = queryError ? 'Failed to load store summary.' : null;
 
     return (
         <MainLayout>
@@ -116,7 +119,38 @@ export default function Dashboard() {
                         </p>
                     </div>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3 items-center">
+                    <select
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                        className="rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-4 py-2 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    >
+                        <option value="ALL">All Data</option>
+                        <option value="TODAY">Today</option>
+                        <option value="WEEK">This Week</option>
+                        <option value="MONTH">This Month</option>
+                        <option value="YEAR">This Year</option>
+                        <option value="CUSTOM">Custom Range</option>
+                    </select>
+
+                    {filterType === 'CUSTOM' && (
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-4 py-2 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                            />
+                            <span className="text-slate-400 font-semibold text-sm">to</span>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-4 py-2 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                            />
+                        </div>
+                    )}
+
                     <Button variant="outline" onClick={fetchData} disabled={loading} className="rounded-2xl border-slate-200">
                         <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
                     </Button>

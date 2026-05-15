@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { ShieldCheck, Eye, EyeOff, Loader2, AlertCircle, ArrowRight } from 'lucide-react';
 import authService from '../services/authService';
+import { useQuery } from '@tanstack/react-query';
 
 export default function ResetPassword() {
     const navigate = useNavigate();
@@ -14,17 +15,22 @@ export default function ResetPassword() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
 
-    useEffect(() => {
-        if (!token) {
-            setError('Invalid or missing reset token. Please request a new one.');
-        }
-    }, [token]);
+    // ✅ Use React Query for caching and fetching token validity
+    const { data: isValid, isLoading: isVerifying, error: verifyError } = useQuery({
+        queryKey: ['verifyResetToken', token],
+        queryFn: () => authService.verifyResetToken(token),
+        enabled: !!token,
+        retry: false, // Don't retry if it's expired/invalid
+    });
+
+    const isExpired = verifyError || isValid === false;
+    const isTokenMissing = !token;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (passwords.password !== passwords.confirm) return setError('Passwords do not match.');
         if (passwords.password.length < 6) return setError('Password must be at least 6 characters.');
-        
+
         setLoading(true);
         setError('');
         try {
@@ -32,7 +38,12 @@ export default function ResetPassword() {
             setSuccess(true);
             setTimeout(() => navigate('/login'), 3000);
         } catch (err) {
-            setError(err.message || 'Failed to reset password.');
+            const errorMsg = err.message || 'Failed to reset password.';
+            if (errorMsg.toLowerCase().includes('invalid') || errorMsg.toLowerCase().includes('expire')) {
+                setIsExpired(true);
+            } else {
+                setError(errorMsg);
+            }
         } finally {
             setLoading(false);
         }
@@ -47,12 +58,62 @@ export default function ResetPassword() {
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900 mb-2">Password reset!</h2>
                     <p className="text-slate-500 mb-8 text-sm leading-relaxed">
-                        Your password has been successfully updated. <br/>
+                        Your password has been successfully updated. <br />
                         Redirecting you to login...
                     </p>
                     <Link to="/login" className="text-sm font-bold text-blue-600 flex items-center justify-center gap-2">
                         Click here if not redirected <ArrowRight className="h-4 w-4" />
                     </Link>
+                </div>
+            </div>
+        );
+    }
+
+    if (isExpired) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+                <div className="w-full max-w-md rounded-3xl bg-white p-10 shadow-2xl shadow-rose-500/10 text-center border border-slate-100">
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-rose-50 text-rose-600">
+                        <AlertCircle className="h-8 w-8" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Link Expired</h2>
+                    <p className="text-slate-500 mb-8 text-sm leading-relaxed">
+                        This link has expired or has already been used to set the password. Please request a new one from your admin or use the forgot password option.
+                    </p>
+                    <Link to="/login" className="text-sm font-bold text-blue-600 flex items-center justify-center gap-2">
+                        Go to Login <ArrowRight className="h-4 w-4" />
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    if (isTokenMissing) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+                <div className="w-full max-w-md rounded-3xl bg-white p-10 shadow-2xl shadow-rose-500/10 text-center border border-slate-100">
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-rose-50 text-rose-600">
+                        <AlertCircle className="h-8 w-8" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Invalid Link</h2>
+                    <p className="text-slate-500 mb-8 text-sm leading-relaxed">
+                        Invalid or missing reset token. Please request a new one from your admin or use the forgot password option.
+                    </p>
+                    <Link to="/login" className="text-sm font-bold text-blue-600 flex items-center justify-center gap-2">
+                        Go to Login <ArrowRight className="h-4 w-4" />
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    if (isVerifying) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+                <div className="w-full max-w-md rounded-3xl bg-white p-10 shadow-2xl shadow-blue-500/10 text-center border border-slate-100">
+                    <Loader2 className="h-10 w-10 animate-spin text-blue-600 mx-auto mb-4" />
+                    <h2 className="text-xl font-bold text-slate-900">Verifying link...</h2>
+                    <p className="text-slate-500 text-sm mt-2">Please wait while we check your secure link.</p>
                 </div>
             </div>
         );
@@ -84,7 +145,7 @@ export default function ResetPassword() {
                                 type={showPassword ? 'text' : 'password'}
                                 required
                                 value={passwords.password}
-                                onChange={(e) => setPasswords(p => ({...p, password: e.target.value}))}
+                                onChange={(e) => setPasswords(p => ({ ...p, password: e.target.value }))}
                                 className="block w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3.5 pr-12 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
                             />
                             <button
@@ -103,7 +164,7 @@ export default function ResetPassword() {
                             type={showPassword ? 'text' : 'password'}
                             required
                             value={passwords.confirm}
-                            onChange={(e) => setPasswords(p => ({...p, confirm: e.target.value}))}
+                            onChange={(e) => setPasswords(p => ({ ...p, confirm: e.target.value }))}
                             className="block w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3.5 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
                         />
                     </div>
